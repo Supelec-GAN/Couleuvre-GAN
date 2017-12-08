@@ -29,9 +29,9 @@ Eigen::MatrixXf NeuralNetwork::process(Eigen::MatrixXf input)
 
 Eigen::MatrixXf NeuralNetwork::process()
 {
-    Eigen::MatrixXf input = Eigen::MatrixXf::Random();
+    Eigen::MatrixXf input = Eigen::MatrixXf::Random((*begin()).getInputSize(), 1);
 	for(auto itr = begin(); itr != end(); ++itr)
-		input = (*itr).process(input);
+        input = (*itr).process(input);
 	
 	return input;
 }
@@ -40,6 +40,11 @@ void NeuralNetwork::reset()
 {
     for (auto itr = begin(); itr != end(); ++itr)
         itr->reset();
+}
+
+int NeuralNetwork::getInputSize()
+{
+    return ((*(begin())).getInputSize());
 }
 
 //*************AUXILIAIRES**************

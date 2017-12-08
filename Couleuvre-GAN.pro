@@ -1,7 +1,13 @@
 TEMPLATE = app
 CONFIG += console c++14
 CONFIG -= app_bundle
-CONFIG -= qt
+
+QT += core
+QT += gui
+QT += widgets
+
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp
 
 HEADERS += \
     headers/CSVFile.h \

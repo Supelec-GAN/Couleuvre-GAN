@@ -25,9 +25,9 @@ Functions::ErrorFun Functions::l2Norm()
 Functions::ErrorFun Functions::coutDiscr()
 {
     return [] (Eigen::MatrixXf v1, Eigen::MatrixXf v2) {
-        int resultat = 0;
-        for(i=0; i<v1.size(); i++)
-            resultat += log(abs(v1(i) - v2(i)));
+        float resultat = 0;
+        for(int i=0; i<v1.size(); i++)
+            resultat += log(abs(v1(i) - v2(i))+0.0001);
         return resultat;
     } ;
 }

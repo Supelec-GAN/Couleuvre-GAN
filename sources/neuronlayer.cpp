@@ -7,7 +7,7 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::f
 : mPoids(Eigen::MatrixXf::Random(outputSize, inputSize))
 , mBiais(Eigen::MatrixXf::Random(outputSize, 1))
 , mActivationFun(activationF)
-, mBufferActivationLevel(Eigen::MatrixXf::Zero(outputSize, 1))
+, mBufferActivationLevel(Eigen::MatrixXf::Zero(outputSize, 1)) //CHANGER TAILLE CAR TAILLE OUTPUT VARIE A CAUSE DE D
 , mBufferInput(Eigen::MatrixXf::Zero(inputSize, 1))
 {}
 
@@ -65,6 +65,11 @@ void NeuronLayer::reset()
 {
     mPoids = Eigen::MatrixXf::Random(mPoids.rows(), mPoids.cols());
     mBiais = Eigen::MatrixXf::Random(mBiais.rows(),1);
+}
+
+int NeuronLayer::getInputSize()
+{
+    return (mPoids.cols());
 }
 
 //*************AUXILIAIRES**************

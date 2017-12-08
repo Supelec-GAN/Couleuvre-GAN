@@ -47,6 +47,8 @@ class NeuralNetwork : public std::list<NeuronLayer>
         Eigen::MatrixXf process(Eigen::MatrixXf input);
         Eigen::MatrixXf process();
 
+        int getInputSize();
+
 
     public:
         /// Fonction utilitaire permettant d'afficher le réseau de neurones

@@ -3,54 +3,87 @@
 #include <eigen3/Eigen/Dense>
 #include <functional>
 #include <ctime>
+#include <string>
+/*#include <QImage>
+#include <QApplication>
+#include <QWidget>
+#include <QLabel>*/
 
+#include "headers/CSVFile.h"
 #include "headers/application.hpp"
 #include "headers/mnist_reader.h"
 
 using namespace std;
 
-int main()
+csvfile csv("image.csv");
+
+int main(int argc, char *argv[])
 {   
+
+    //QApplication app(argc, argv);
+
     srand(time(0));
 
     try
     {
         // Construction du réseau de neurones
-        std::vector<unsigned int> sizes{ {784,1000,300,10} };
-        std::vector<Functions::ActivationFun> funs{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
-        std::shared_ptr<NeuralNetwork> network(new NeuralNetwork(sizes, funs));
+        std::vector<unsigned int> sizesGen{ {1100,1000,800,784} };
+        std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::shared_ptr<NeuralNetwork> generator(new NeuralNetwork(sizesGen, funsGen));
+
+        std::vector<unsigned int> sizesDis{ {784,1000,500,1} };
+        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::shared_ptr<NeuralNetwork> discriminator(new NeuralNetwork(sizesDis, funsDis));
 
         mnist_reader readerTrain("MNIST/train-images-60k", "MNIST/train-labels-60k");
         std::vector<Eigen::MatrixXf> imageTrain;
         Eigen::MatrixXi labelTrain;
         readerTrain.ReadMNIST(imageTrain, labelTrain);
 
-        mnist_reader readerTest("MNIST/test-images-10k", "MNIST/test-labels-10k");
-        std::vector<Eigen::MatrixXf> imageTest;
-        Eigen::MatrixXi labelTest;
-        readerTest.ReadMNIST(imageTest, labelTest);
-
         Application::Batch batchTrain;
-        Application::Batch batchTest;
 
         for(auto i(0); i< labelTrain.size(); i++)
         {
-            Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(10,1);
-            outputTrain(labelTrain(i)) = 1;
+            Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
+            outputTrain(0,0) = 1;
             batchTrain.push_back(Application::Sample(imageTrain[i], outputTrain));
         }
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
-        for(auto i(0); i< labelTest.size(); i++)
-        {
-            Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(10,1);
-            outputTest(labelTest(i)) = 1;
-            batchTest.push_back(Application::Sample(imageTest[i], outputTest));
-        }
-        cout << "Chargement du Batch de test effectué !" << endl;
 
         //Construction de l'application qui gère tout
-        Application appMNIST(network, batchTrain, batchTest);
-        appMNIST.runExperiments(1, 20, 60000);
+        Application appMNIST(discriminator, generator, batchTrain);
+        appMNIST.runExperiments(1, 4000, 1);
+        std::vector<Eigen::MatrixXf> resultat;
+        for(int i(0); i < 5; i++)
+        {
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1200,1);
+            resultat.push_back(appMNIST.genProcessing(input));
+            if (i==0)
+            {
+                for(int j(0); j<784; j++)
+                {
+                    csv << resultat[i](j);
+                    if (j%28 == 27) csv << endrow;
+                }
+            }
+        }
+       /*for(int i(0); i < 5; i++)
+        {
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1200,1);
+            resultat.push_back(appMNIST.genProcessing(input));
+            if (i==0)
+            {
+                QImage myImage(28,28, QImage::Format_Grayscale8);
+                for(int j(0); j<784; j++)
+                {
+                    myImage.setPixel(j/28, j%28, resultat[i](j));
+                }
+                QLabel myLabel;
+                myLabel.setPixmap(QPixmap::fromImage(myImage));
+
+                myLabel.show();
+            }
+        }*/
     }
     catch (const std::exception& ex)
     {

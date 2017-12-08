@@ -38,7 +38,7 @@ class Application
          * @param teachingBatch le batch des données servant à l'apprentissage
          * @param testingBatch le batch des données de test
          */
-        Application(NeuralNetwork::Ptr network, Batch teachingBatch, Batch testingBatch);
+        Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch);
 
         /// Constructeur par fonction modèle
         /**
@@ -49,10 +49,10 @@ class Application
          * @param teachingInputs les inputs pour l'apprentissage
          * @param testingInputs les inputs pour les tests
          */
-        Application(NeuralNetwork::Ptr network,
+        /*Application(NeuralNetwork::Ptr network,
                     std::function<Eigen::MatrixXf(Eigen::MatrixXf)> modelFunction,
                     std::vector<Eigen::MatrixXf> teachingInputs,
-                    std::vector<Eigen::MatrixXf> testingInputs);
+                    std::vector<Eigen::MatrixXf> testingInputs);*/
 
         /// Effectue une run d'apprentissage
         /**
@@ -72,6 +72,7 @@ class Application
         void runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
 
         void resetExperiment();
+        Eigen::MatrixXf genProcessing(Eigen::MatrixXf input);
 
     private:
         /// Fonction pour charger la configuration de l'application
@@ -83,8 +84,7 @@ class Application
         NeuralNetwork::Ptr  mDiscrimator;
         NeuralNetwork::Ptr  mGenerator;
         /// Le teacher qui permet de superviser l'apprentissage du réseau
-        Teacher             mTeacherDis;
-        Teacher             mTeacherGen;
+        Teacher             mTeacher;
 
         /// Le batch contenant tous les samples d'apprentissage du projet
         Batch               mTeachingBatch;

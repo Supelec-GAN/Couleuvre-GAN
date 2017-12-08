@@ -50,19 +50,20 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
 
 void Application::runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
-    mStatsCollector[0].addResult(runTest());
+    //mStatsCollector[0].addResult(runTest());
 
     for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
     {
         std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
         runTeach(nbTeachingsPerLoop);
-        mStatsCollector[loopIndex+1].addResult(runTest());
+        //mStatsCollector[loopIndex+1].addResult(runTest());
     }
 }
 
 void Application::resetExperiment()
 {
-    mNetwork->reset();
+    mGenerator->reset();
+    mDiscrimator->reset();
 }
 
 void Application::runTeach(unsigned int nbTeachings)
@@ -72,14 +73,28 @@ void Application::runTeach(unsigned int nbTeachings)
 
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
-        Sample sample{mTeachingBatch[distribution(randomEngine)]};
-        mTeacher.backProp(sample.first, sample.second, mConfig.step, mConfig.dx);
+        Eigen::MatrixXf input = Eigen::MatrixXf::Random(mGenerator->getInputSize(),1);
+        Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
+        desiredOutput(0,0) = 1;
+        mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
+
+        if (index%2 == 0)
+        {
+            Sample sample{mTeachingBatch[distribution(randomEngine)]};
+            mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
+        }
+        else
+        {
+            Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
+            desiredOutput(0,0) = 0;
+            mTeacher.backPropDis(mGenerator->process(input), desiredOutput, mConfig.step, mConfig.dx);
+        }
         if(index %100 == 0)
             std::cout << "+" << index << std::endl;
     }
 }
 
-float Application::runTest(int limit, bool returnErrorRate)
+/*float Application::runTest(int limit, bool returnErrorRate)
 {
     float errorMean{0};
 
@@ -105,7 +120,7 @@ float Application::runTest(int limit, bool returnErrorRate)
     }
 
     return errorMean/static_cast<float>(mTestingBatch.size());
-}
+}*/
 
 void Application::loadConfig(const std::string& configFileName)
 {
@@ -137,4 +152,8 @@ void Application::setConfig(rapidjson::Document& document)
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 }
 
+Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
+{
+    return(mGenerator->process(input));
+}
 

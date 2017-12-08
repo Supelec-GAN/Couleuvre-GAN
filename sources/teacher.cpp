@@ -6,21 +6,22 @@
 Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator)
 : mGenerator(std::move(generator))
 , mDiscriminator(std::move(discriminator))
-, mErrorFun(Functions::coutDiscr)
+, mErrorFun(Functions::l2Norm())
 {}
 
 Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 : mGenerator(generator)
 , mDiscriminator(discriminator)
-, mErrorFun(Functions::coutDiscr)
+, mErrorFun(Functions::coutDiscr())
 {}
 
 void Teacher::backPropGen(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-    Eigen::MatrixXf xnPartialDerivative = errorVector(mDiscriminator->process(mGenerator->process(input)), desiredOutput, dx);
+    Eigen::MatrixXf xnPartialDerivative = errorVectorGen(mGenerator->process(input), desiredOutput, dx);
 
     propErrorGen(xnPartialDerivative, step);
 }
+
 
 void Teacher::propErrorGen(Eigen::MatrixXf xnPartialDerivative, float step)
 {
@@ -34,7 +35,7 @@ void Teacher::backPropDis(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, 
 {
     Eigen::MatrixXf xnPartialDerivative = errorVector(mDiscriminator->process(input), desiredOutput, dx);
 
-    propErrorGen(xnPartialDerivative, step);
+    propErrorDis(xnPartialDerivative, step);
 }
 
 void Teacher::propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step)
@@ -43,6 +44,20 @@ void Teacher::propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step)
     {
         xnPartialDerivative = itr->backProp(xnPartialDerivative, step);
     }
+}
+
+
+Eigen::MatrixXf Teacher::errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
+{
+    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(output.size(), 1);
+
+    for(unsigned int i(0); i < output.size(); ++i)
+    {
+        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(output.size(), 1));
+        deltaX(i) = dx;
+        errorVect(i) = (mErrorFun(mDiscriminator->process(output + deltaX), desiredOutput) - mErrorFun(mDiscriminator->process(output), desiredOutput))/dx;
+    }
+    return errorVect;
 }
 
 Eigen::MatrixXf Teacher::errorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)

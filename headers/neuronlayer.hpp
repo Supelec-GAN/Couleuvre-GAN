@@ -47,6 +47,8 @@ class NeuronLayer
 
         void            reset();
 
+        int             getInputSize();
+
     public:
         /// Fonction utilitaire permettant d'afficher le neurone
         /**
@@ -77,6 +79,8 @@ class NeuronLayer
 
         /// Buffer pour stocker l'input, nécessaire pour la backrprop
         Eigen::MatrixXf                 mBufferInput;
+
+
 };
 
 #endif // NEURONLAYER_HPP

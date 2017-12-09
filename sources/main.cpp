@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
     try
     {
         // Construction du réseau de neurones
-        std::vector<unsigned int> sizesGen{ {1100,1000,800,784} };
+        int nombreInputGen = 1100;
+        std::vector<unsigned int> sizesGen{ {nombreInputGen,1000,800,784} };
         std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
         std::shared_ptr<NeuralNetwork> generator(new NeuralNetwork(sizesGen, funsGen));
 
@@ -52,11 +53,11 @@ int main(int argc, char *argv[])
 
         //Construction de l'application qui gère tout
         Application appMNIST(discriminator, generator, batchTrain);
-        appMNIST.runExperiments(1, 4000, 1);
+        appMNIST.runExperiments(1, 1, 1);
         std::vector<Eigen::MatrixXf> resultat;
         for(int i(0); i < 5; i++)
         {
-            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1200,1);
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(nombreInputGen,1);
             resultat.push_back(appMNIST.genProcessing(input));
             if (i==0)
             {

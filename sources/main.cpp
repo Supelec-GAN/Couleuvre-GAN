@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
         //Construction de l'application qui gère tout
         Application appMNIST(discriminator, generator, batchTrain);
-        appMNIST.runExperiments(1, 1, 1);
+        appMNIST.runExperiments(1, 4000, 1);
         std::vector<Eigen::MatrixXf> resultat;
         for(int i(0); i < 5; i++)
         {

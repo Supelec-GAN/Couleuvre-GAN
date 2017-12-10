@@ -24,7 +24,7 @@ class Teacher
 
 
 
-        /// Fonction appliquant la méthode de rétropropagation sur mNetwork
+        /// Fonction appliquant la méthode de rétropropagation sur mDiscriminator
         /**
          * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau
          * @param input le vecteur d'input que le réseau va process
@@ -34,10 +34,19 @@ class Teacher
          */
         void            backPropDis(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
+        /// Fonction appliquant la méthode de rétropropagation sur mGenerator
+        /**
+         * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau
+         * @param input le vecteur d'input que le réseau va process
+         * @param desiredOutput la sortie modèle dont on veut se rapprocher
+         * @param step le pas d'apprentissage
+         * @param dx le deplacement élémentaire pour calculer la dérivée
+         */
+
         void            backPropGen(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
     private:
-        /// Fonction propageant l'erreur itérativement à travers le réseau
+        /// Fonction propageant l'erreur itérativement à travers le réseau discriminant
         /**
          * La fonction itère sur toutes les couches de neurones et appliques les formules de récurrence
          * @param xnPartialDerivative la dérivée dE/dXn initiale
@@ -45,6 +54,13 @@ class Teacher
          */
         void            propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step);
 
+
+        /// Fonction propageant l'erreur itérativement à travers le réseau générateur
+        /**
+         * La fonction itère sur toutes les couches de neurones et appliques les formules de récurrence
+         * @param xnPartialDerivative la dérivée dE/dXn initiale
+         * @param step le pas d'apprentissage
+         */
         void            propErrorGen(Eigen::MatrixXf xnPartialDerivative, float step);
 
         /// Fonction calculant le vecteur dE/dXn initial
@@ -58,10 +74,19 @@ class Teacher
          */
         Eigen::MatrixXf errorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
 
+        /// Fonction calculant le vecteur dE/dXn initial
+        /**
+         * La fonction effectue la dérivée de la fonction d'erreur par rapport à une variation dans chaque
+         * dimension, successivement
+         * @param output la sortie obtenue du réseau générateur
+         * @param desiredOutput la sortie modèle après passage par le disciminateur
+         * @param dx le pas de dérivation
+         * @return renvoie le vecteur dE/dXn
+         */
         Eigen::MatrixXf errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
 
     private:
-        /// Un pointeur sur le réseau dont on veut superviser l'apprentissage
+        /// Des pointeur sur les réseaux dont on veut superviser l'apprentissage
         NeuralNetwork::Ptr  mGenerator;
         NeuralNetwork::Ptr  mDiscriminator;
 

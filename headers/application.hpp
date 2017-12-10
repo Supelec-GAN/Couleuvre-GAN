@@ -38,7 +38,7 @@ class Application
          * @param teachingBatch le batch des données servant à l'apprentissage
          * @param testingBatch le batch des données de test
          */
-        Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch);
+        Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch);
 
         /// Constructeur par fonction modèle
         /**
@@ -72,6 +72,12 @@ class Application
         void runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
 
         void resetExperiment();
+
+        /// Génère une image à partir d'un input
+        /**
+         * Effectue un process de l'input par le Generateur
+         * @param input un vecteur colonne, généralement, du bruit blanc
+         */
         Eigen::MatrixXf genProcessing(Eigen::MatrixXf input);
 
     private:
@@ -81,9 +87,9 @@ class Application
 
     private:
         /// Les réseaux avec lequel on travaille
-        NeuralNetwork::Ptr  mDiscrimator;
+        NeuralNetwork::Ptr  mDiscriminator;
         NeuralNetwork::Ptr  mGenerator;
-        /// Le teacher qui permet de superviser l'apprentissage du réseau
+        /// Le teacher qui permet de superviser l'apprentissage des réseaux
         Teacher             mTeacher;
 
         /// Le batch contenant tous les samples d'apprentissage du projet

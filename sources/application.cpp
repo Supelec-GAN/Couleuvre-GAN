@@ -4,11 +4,12 @@
 #include <math.h>
 #include <fstream>
 
-Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch)
-: mDiscrimator(discriminator)
+Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch)
+: mDiscriminator(discriminator)
 , mGenerator(generator)
-, mTeacher(mGenerator, mDiscrimator)
+, mTeacher(mGenerator, mDiscriminator)
 , mTeachingBatch(teachingBatch)
+, mTestingBatch(testBatch)
 , mStatsCollector()
 , mTestCounter(0)
 {
@@ -50,20 +51,20 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
 
 void Application::runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
-    //mStatsCollector[0].addResult(runTest());
+    mStatsCollector[0].addResult(runTest());
 
     for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
     {
         std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
         runTeach(nbTeachingsPerLoop);
-        //mStatsCollector[loopIndex+1].addResult(runTest());
+        mStatsCollector[loopIndex+1].addResult(runTest());
     }
 }
 
 void Application::resetExperiment()
 {
     mGenerator->reset();
-    mDiscrimator->reset();
+    mDiscriminator->reset();
 }
 
 void Application::runTeach(unsigned int nbTeachings)
@@ -94,33 +95,19 @@ void Application::runTeach(unsigned int nbTeachings)
     }
 }
 
-/*float Application::runTest(int limit, bool returnErrorRate)
+float Application::runTest(int limit, bool returnErrorRate)
 {
     float errorMean{0};
-
     if (returnErrorRate)
     {
-        int maxLine, maxCol;
         for(std::vector<Sample>::iterator itr = mTestingBatch.begin(); itr != mTestingBatch.end() && limit-- != 0; ++itr)
         {
-            Eigen::MatrixXf output{mNetwork->process(itr->first)};
-            output.maxCoeff(&maxLine, &maxCol);
-            output.setZero();
-            output(maxLine, maxCol) = 1;
-            errorMean += sqrt((output - itr->second).squaredNorm())/sqrt(2);
-        }
-    }
-    else
-    {
-        for(std::vector<Sample>::iterator itr = mTestingBatch.begin(); itr != mTestingBatch.end() && limit-- != 0; ++itr)
-        {
-            Eigen::MatrixXf output{mNetwork->process(itr->first)};
+            Eigen::MatrixXf output{mDiscriminator->process(mGenerator->process(itr->first))};
             errorMean += sqrt((output - itr->second).squaredNorm());
         }
     }
-
     return errorMean/static_cast<float>(mTestingBatch.size());
-}*/
+}
 
 void Application::loadConfig(const std::string& configFileName)
 {

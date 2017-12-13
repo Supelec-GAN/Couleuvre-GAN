@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <fstream>
+#include <ctime>
 
 Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch)
 : mDiscriminator(discriminator)
@@ -74,25 +75,21 @@ void Application::runTeach(unsigned int nbTeachings)
 
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
+        int timeref = time(0);
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(mGenerator->getInputSize(),1);
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
         desiredOutput(0,0) = 1;
         Eigen::MatrixXf input = mGenerator->process(noiseInput);
         mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
 
-        if (index%2 == 0)
-        {
-            Sample sample{mTeachingBatch[distribution(randomEngine)]};
-            mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
-        }
-        else
-        {
-            Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
-            desiredOutput(0,0) = 0;
-            mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
-        }
-        if(index %100 == 0)
-            std::cout << "+" << index << std::endl;
+        Sample sample{mTeachingBatch[distribution(randomEngine)]};
+        mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
+
+        desiredOutput(0,0) = 0;
+        mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
+
+        if(index %10 == 0)
+            std::cout << time(0)-timeref << "pour " << index << " appentissages !" << std::endl;
     }
 }
 

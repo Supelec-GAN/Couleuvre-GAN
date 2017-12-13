@@ -74,9 +74,10 @@ void Application::runTeach(unsigned int nbTeachings)
 
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
-        Eigen::MatrixXf input = Eigen::MatrixXf::Random(mGenerator->getInputSize(),1);
+        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(mGenerator->getInputSize(),1);
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
         desiredOutput(0,0) = 1;
+        Eigen::MatrixXf input = mGenerator->process(noiseInput);
         mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
 
         if (index%2 == 0)
@@ -88,7 +89,7 @@ void Application::runTeach(unsigned int nbTeachings)
         {
             Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
             desiredOutput(0,0) = 0;
-            mTeacher.backPropDis(mGenerator->process(input), desiredOutput, mConfig.step, mConfig.dx);
+            mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
         }
         if(index %100 == 0)
             std::cout << "+" << index << std::endl;

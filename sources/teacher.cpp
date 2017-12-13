@@ -17,7 +17,7 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 
 void Teacher::backPropGen(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-    Eigen::MatrixXf xnPartialDerivative = errorVectorGen(mGenerator->process(input), desiredOutput, dx);
+    Eigen::MatrixXf xnPartialDerivative = errorVectorGen(input, desiredOutput, dx);
 
     propErrorGen(xnPartialDerivative, step);
 }
@@ -50,12 +50,13 @@ void Teacher::propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step)
 Eigen::MatrixXf Teacher::errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
     Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(output.size(), 1);
+    Eigen::MatrixXf discrOutput = mDiscriminator->process(output);
 
     for(unsigned int i(0); i < output.size(); ++i)
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(output.size(), 1));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFun(mDiscriminator->process(output + deltaX), desiredOutput) - mErrorFun(mDiscriminator->process(output), desiredOutput))/dx;
+        errorVect(i) = (mErrorFun(mDiscriminator->process(output + deltaX), desiredOutput) - mErrorFun(discrOutput, desiredOutput))/dx;
     }
     return errorVect;
 }
@@ -70,7 +71,5 @@ Eigen::MatrixXf Teacher::errorVector(Eigen::MatrixXf output, Eigen::MatrixXf des
         deltaX(i) = dx;
         errorVect(i) = (mErrorFun(output + deltaX, desiredOutput) - mErrorFun(output, desiredOutput))/dx;
     }
-
-
     return errorVect;
 }

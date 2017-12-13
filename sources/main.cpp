@@ -27,14 +27,14 @@ int main(int argc, char *argv[])
     try
     {
         // Construction du réseau de neurones
-        unsigned int nombreInputGen = 1000;
+        unsigned int nombreInputGen = 1200;
         //Le Generateur
-        std::vector<unsigned int> sizesGen{ {nombreInputGen,900,800,784} };
+        std::vector<unsigned int> sizesGen{ {nombreInputGen,1000,800,784} };
         std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
         std::shared_ptr<NeuralNetwork> generator(new NeuralNetwork(sizesGen, funsGen));
         //Le Discriminateur
-        std::vector<unsigned int> sizesDis{ {784,500,1} };
-        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::vector<unsigned int> sizesDis{ {784,1000,300,1} };
+        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
         std::shared_ptr<NeuralNetwork> discriminator(new NeuralNetwork(sizesDis, funsDis));
 
         //Chargement de MNIST

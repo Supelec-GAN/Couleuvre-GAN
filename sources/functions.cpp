@@ -27,7 +27,7 @@ Functions::ErrorFun Functions::coutDiscr()
     return [] (Eigen::MatrixXf v1, Eigen::MatrixXf v2) {
         float resultat = 0;
         for(int i=0; i<v1.size(); i++)
-            resultat += log(abs(v1(i) - v2(i))+0.0001);
+            resultat += -log(abs(v1(i) - (1-v2(i)))); //Permet d'inverser le desiredOutput -> donc ajout du signe -
         return resultat;
     } ;
 }

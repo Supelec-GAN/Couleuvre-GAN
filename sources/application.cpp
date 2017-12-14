@@ -76,7 +76,7 @@ void Application::runTeach(unsigned int nbTeachings)
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
         int timeref = time(0);
-        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(mGenerator->getInputSize(),1);
+        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
         desiredOutput(0,0) = 1;
         Eigen::MatrixXf input = mGenerator->process(noiseInput);

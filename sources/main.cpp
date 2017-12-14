@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         int sizeTest(20);
         for(int i(0); i < sizeTest; i++)
         {
-            Eigen::MatrixXf noise = Eigen::MatrixXf::Random(nombreInputGen,1);
+            Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, nombreInputGen);
             vectorTest.push_back(noise);
         }
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         std::vector<Eigen::MatrixXf> resultat;
         for(int i(0); i < 10; i++)
         {
-            Eigen::MatrixXf input = Eigen::MatrixXf::Random(nombreInputGen,1);
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, nombreInputGen);
             resultat.push_back(appMNIST.genProcessing(input));
             for(int j(0); j<784; j++)
             {

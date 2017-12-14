@@ -4,11 +4,11 @@
 //**************************************
 
 NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF)
-: mPoids(Eigen::MatrixXf::Random(outputSize, inputSize))
-, mBiais(Eigen::MatrixXf::Random(outputSize, 1))
+: mPoids(Eigen::MatrixXf::Random(inputSize,outputSize))
+, mBiais(Eigen::MatrixXf::Random(1, outputSize))
 , mActivationFun(activationF)
-, mBufferActivationLevel(Eigen::MatrixXf::Zero(outputSize, 1)) //CHANGER TAILLE CAR TAILLE OUTPUT VARIE A CAUSE DE D
-, mBufferInput(Eigen::MatrixXf::Zero(inputSize, 1))
+, mBufferActivationLevel(Eigen::MatrixXf::Zero(1, outputSize))
+, mBufferInput(Eigen::MatrixXf::Zero(1, inputSize))
 {}
 
 
@@ -18,11 +18,11 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::f
 Eigen::MatrixXf NeuronLayer::process(Eigen::MatrixXf inputs)
 {
     mBufferInput = inputs;
-    mBufferActivationLevel = mPoids*inputs - mBiais;
+    mBufferActivationLevel = inputs*mPoids - mBiais;
     Eigen::MatrixXf output = mBufferActivationLevel;
 
     for(unsigned int i(0); i < output.size(); i++)
-        output(i,0) = mActivationFun(output(i,0));
+        output(0,i) = mActivationFun(output(0,i));
 
     return output;
 }
@@ -34,17 +34,17 @@ Eigen::MatrixXf NeuronLayer::process(Eigen::MatrixXf inputs)
 Eigen::MatrixXf NeuronLayer::backProp(Eigen::MatrixXf xnPartialDerivative, float step)
 {
     // Calcul de ynPartialDerivative
-    Eigen::MatrixXf ynPartialDerivative = fnDerivativeMatrix()*xnPartialDerivative;
+    Eigen::MatrixXf ynPartialDerivative = xnPartialDerivative*fnDerivativeMatrix();
 
     //Mise à jour des poids
-    Eigen::MatrixXf wnPartialDerivative = ynPartialDerivative*(mBufferInput.transpose());
+    Eigen::MatrixXf wnPartialDerivative = (mBufferInput.transpose())*ynPartialDerivative;
     mPoids -= step*wnPartialDerivative;
 
     // Mise à jour des biais
     mBiais += step*ynPartialDerivative;
 
     //Retour de x(n-1)PartialDerivative
-    return mPoids.transpose()*ynPartialDerivative;
+    return ynPartialDerivative*mPoids.transpose();
 }
 
 Eigen::MatrixXf NeuronLayer::fnDerivativeMatrix() const
@@ -64,12 +64,12 @@ Eigen::MatrixXf NeuronLayer::fnDerivativeMatrix() const
 void NeuronLayer::reset()
 {
     mPoids = Eigen::MatrixXf::Random(mPoids.rows(), mPoids.cols());
-    mBiais = Eigen::MatrixXf::Random(mBiais.rows(),1);
+    mBiais = Eigen::MatrixXf::Random(1,mBiais.rows());
 }
 
 int NeuronLayer::getInputSize()
 {
-    return (mPoids.cols());
+    return (mPoids.rows());
 }
 
 //*************AUXILIAIRES**************

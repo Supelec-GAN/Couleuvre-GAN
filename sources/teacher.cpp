@@ -49,12 +49,12 @@ void Teacher::propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step)
 
 Eigen::MatrixXf Teacher::errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
-    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(output.size(), 1);
+    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
     Eigen::MatrixXf discrOutput = mDiscriminator->process(output);
 
     for(unsigned int i(0); i < output.size(); ++i)
     {
-        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(output.size(), 1));
+        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
         errorVect(i) = (mErrorFun(mDiscriminator->process(output + deltaX), desiredOutput) - mErrorFun(discrOutput, desiredOutput))/dx;
     }
@@ -63,11 +63,11 @@ Eigen::MatrixXf Teacher::errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf 
 
 Eigen::MatrixXf Teacher::errorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
-    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(output.size(), 1);
+    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
 
     for(unsigned int i(0); i < output.size(); ++i)
     {
-        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(output.size(), 1));
+        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
         errorVect(i) = (mErrorFun(output + deltaX, desiredOutput) - mErrorFun(output, desiredOutput))/dx;
     }

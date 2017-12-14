@@ -19,8 +19,7 @@ HEADERS += \
     headers/application.hpp \
     headers/errorcollector.hpp \
     headers/functions.hpp \
-    headers/statscollector.hpp \
-    headers/generator.hpp
+    headers/statscollector.hpp
 
 SOURCES += \
     sources/functions.cpp \
@@ -32,8 +31,7 @@ SOURCES += \
     headers/neuralnetwork.inl \
     sources/errorcollector.cpp \
     sources/statscollector.cpp \
-    sources/application.cpp \
-    sources/generator.cpp
+    sources/application.cpp
 
 DISTFILES += \
     MNIST/test-images-10k \

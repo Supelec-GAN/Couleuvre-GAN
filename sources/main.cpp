@@ -15,10 +15,9 @@
 
 using namespace std;
 
-csvfile csv("image.csv");
-
 int main(int argc, char *argv[])
-{   
+{       
+    csvfile csv("image.csv");
 
     //QApplication app(argc, argv);
 
@@ -78,7 +77,7 @@ int main(int argc, char *argv[])
 
         //Construction de l'application qui gère tout
         Application appMNIST(discriminator, generator, batchTrain, batchTest);
-        appMNIST.runExperiments(1, 100, 100);
+        appMNIST.runExperiments(1, 500, 100);
 
         //Génération de 10 images et export pour analyse
         std::vector<Eigen::MatrixXf> resultat;
@@ -95,23 +94,6 @@ int main(int argc, char *argv[])
         }
         cout << "Génération des images terminé !" << endl;
 
-       /*for(int i(0); i < 5; i++)
-        {
-            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1200,1);
-            resultat.push_back(appMNIST.genProcessing(input));
-            if (i==0)
-            {
-                QImage myImage(28,28, QImage::Format_Grayscale8);
-                for(int j(0); j<784; j++)
-                {
-                    myImage.setPixel(j/28, j%28, resultat[i](j));
-                }
-                QLabel myLabel;
-                myLabel.setPixmap(QPixmap::fromImage(myImage));
-
-                myLabel.show();
-            }
-        }*/
     }
     catch (const std::exception& ex)
     {

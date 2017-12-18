@@ -68,6 +68,9 @@ class Application
          */
         float runTest(int limit = -1, bool returnErrorRate = 1);
 
+        /// Effectue une approximation du score des réseaux
+        float gameScore(int nbImages);
+
         void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
         void runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
 

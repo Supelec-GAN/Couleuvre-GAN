@@ -64,7 +64,7 @@ Eigen::MatrixXf NeuronLayer::fnDerivativeMatrix() const
 void NeuronLayer::reset()
 {
     mPoids = Eigen::MatrixXf::Random(mPoids.rows(), mPoids.cols());
-    mBiais = Eigen::MatrixXf::Random(1,mBiais.rows());
+    mBiais = Eigen::MatrixXf::Random(1,mBiais.cols());
 }
 
 int NeuronLayer::getInputSize()

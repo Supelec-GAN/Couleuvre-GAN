@@ -42,10 +42,11 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
 {
     for(unsigned int index{0}; index < nbExperiments; ++index)
     {
+        resetExperiment();
         runSingleExperiment(nbLoops, nbTeachingsPerLoop);
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
-        resetExperiment();
     }
+
 
     mStatsCollector.exportData(true);
 }
@@ -75,22 +76,36 @@ void Application::runTeach(unsigned int nbTeachings)
 
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
-        int timeref = time(0);
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
-        desiredOutput(0,0) = 1;
         Eigen::MatrixXf input = mGenerator->process(noiseInput);
-        mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
 
-        Sample sample{mTeachingBatch[distribution(randomEngine)]};
-        mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
+        int nbImagesPourScore = 5; // OMG HARDCODEE
 
-        desiredOutput(0,0) = 0;
-        mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
+        if (gameScore(nbImagesPourScore) < 0.5)
+        {
+            desiredOutput(0,0) = 1;
+            mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
+        }
+        else
+        {
+            Sample sample{mTeachingBatch[distribution(randomEngine)]};
+            mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
 
-        if(index %10 == 0)
-            std::cout << time(0)-timeref << "pour " << index << " appentissages !" << std::endl;
+            desiredOutput(0,0) = 0;
+            mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
+        }
     }
+}
+
+float Application::gameScore(int nbImages)
+{
+    float mean = 0;
+    for (int i(0); i < nbImages; i++)
+    {
+        mean =+ (mDiscriminator->process(mGenerator->process(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
+    }
+    return(mean/(float)nbImages);
 }
 
 float Application::runTest(int limit, bool returnErrorRate)

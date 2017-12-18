@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
         //Construction de l'application qui gère tout
         Application appMNIST(discriminator, generator, batchTrain, batchTest);
-        appMNIST.runExperiments(1, 30, 100);
+        appMNIST.runExperiments(1, 1000, 100);
 
         //Génération de 10 images et export pour analyse
         std::vector<Eigen::MatrixXf> resultat;

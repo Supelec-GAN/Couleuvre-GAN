@@ -80,21 +80,21 @@ void Application::runTeach(unsigned int nbTeachings)
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
         Eigen::MatrixXf input = mGenerator->process(noiseInput);
 
-        int nbImagesPourScore = 5; // OMG HARDCODEE
+        //int nbImagesPourScore = 5; // OMG HARDCODEE
 
-        if (gameScore(nbImagesPourScore) < 0.5)
-        {
+        //if (gameScore(nbImagesPourScore) < 0.5)
+        //{
             desiredOutput(0,0) = 1;
             mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
-        }
-        else
-        {
+        //}
+        //else
+        //{
             Sample sample{mTeachingBatch[distribution(randomEngine)]};
             mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
 
             desiredOutput(0,0) = 0;
             mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
-        }
+        //}
     }
 }
 

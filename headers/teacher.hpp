@@ -55,6 +55,14 @@ class Teacher
         void            propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step);
 
 
+
+        /// Fonction propageant l'erreur itérativement à travers le réseau discriminant
+        /**
+         * La fonction itère sur toutes les couches de neurones et propage l'erreur sans faire varier les poids.
+         * @param xnPartialDerivative la dérivée dE/dXn initiale
+         */
+        Eigen::MatrixXf propErrorDisInvariant(Eigen::MatrixXf xnPartialDerivative);
+
         /// Fonction propageant l'erreur itérativement à travers le réseau générateur
         /**
          * La fonction itère sur toutes les couches de neurones et appliques les formules de récurrence

@@ -45,6 +45,17 @@ class NeuronLayer
          */
         Eigen::MatrixXf backProp(Eigen::MatrixXf xnPartialDerivative, float step);
 
+
+        /// La fonction effectuant les calculs de rétropropagation
+        /**
+         * La fonction propage l'erreur comme pour bakcprop, mais ne change pas les poids et biais.
+         * @param xnPartialDerivative le vecteur des dérivées partielles selon Xn
+         * @param step le pas d'apprentissage
+         * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
+         */
+        Eigen::MatrixXf backPropInvariant(Eigen::MatrixXf xnPartialDerivative);
+
+
         void            reset();
 
         int             getInputSize();

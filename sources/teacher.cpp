@@ -17,8 +17,8 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 
 void Teacher::backPropGen(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-    Eigen::MatrixXf xnPartialDerivative = errorVectorGen(input, desiredOutput, dx);
-
+    Eigen::MatrixXf xnPartialDerivative = errorVector(mDiscriminator->process(input), desiredOutput, dx);
+    xnPartialDerivative = propErrorDisInvariant(xnPartialDerivative);
     propErrorGen(xnPartialDerivative, step);
 }
 
@@ -46,6 +46,14 @@ void Teacher::propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step)
     }
 }
 
+Eigen::MatrixXf Teacher::propErrorDisInvariant(Eigen::MatrixXf xnPartialDerivative)
+{
+    for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
+    {
+        xnPartialDerivative = itr->backPropInvariant(xnPartialDerivative);
+    }
+    return xnPartialDerivative;
+}
 
 Eigen::MatrixXf Teacher::errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {

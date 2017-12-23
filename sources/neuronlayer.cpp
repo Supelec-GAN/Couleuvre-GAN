@@ -47,6 +47,15 @@ Eigen::MatrixXf NeuronLayer::backProp(Eigen::MatrixXf xnPartialDerivative, float
     return ynPartialDerivative*mPoids.transpose();
 }
 
+Eigen::MatrixXf NeuronLayer::backPropInvariant(Eigen::MatrixXf xnPartialDerivative)
+{
+    // Calcul de ynPartialDerivative
+    Eigen::MatrixXf ynPartialDerivative = xnPartialDerivative*fnDerivativeMatrix();
+
+    //Retour de x(n-1)PartialDerivative
+    return ynPartialDerivative*mPoids.transpose();
+}
+
 Eigen::MatrixXf NeuronLayer::fnDerivativeMatrix() const
 {
     auto fnDerivated = [this] (float x, float dx)

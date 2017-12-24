@@ -59,7 +59,7 @@ class Application
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
          * @param nbTeachings le nombre d'apprentissages à faire pendant la run
          */
-        void runTeach(unsigned int nbTeachings);
+        void runTeach(unsigned int nbTeachings, bool trigger);
 
         /// Effectue une run de tests
         /**

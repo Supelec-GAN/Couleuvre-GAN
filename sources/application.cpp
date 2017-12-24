@@ -54,11 +54,12 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
 void Application::runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
     mStatsCollector[0].addResult(runTest());
-
+    bool trigger = false;
     for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
     {
+        if (loopIndex < 6000) trigger = true;
         std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
-        runTeach(nbTeachingsPerLoop);
+        runTeach(nbTeachingsPerLoop, trigger);
         mStatsCollector[loopIndex+1].addResult(runTest());
     }
 }
@@ -69,7 +70,7 @@ void Application::resetExperiment()
     mDiscriminator->reset();
 }
 
-void Application::runTeach(unsigned int nbTeachings)
+void Application::runTeach(unsigned int nbTeachings, bool trigger)
 {
     std::uniform_int_distribution<> distribution(0, mTeachingBatch.size()-1);
     std::mt19937 randomEngine((std::random_device())());
@@ -80,24 +81,25 @@ void Application::runTeach(unsigned int nbTeachings)
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
         Eigen::MatrixXf input = mGenerator->process(noiseInput);
 
-        int nbImagesPourScore = 20; // OMG HARDCODEE
+        //int nbImagesPourScore = 20; // OMG HARDCODEE
 
         desiredOutput(0,0) = 1;
         mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
 
-        if (gameScore(nbImagesPourScore) < 0.1)
+        if (trigger)
         {
+            noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            input = mGenerator->process(noiseInput);
+
             desiredOutput(0,0) = 1;
             mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
         }
-        else
-        {
-            Sample sample{mTeachingBatch[distribution(randomEngine)]};
-            mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
+        Sample sample{mTeachingBatch[distribution(randomEngine)]};
+        mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
 
-            desiredOutput(0,0) = 0;
-            mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
-        }
+        desiredOutput(0,0) = 0;
+        mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
+
     }
 }
 

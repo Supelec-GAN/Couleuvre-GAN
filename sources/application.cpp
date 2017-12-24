@@ -62,6 +62,7 @@ void Application::runSingleExperiment(unsigned int nbLoops, unsigned int nbTeach
         auto score = runTest();
         mStatsCollector[loopIndex+1].addResult(score);
         if (score < 0.1) trigger = true;
+        else trigger = false;
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
     }
 }

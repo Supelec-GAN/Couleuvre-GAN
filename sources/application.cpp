@@ -57,10 +57,12 @@ void Application::runSingleExperiment(unsigned int nbLoops, unsigned int nbTeach
     bool trigger = false;
     for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
     {
-        if (loopIndex < 6000) trigger = true;
         std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
         runTeach(nbTeachingsPerLoop, trigger);
-        mStatsCollector[loopIndex+1].addResult(runTest());
+        auto score = runTest();
+        mStatsCollector[loopIndex+1].addResult(score);
+        if (score < 0.1) trigger = true;
+        std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
     }
 }
 
@@ -94,12 +96,14 @@ void Application::runTeach(unsigned int nbTeachings, bool trigger)
             desiredOutput(0,0) = 1;
             mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
         }
-        Sample sample{mTeachingBatch[distribution(randomEngine)]};
-        mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
+        else
+        {
+            Sample sample{mTeachingBatch[distribution(randomEngine)]};
+            mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
 
-        desiredOutput(0,0) = 0;
-        mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
-
+            desiredOutput(0,0) = 0;
+            mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
+        }
     }
 }
 

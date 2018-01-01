@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     //QApplication app(argc, argv);
 
-    srand(time(0));
+	srand(static_cast<unsigned int>(time(0)) );
 
     try
     {

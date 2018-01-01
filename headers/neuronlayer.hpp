@@ -48,9 +48,8 @@ class NeuronLayer
 
         /// La fonction effectuant les calculs de rétropropagation
         /**
-         * La fonction propage l'erreur comme pour bakcprop, mais ne change pas les poids et biais.
+         * La fonction propage l'erreur comme pour bakcprop, mais ne change pas les poids et biais. On ne définit donc pas de pas d'apprentissage
          * @param xnPartialDerivative le vecteur des dérivées partielles selon Xn
-         * @param step le pas d'apprentissage
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
         Eigen::MatrixXf backPropInvariant(Eigen::MatrixXf xnPartialDerivative);

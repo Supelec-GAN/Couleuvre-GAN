@@ -59,7 +59,7 @@ void mnist_reader::ReadMNIST(vector<Eigen::MatrixXf> &mnist, Eigen::MatrixXi &la
         throw std::runtime_error("mnist_reader::ReadMnist - Unable to open file : " + mFullPathImage);
 
     ifstream file2 (mFullPathLabel,ios::binary);
-    if (file.is_open())
+    if (file2.is_open())
     {
         int magic_number=0;
         int number_of_images=0;

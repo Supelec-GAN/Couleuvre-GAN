@@ -34,13 +34,12 @@ class NeuralNetwork : public std::list<NeuronLayer>
          */
         NeuralNetwork(std::vector<unsigned int> layerSizes);
 
-        /// Constructeur permettant d'initialiser le réseau neuronal avec un conteneur (vector, list...) de neuronLayer
-        /**
-         *  \param layerList la liste des couches de neurones
-         */
-
         void reset();
 
+		/// Constructeur permettant d'initialiser le réseau neuronal avec un conteneur (vector, list...) de neuronLayer
+		/**
+		 * @param layerList la liste des couches de neurones
+		 */
         template <typename Container>
         NeuralNetwork(Container layerList);
 

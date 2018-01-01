@@ -78,7 +78,7 @@ void NeuronLayer::reset()
 
 int NeuronLayer::getInputSize()
 {
-    return (mPoids.rows());
+    return (static_cast<int>(mPoids.rows()));
 }
 
 //*************AUXILIAIRES**************

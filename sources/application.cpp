@@ -75,7 +75,7 @@ void Application::resetExperiment()
 
 void Application::runTeach(unsigned int nbTeachings, bool trigger)
 {
-    std::uniform_int_distribution<> distribution(0, mTeachingBatch.size()-1);
+    std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
 
     for(unsigned int index{0}; index < nbTeachings; index++)
@@ -113,7 +113,7 @@ float Application::gameScore(int nbImages)
     float mean = 0;
     for (int i(0); i < nbImages; i++)
     {
-        mean =+ (mDiscriminator->process(mGenerator->process(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
+        mean += (mDiscriminator->process(mGenerator->process(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
     }
     return(mean/(float)nbImages);
 }

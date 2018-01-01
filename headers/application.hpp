@@ -34,9 +34,10 @@ class Application
         /// Constructeur par batchs
         /**
          * Ce constructeur supervise le projet par rapport au réseau de neurones donné et aux batchs de tests et d'apprentissages donnés en paramètre
-         * @param network le réseau avec lequel on travaille
+         * @param discriminator le discriminateur avec lequel on travaille
+		 * @param generator le generateur avec lequel on travaille
          * @param teachingBatch le batch des données servant à l'apprentissage
-         * @param testingBatch le batch des données de test
+         * @param testBatch le batch des données de test
          */
         Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch);
 
@@ -63,8 +64,7 @@ class Application
 
         /// Effectue une run de tests
         /**
-         * Effectue une run de test dont le nombre de tests est passé en paramètres
-         * @param nbTests le nombre de tests à faire pendant la run
+         * Effectue une run de test sur le batch de test
          */
         float runTest(int limit = -1, bool returnErrorRate = 1);
 

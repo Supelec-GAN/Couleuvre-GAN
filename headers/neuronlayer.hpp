@@ -32,7 +32,7 @@ class NeuronLayer
          * \return le vecteur d'output de la couche de neurones
          * la fonction effectue le produit matriciel des poids par les entrées, puis applique la fonction d'activation
          */
-        Eigen::MatrixXf process(Eigen::MatrixXf inputs);
+        Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
 
 
         /// La fonction effectuant les calculs de rétropropagation
@@ -43,16 +43,16 @@ class NeuronLayer
          * @param step le pas d'apprentissage
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
-        Eigen::MatrixXf backProp(Eigen::MatrixXf xnPartialDerivative, float step);
+        Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
-
+	
         /// La fonction effectuant les calculs de rétropropagation
         /**
-         * La fonction propage l'erreur comme pour bakcprop, mais ne change pas les poids et biais. On ne définit donc pas de pas d'apprentissage
+         * La fonction propage l'erreur comme pour backprop, mais ne change pas les poids et biais. On ne définit donc pas de pas d'apprentissage
          * @param xnPartialDerivative le vecteur des dérivées partielles selon Xn
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
-        Eigen::MatrixXf backPropInvariant(Eigen::MatrixXf xnPartialDerivative);
+        Eigen::MatrixXf layerBackpropInvariant(Eigen::MatrixXf xnPartialDerivative);
 
 
         void            reset();
@@ -76,10 +76,10 @@ class NeuronLayer
 
     private:
         /// La matrice des poids de la couche de neurones
-        Eigen::MatrixXf                 mPoids;
+        Eigen::MatrixXf                 mWeight;
 
         /// La matrice des biais de la couche de neurones
-        Eigen::MatrixXf                 mBiais;
+        Eigen::MatrixXf                 mBias;
 
         /// La fonction d'activation de la couche de neurones
         std::function<float(float)>     mActivationFun;
@@ -89,7 +89,12 @@ class NeuronLayer
 
         /// Buffer pour stocker l'input, nécessaire pour la backrprop
         Eigen::MatrixXf                 mBufferInput;
-
+	
+		/// Buffer de la somme des variations du biais au sein d'un mini-batch
+		Eigen::MatrixXf					mSumWeightVariation;
+	
+		/// Buffer de la somme des variation de poids au sein d'un mini-batch
+		Eigen::MatrixXf 				mSumBiasVariation;
 
 };
 

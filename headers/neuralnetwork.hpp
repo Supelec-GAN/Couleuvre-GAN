@@ -43,8 +43,8 @@ class NeuralNetwork : public std::list<NeuronLayer>
         template <typename Container>
         NeuralNetwork(Container layerList);
 
-        Eigen::MatrixXf process(Eigen::MatrixXf input);
-        Eigen::MatrixXf process();
+        Eigen::MatrixXf processNetwork(Eigen::MatrixXf input);
+        Eigen::MatrixXf processNetwork();
 
         int getInputSize();
 

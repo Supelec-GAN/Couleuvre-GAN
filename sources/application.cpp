@@ -82,28 +82,28 @@ void Application::runTeach(unsigned int nbTeachings, bool trigger)
     {
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
-        Eigen::MatrixXf input = mGenerator->process(noiseInput);
+		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
 
         //int nbImagesPourScore = 20; // OMG HARDCODEE
 
         desiredOutput(0,0) = 1;
-        mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
+        mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
 
         if (trigger)
         {
             noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            input = mGenerator->process(noiseInput);
+            input = mGenerator->processNetwork(noiseInput);
 
             desiredOutput(0,0) = 1;
-            mTeacher.backPropGen(input, desiredOutput, mConfig.step, mConfig.dx);
+            mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
         }
         else
         {
             Sample sample{mTeachingBatch[distribution(randomEngine)]};
-            mTeacher.backPropDis(sample.first, sample.second, mConfig.step, mConfig.dx);
+            mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
 
             desiredOutput(0,0) = 0;
-            mTeacher.backPropDis(input, desiredOutput, mConfig.step, mConfig.dx);
+            mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
         }
     }
 }
@@ -113,7 +113,7 @@ float Application::gameScore(int nbImages)
     float mean = 0;
     for (int i(0); i < nbImages; i++)
     {
-        mean += (mDiscriminator->process(mGenerator->process(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
+        mean += (mDiscriminator->processNetwork(mGenerator->processNetwork(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
     }
     return(mean/(float)nbImages);
 }
@@ -125,7 +125,7 @@ float Application::runTest(int limit, bool returnErrorRate)
     {
         for(std::vector<Sample>::iterator itr = mTestingBatch.begin(); itr != mTestingBatch.end() && limit-- != 0; ++itr)
         {
-            Eigen::MatrixXf output{mDiscriminator->process(mGenerator->process(itr->first))};
+            Eigen::MatrixXf output{mDiscriminator->processNetwork(mGenerator->processNetwork(itr->first))};
             errorMean += sqrt((output - itr->second).squaredNorm());
         }
     }
@@ -164,6 +164,6 @@ void Application::setConfig(rapidjson::Document& document)
 
 Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
 {
-    return(mGenerator->process(input));
+    return(mGenerator->processNetwork(input));
 }
 

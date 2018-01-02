@@ -15,61 +15,61 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 , mErrorFun(Functions::coutDiscr())
 {}
 
-void Teacher::backPropGen(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
+void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-    Eigen::MatrixXf xnPartialDerivative = errorVector(mDiscriminator->process(input), desiredOutput, dx);
-    xnPartialDerivative = propErrorDisInvariant(xnPartialDerivative);
-    propErrorGen(xnPartialDerivative, step);
+    Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
+    xnPartialDerivative = propagateErrorDiscriminatorInvariant(xnPartialDerivative);
+    propagateErrorGenerator(xnPartialDerivative, step);
 }
 
 
-void Teacher::propErrorGen(Eigen::MatrixXf xnPartialDerivative, float step)
+void Teacher::propagateErrorGenerator(Eigen::MatrixXf xnPartialDerivative, float step)
 {
     for(auto itr = mGenerator->rbegin(); itr != mGenerator->rend(); ++itr)
     {
-        xnPartialDerivative = itr->backProp(xnPartialDerivative, step);
-    }
+		xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
+	}
 }
 
-void Teacher::backPropDis(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
+void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-    Eigen::MatrixXf xnPartialDerivative = errorVector(mDiscriminator->process(input), desiredOutput, dx);
+    Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
 
-    propErrorDis(xnPartialDerivative, step);
+    propagateErrorDiscriminator(xnPartialDerivative, step);
 }
 
-void Teacher::propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step)
-{
-    for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
-    {
-        xnPartialDerivative = itr->backProp(xnPartialDerivative, step);
-    }
-}
-
-Eigen::MatrixXf Teacher::propErrorDisInvariant(Eigen::MatrixXf xnPartialDerivative)
+void Teacher::propagateErrorDiscriminator(Eigen::MatrixXf xnPartialDerivative, float step)
 {
     for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
     {
-        xnPartialDerivative = itr->backPropInvariant(xnPartialDerivative);
+        xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
+	}
+}
+
+Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xnPartialDerivative)
+{
+    for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
+    {
+        xnPartialDerivative = itr->layerBackpropInvariant(xnPartialDerivative);
     }
     return xnPartialDerivative;
 }
 
-Eigen::MatrixXf Teacher::errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
+Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
     Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
-    Eigen::MatrixXf discrOutput = mDiscriminator->process(output);
+    Eigen::MatrixXf discrOutput = mDiscriminator->processNetwork(output);
 
     for(unsigned int i(0); i < output.size(); ++i)
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFun(mDiscriminator->process(output + deltaX), desiredOutput) - mErrorFun(discrOutput, desiredOutput))/dx;
+        errorVect(i) = (mErrorFun(mDiscriminator->processNetwork(output + deltaX), desiredOutput) - mErrorFun(discrOutput, desiredOutput))/dx;
     }
     return errorVect;
 }
 
-Eigen::MatrixXf Teacher::errorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
+Eigen::MatrixXf Teacher::calculateInitialErrorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
     Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
 

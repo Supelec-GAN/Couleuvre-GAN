@@ -34,7 +34,7 @@ class Teacher
          * @param step le pas d'apprentissage
          * @param dx le deplacement élémentaire pour calculer la dérivée
          */
-        void            backPropDis(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
+        void            backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
         /// Fonction appliquant la méthode de rétropropagation sur mGenerator
         /**
@@ -45,7 +45,7 @@ class Teacher
          * @param dx le deplacement élémentaire pour calculer la dérivée
          */
 
-        void            backPropGen(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
+        void            backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
     private:
         /// Fonction propageant l'erreur itérativement à travers le réseau discriminant
@@ -54,7 +54,7 @@ class Teacher
          * @param xnPartialDerivative la dérivée dE/dXn initiale
          * @param step le pas d'apprentissage
          */
-        void            propErrorDis(Eigen::MatrixXf xnPartialDerivative, float step);
+        void            propagateErrorDiscriminator(Eigen::MatrixXf xnPartialDerivative, float step);
 
 
 
@@ -63,7 +63,7 @@ class Teacher
          * La fonction itère sur toutes les couches de neurones et propage l'erreur sans faire varier les poids.
          * @param xnPartialDerivative la dérivée dE/dXn initiale
          */
-        Eigen::MatrixXf propErrorDisInvariant(Eigen::MatrixXf xnPartialDerivative);
+        Eigen::MatrixXf propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xnPartialDerivative);
 
         /// Fonction propageant l'erreur itérativement à travers le réseau générateur
         /**
@@ -71,7 +71,7 @@ class Teacher
          * @param xnPartialDerivative la dérivée dE/dXn initiale
          * @param step le pas d'apprentissage
          */
-        void            propErrorGen(Eigen::MatrixXf xnPartialDerivative, float step);
+        void            propagateErrorGenerator(Eigen::MatrixXf xnPartialDerivative, float step);
 
         /// Fonction calculant le vecteur dE/dXn initial
         /**
@@ -82,7 +82,7 @@ class Teacher
          * @param dx le pas de dérivation
          * @return renvoie le vecteur dE/dXn
          */
-        Eigen::MatrixXf errorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
+        Eigen::MatrixXf calculateInitialErrorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
 
         /// Fonction calculant le vecteur dE/dXn initial
         /**
@@ -93,7 +93,7 @@ class Teacher
          * @param dx le pas de dérivation
          * @return renvoie le vecteur dE/dXn
          */
-        Eigen::MatrixXf errorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
+        Eigen::MatrixXf calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
 
     private:
         /// Des pointeur sur les réseaux dont on veut superviser l'apprentissage

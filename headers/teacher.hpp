@@ -25,7 +25,8 @@ class Teacher
                         Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator);
 
 
-
+#pragma mark - Backpropagation
+	
         /// Fonction appliquant la méthode de rétropropagation sur mDiscriminator
         /**
          * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau

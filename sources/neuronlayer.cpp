@@ -13,7 +13,7 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::f
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
 {}
 
-
+#pragma mark - Propagation
 //*************PROPAGATION**************
 //**************************************
 
@@ -29,6 +29,7 @@ Eigen::MatrixXf NeuronLayer::processLayer(Eigen::MatrixXf inputs)
     return output;
 }
 
+#pragma mark - Backprop
 //***********RETROPROPAGATION***********
 //**************************************
 
@@ -72,6 +73,10 @@ Eigen::MatrixXf NeuronLayer::miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDer
 	return ynPartialDerivative*mWeight.transpose();
 }
 
+#pragma mark - Autres
+//****************AUTRES****************
+//**************************************
+
 void NeuronLayer::updateLayerWeights()
 {
 	mWeight -= mSumWeightVariation;
@@ -81,9 +86,6 @@ void NeuronLayer::updateLayerWeights()
 	mSumWeightVariation.setZero() ;
 	mSumBiasVariation.setZero();
 }
-
-//****************AUTRES****************
-//**************************************
 
 Eigen::MatrixXf NeuronLayer::fnDerivativeMatrix() const
 {
@@ -109,9 +111,6 @@ int NeuronLayer::getInputSize()
 {
     return (static_cast<int>(mWeight.rows()));
 }
-
-//*************AUXILIAIRES**************
-//**************************************
 
 std::ostream& operator<<(std::ostream& flux, NeuronLayer n)
 {

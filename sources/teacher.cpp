@@ -15,13 +15,16 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 , mErrorFun(Functions::coutDiscr())
 {}
 
+#pragma mark - Backpropagation
+
+#pragma mark Generator
+
 void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
     Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
     xnPartialDerivative = propagateErrorDiscriminatorInvariant(xnPartialDerivative);
     propagateErrorGenerator(xnPartialDerivative, step);
 }
-
 
 void Teacher::propagateErrorGenerator(Eigen::MatrixXf xnPartialDerivative, float step)
 {
@@ -30,6 +33,8 @@ void Teacher::propagateErrorGenerator(Eigen::MatrixXf xnPartialDerivative, float
 		xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
 	}
 }
+
+#pragma mark Discriminator
 
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
@@ -55,6 +60,8 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
     return xnPartialDerivative;
 }
 
+#pragma mark Minibatch
+
 void Teacher::miniBatchBackProp(Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
 {
 #warning Japillow must implement
@@ -74,6 +81,7 @@ void Teacher::updateNetworkWeights()
 //		itr->updateLayerWeights();
 }
 
+#pragma mark initial vector calculation
 
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {

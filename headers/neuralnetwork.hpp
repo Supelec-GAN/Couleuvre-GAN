@@ -14,7 +14,8 @@ class NeuralNetwork : public std::list<NeuronLayer>
 
     public:
 	
-        /// Constructeur permettant d'initialiser une réseau neuronal vide
+#pragma mark - Constructeur
+	    /// Constructeur permettant d'initialiser une réseau neuronal vide
         NeuralNetwork();
 	
         /// Constructeur permettant d'initialiser un réseau neuronal avec choix des fonctions d'activation
@@ -34,20 +35,24 @@ class NeuralNetwork : public std::list<NeuronLayer>
          */
         NeuralNetwork(std::vector<unsigned int> layerSizes);
 
-        void reset();
-
 		/// Constructeur permettant d'initialiser le réseau neuronal avec un conteneur (vector, list...) de neuronLayer
 		/**
 		 * @param layerList la liste des couches de neurones
 		 */
-        template <typename Container>
-        NeuralNetwork(Container layerList);
+		template <typename Container>
+		NeuralNetwork(Container layerList);
+	
+#pragma mark - Propagation
 
         Eigen::MatrixXf processNetwork(Eigen::MatrixXf input);
         Eigen::MatrixXf processNetwork();
 
+#pragma mark - Autres
+		void reset();
+	
         int getInputSize();
 
+#pragma mark - Auxiliaires
 
     public:
         /// Fonction utilitaire permettant d'afficher le réseau de neurones

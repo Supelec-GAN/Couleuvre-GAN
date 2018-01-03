@@ -1,5 +1,6 @@
 #include "headers/neuralnetwork.hpp"
 
+#pragma mark - Constructeur
 //*************CONSTRUCTEUR*************
 //**************************************
 
@@ -20,7 +21,7 @@ NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes)
         push_back(NeuronLayer(layerSizes[i], layerSizes[i+1]));
 }
 
-
+#pragma mark - Propagation
 //*************PROPAGATION**************
 //**************************************
 
@@ -41,6 +42,7 @@ Eigen::MatrixXf NeuralNetwork::processNetwork()
 	return input;
 }
 
+#pragma mark - Autres
 //****************AUTRES****************
 //**************************************
 
@@ -55,6 +57,7 @@ int NeuralNetwork::getInputSize()
     return ((*(begin())).getInputSize());
 }
 
+#pragma mark - Auxiliaires
 //*************AUXILIAIRES**************
 //**************************************
 

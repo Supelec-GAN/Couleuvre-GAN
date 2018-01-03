@@ -54,6 +54,8 @@ class NeuronLayer
          */
         Eigen::MatrixXf layerBackpropInvariant(Eigen::MatrixXf xnPartialDerivative);
 
+		/// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
+		void updateWeights();
 
         void            reset();
 

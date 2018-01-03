@@ -71,6 +71,7 @@ class Application
          * @param nbTeachings le nombre d'apprentissages à faire pendant la run
          */
         void runStochasticTeach(unsigned int nbTeachings, bool trigger);
+#warning documenter @param trigger
 
 		/// Effectue une run d'apprentissage par la méthode par batch
 		/**

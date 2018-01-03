@@ -2,6 +2,7 @@
 
 #include "headers/teacher.hpp"
 
+#pragma mark Constructeur
 
 Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator)
 : mGenerator(std::move(generator))
@@ -17,37 +18,29 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 
 #pragma mark - Backpropagation
 
-#pragma mark Generator
+#pragma mark Backprop
 
 void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
     Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
     xnPartialDerivative = propagateErrorDiscriminatorInvariant(xnPartialDerivative);
-    propagateErrorGenerator(xnPartialDerivative, step);
+    propagateError(mGenerator, xnPartialDerivative, step);
 }
-
-void Teacher::propagateErrorGenerator(Eigen::MatrixXf xnPartialDerivative, float step)
-{
-    for(auto itr = mGenerator->rbegin(); itr != mGenerator->rend(); ++itr)
-    {
-		xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
-	}
-}
-
-#pragma mark Discriminator
 
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-    Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
-
-    propagateErrorDiscriminator(xnPartialDerivative, step);
+	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
+	
+	propagateError(mDiscriminator, xnPartialDerivative, step);
 }
 
-void Teacher::propagateErrorDiscriminator(Eigen::MatrixXf xnPartialDerivative, float step)
+#pragma mark Error Propagation
+
+void Teacher::propagateError(NeuralNetwork::Ptr network, Eigen::MatrixXf xnPartialDerivative, float step)
 {
-    for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
+    for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
     {
-        xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
+		xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
 	}
 }
 
@@ -62,23 +55,21 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
 
 #pragma mark Minibatch
 
-void Teacher::miniBatchBackProp(Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
+void Teacher::miniBatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
 {
 #warning Japillow must implement
 	throw std::logic_error("Not implemented yet");
 //	Eigen::VectorXf xnPartialDerivative = errorVector(mNetwork->process(input), desiredOutput, dx);
-//	for(auto itr = mNetwork->rbegin(); itr != mNetwork->rend(); ++itr)
+//	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
 //	{
 //		xnPartialDerivative = itr->layerBackProp(xnPartialDerivative, step);
 //	}
 }
 
-void Teacher::updateNetworkWeights()
+void Teacher::updateNetworkWeights(NeuralNetwork::Ptr network)
 {
-#warning Japillow must implement
-	throw std::logic_error("Not implemented yet");
-//	for(auto itr = mNetwork->rbegin(); itr != mNetwork->rend(); ++itr)
-//		itr->updateLayerWeights();
+	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
+		itr->updateLayerWeights();
 }
 
 #pragma mark initial vector calculation

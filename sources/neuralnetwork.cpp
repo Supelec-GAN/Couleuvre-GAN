@@ -1,5 +1,8 @@
 #include "headers/neuralnetwork.hpp"
 
+//*************CONSTRUCTEUR*************
+//**************************************
+
 NeuralNetwork::NeuralNetwork(){}
 
 NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns)
@@ -11,13 +14,15 @@ NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<F
         push_back(NeuronLayer(layerSizes[i], layerSizes[i+1], activationFuns[i]));
 }
 
-
 NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes)
 {
     for(size_t i(0); i < layerSizes.size()-1; ++i)
         push_back(NeuronLayer(layerSizes[i], layerSizes[i+1]));
 }
 
+
+//*************PROPAGATION**************
+//**************************************
 
 Eigen::MatrixXf NeuralNetwork::processNetwork(Eigen::MatrixXf input)
 {
@@ -35,6 +40,9 @@ Eigen::MatrixXf NeuralNetwork::processNetwork()
 	
 	return input;
 }
+
+//****************AUTRES****************
+//**************************************
 
 void NeuralNetwork::reset()
 {

@@ -38,12 +38,15 @@ Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr ge
         mTestingBatch.push_back(Sample(testingInputs[i], modelFunction(testingInputs[i])));
 }*/
 
+//**************EXPERIENCES*************
+//**************************************
+
 void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
     for(unsigned int index{0}; index < nbExperiments; ++index)
     {
         resetExperiment();
-        runSingleExperiment(nbLoops, nbTeachingsPerLoop);
+        runSingleStochasticExperiment(nbLoops, nbTeachingsPerLoop);
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
     }
 
@@ -51,14 +54,14 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
     mStatsCollector.exportData(true);
 }
 
-void Application::runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
+void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
     mStatsCollector[0].addResult(runTest());
     bool trigger = false;
     for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
     {
         std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
-        runTeach(nbTeachingsPerLoop, trigger);
+        runStochasticTeach(nbTeachingsPerLoop, trigger);
         auto score = runTest();
         mStatsCollector[loopIndex+1].addResult(score);
         if (score < 0.1) trigger = true;
@@ -73,8 +76,12 @@ void Application::resetExperiment()
     mDiscriminator->reset();
 }
 
-void Application::runTeach(unsigned int nbTeachings, bool trigger)
+//************APPRENTISSAGE*************
+//**************************************
+
+void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
 {
+	
     std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
 
@@ -83,8 +90,6 @@ void Application::runTeach(unsigned int nbTeachings, bool trigger)
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
-
-        //int nbImagesPourScore = 20; // OMG HARDCODEE
 
         desiredOutput(0,0) = 1;
         mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
@@ -107,6 +112,19 @@ void Application::runTeach(unsigned int nbTeachings, bool trigger)
         }
     }
 }
+
+void Application::runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize)
+{
+#warning Japillow must implement
+	throw std::logic_error("Not implemented yet");
+//	for (unsigned int i(0); i < nbTeachings; ++i){
+//		auto samples(generateBatch(batchSize));
+//		for(auto itr = samples.begin(); itr != samples.end(); ++itr)
+//			mTeacher.miniBatchBackProp(itr->first, itr->second);
+//		mTeacher.updateNetworkWeights();
+//	}
+}
+
 
 float Application::gameScore(int nbImages)
 {
@@ -131,6 +149,9 @@ float Application::runTest(int limit, bool returnErrorRate)
     }
     return errorMean/static_cast<float>(mTestingBatch.size());
 }
+
+//************CONFIGURATION*************
+//**************************************
 
 void Application::loadConfig(const std::string& configFileName)
 {

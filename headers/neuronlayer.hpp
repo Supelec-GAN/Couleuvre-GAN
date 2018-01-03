@@ -46,16 +46,27 @@ class NeuronLayer
         Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
 	
-        /// La fonction effectuant les calculs de rétropropagation
+        /// La fonction effectuant les calculs de rétropropagation sans mise à jour du réseau
         /**
          * La fonction propage l'erreur comme pour backprop, mais ne change pas les poids et biais. On ne définit donc pas de pas d'apprentissage
          * @param xnPartialDerivative le vecteur des dérivées partielles selon Xn
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
         Eigen::MatrixXf layerBackpropInvariant(Eigen::MatrixXf xnPartialDerivative);
+	
+		/// La fonction effectuant les calculs de rétropropagation sans mise à jour du réseau selon le principe du mini-batch
+		/**
+		 * La fonction calcule les 3 équations matricielles, somme les poids à modifier et
+		 * renvoie le vecteur de dérivées partielles
+		 * nécessaire pour la backprop de la couche précédente
+		 * @param xnPartialDerivative le vecteur des dérivées partielles selon Xn
+		 * @param step le pas d'apprentissage
+		 * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
+		 */
+	Eigen::MatrixXf miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
 		/// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
-		void updateWeights();
+		void updateLayerWeights();
 
         void            reset();
 

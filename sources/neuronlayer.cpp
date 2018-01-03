@@ -42,7 +42,7 @@ Eigen::MatrixXf NeuronLayer::layerBackprop(Eigen::MatrixXf xnPartialDerivative, 
     Eigen::MatrixXf wnPartialDerivative = (mBufferInput.transpose())*ynPartialDerivative;
 	mSumBiasVariation += step*ynPartialDerivative;
 	mSumWeightVariation += step*wnPartialDerivative;
-	updateWeights();
+	updateLayerWeights();
 	
     //Retour de x(n-1)PartialDerivative
     return ynPartialDerivative*mWeight.transpose();
@@ -72,7 +72,7 @@ Eigen::MatrixXf NeuronLayer::miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDer
 	return ynPartialDerivative*mWeight.transpose();
 }
 
-void NeuronLayer::updateWeights()
+void NeuronLayer::updateLayerWeights()
 {
 	mWeight -= mSumWeightVariation;
 	mBias += mSumBiasVariation;

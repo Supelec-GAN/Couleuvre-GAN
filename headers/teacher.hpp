@@ -47,6 +47,19 @@ class Teacher
 
         void            backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
+		/// Fonction appliquant la méthode de rétropropagation par mini-Batch sur mNetwork
+		/**
+		 * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau
+		 * @param input le vecteur d'input que le réseau va process
+		 * @param desiredOutput la sortie modèle dont on veut se rapprocher
+		 * @param step le pas d'apprentissage
+		 * @param dx le deplacement élémentaire pour calculer la dérivée
+		 */
+		void 			miniBatchBackProp(Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step = 0.2, float dx = 0.05);
+	
+		/// Fonction mettant à jour les poids du réseau
+		void 			updateNetworkWeights();
+	
     private:
         /// Fonction propageant l'erreur itérativement à travers le réseau discriminant
         /**

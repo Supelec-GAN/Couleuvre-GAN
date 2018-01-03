@@ -55,13 +55,21 @@ class Application
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
 
-        /// Effectue une run d'apprentissage
+        /// Effectue une run d'apprentissage par méthode stochastique
         /**
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
          * @param nbTeachings le nombre d'apprentissages à faire pendant la run
          */
-        void runTeach(unsigned int nbTeachings, bool trigger);
+        void runStochasticTeach(unsigned int nbTeachings, bool trigger);
 
+		/// Effectue une run d'apprentissage par la méthode par batch
+		/**
+		 * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
+		 * @param nbTeachings le nombre d'apprentissages à faire pendant la run
+		 */
+		void runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize);
+	
+	
         /// Effectue une run de tests
         /**
          * Effectue une run de test sur le batch de test
@@ -72,7 +80,7 @@ class Application
         float gameScore(int nbImages);
 
         void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
-        void runSingleExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+        void runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
 
         void resetExperiment();
 

@@ -55,6 +55,26 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
     return xnPartialDerivative;
 }
 
+void Teacher::miniBatchBackProp(Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
+{
+#warning Japillow must implement
+	throw std::logic_error("Not implemented yet");
+//	Eigen::VectorXf xnPartialDerivative = errorVector(mNetwork->process(input), desiredOutput, dx);
+//	for(auto itr = mNetwork->rbegin(); itr != mNetwork->rend(); ++itr)
+//	{
+//		xnPartialDerivative = itr->layerBackProp(xnPartialDerivative, step);
+//	}
+}
+
+void Teacher::updateNetworkWeights()
+{
+#warning Japillow must implement
+	throw std::logic_error("Not implemented yet");
+//	for(auto itr = mNetwork->rbegin(); itr != mNetwork->rend(); ++itr)
+//		itr->updateLayerWeights();
+}
+
+
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
     Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());

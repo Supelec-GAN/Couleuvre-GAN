@@ -38,6 +38,7 @@ Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr ge
         mTestingBatch.push_back(Sample(testingInputs[i], modelFunction(testingInputs[i])));
 }*/
 
+#pragma mark - Expériences
 //**************EXPERIENCES*************
 //**************************************
 
@@ -76,6 +77,7 @@ void Application::resetExperiment()
     mDiscriminator->reset();
 }
 
+#pragma mark - Apprentissage
 //************APPRENTISSAGE*************
 //**************************************
 
@@ -125,17 +127,6 @@ void Application::runMiniBatchTeach(unsigned int nbTeachings, unsigned int batch
 //	}
 }
 
-
-float Application::gameScore(int nbImages)
-{
-    float mean = 0;
-    for (int i(0); i < nbImages; i++)
-    {
-        mean += (mDiscriminator->processNetwork(mGenerator->processNetwork(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
-    }
-    return(mean/(float)nbImages);
-}
-
 float Application::runTest(int limit, bool returnErrorRate)
 {
     float errorMean{0};
@@ -150,6 +141,22 @@ float Application::runTest(int limit, bool returnErrorRate)
     return errorMean/static_cast<float>(mTestingBatch.size());
 }
 
+float Application::gameScore(int nbImages)
+{
+	float mean = 0;
+	for (int i(0); i < nbImages; i++)
+	{
+		mean += (mDiscriminator->processNetwork(mGenerator->processNetwork(Eigen::MatrixXf::Random(1, mGenerator->getInputSize()))))(0);
+	}
+	return(mean/(float)nbImages);
+}
+
+Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
+{
+	return(mGenerator->processNetwork(input));
+}
+
+#pragma mark - Configuration
 //************CONFIGURATION*************
 //**************************************
 
@@ -182,9 +189,3 @@ void Application::setConfig(rapidjson::Document& document)
 
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 }
-
-Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
-{
-    return(mGenerator->processNetwork(input));
-}
-

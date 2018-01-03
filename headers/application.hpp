@@ -55,6 +55,16 @@ class Application
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
 
+#pragma mark - Expériences
+	
+		void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+	
+		void runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+	
+		void resetExperiment();
+	
+#pragma mark - Apprentissage
+
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
@@ -69,7 +79,6 @@ class Application
 		 */
 		void runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize);
 	
-	
         /// Effectue une run de tests
         /**
          * Effectue une run de test sur le batch de test
@@ -79,17 +88,14 @@ class Application
         /// Effectue une approximation du score des réseaux
         float gameScore(int nbImages);
 
-        void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
-        void runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
-
-        void resetExperiment();
-
         /// Génère une image à partir d'un input
         /**
          * Effectue un process de l'input par le Generateur
          * @param input un vecteur colonne, généralement, du bruit blanc
          */
         Eigen::MatrixXf genProcessing(Eigen::MatrixXf input);
+	
+#pragma mark - Configuration
 
     private:
         /// Fonction pour charger la configuration de l'application

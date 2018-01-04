@@ -29,6 +29,8 @@ class Application
         using Sample = std::pair<Eigen::MatrixXf, Eigen::MatrixXf>;
         /// Un alias pour désigner un batch de données (Entrée, Sortie)
         using Batch = std::vector<Sample>;
+		/// Un alias pour désigner un minibatch de données (Entrée, Sortie)
+		using Minibatch = Batch;
 
     public:
         /// Constructeur par batchs
@@ -43,7 +45,7 @@ class Application
 
         /// Constructeur par fonction modèle
         /**
-         * Ce constructeur supervise le projet par rapport au réseaude neurones donné, des batchs d'inputs pour l'apprentissage et les tests,
+         * Ce constructeur supervise le projet par rapport au réseau de neurones donné, des batchs d'inputs pour l'apprentissage et les tests,
          * et la fonction à modéliser
          * @param network le réseau avec lequel on travaille
          * @param modelFunction la fonction à modéliser
@@ -78,7 +80,7 @@ class Application
 		 * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
 		 * @param nbTeachings le nombre d'apprentissages à faire pendant la run
 		 */
-		void runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize);
+		void runMinibatchTeach(unsigned int nbTeachings, unsigned int batchSize);
 	
         /// Effectue une run de tests
         /**
@@ -95,6 +97,23 @@ class Application
          * @param input un vecteur colonne, généralement, du bruit blanc
          */
         Eigen::MatrixXf genProcessing(Eigen::MatrixXf input);
+
+	private:
+		/// Génère un minibatch à partir d'un batch
+		/**
+		 * Génère un sous-ensemble du batch d'apprentissage ou du batch à partir de celui-ci
+		 * @param batch le batch d'apprentissage ou le batch de test
+		 * @param minibatchSize la taille du sous-ensemble à générer
+		 */
+		Minibatch sampleMinibatch(Batch batch, unsigned long minibatchSize);
+	
+	
+		/// Génère un minibatch d'images obtenues par le générateur
+		/**
+		 * Génère un minibatch d'images obtenues par le générateur
+		 * @param minibatchSize la taille du minibatch à générer
+		 */
+		Minibatch sampleGeneratedImagesFromNoiseMinibatch(unsigned long minibatchSize);
 	
 #pragma mark - Configuration
 

@@ -59,7 +59,7 @@ class Teacher
 		 * @param step le pas d'apprentissage
 		 * @param dx le deplacement élémentaire pour calculer la dérivée
 		 */
-		void 			miniBatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step = 0.2, float dx = 0.05);
+		void 			minibatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step = 0.2, float dx = 0.05);
 	
 		/// Fonction mettant à jour les poids du réseau
 		/**

@@ -58,7 +58,7 @@ Eigen::MatrixXf NeuronLayer::layerBackpropInvariant(Eigen::MatrixXf xnPartialDer
     return ynPartialDerivative*mWeight.transpose();
 }
 
-Eigen::MatrixXf NeuronLayer::miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step)
+Eigen::MatrixXf NeuronLayer::minibatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step)
 {
 	//Same as layerBackprop but no weight updating
 	

@@ -55,7 +55,7 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
     mStatsCollector.exportData(true);
 }
 
-double maximumScoreBeforeTrigger = 0.1 ; 
+double minimumScoreBeforeTrigger = 0.1 ; 
 
 void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
@@ -67,7 +67,7 @@ void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned i
         runStochasticTeach(nbTeachingsPerLoop, trigger);
         auto score = runTest();
         mStatsCollector[loopIndex+1].addResult(score);
-        if (score < maximumScoreBeforeTrigger) trigger = true;
+        if (score < minimumScoreBeforeTrigger) trigger = true;
         else trigger = false;
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
     }
@@ -85,10 +85,9 @@ void Application::resetExperiment()
 
 void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
 {
-	//generate a random distribution to randomly select elements from the mTeachingBatch
+	//generate a random distribution (to later randomly select elements from the mTeachingBatch)
     std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
-
 	
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
@@ -104,7 +103,7 @@ void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
 		//Apply Backprop to Gen
         mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
 
-        if (trigger) //teach the Generator a second time
+        if (trigger) //then teach the Generator a second time
         {
 			
             noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
@@ -128,18 +127,57 @@ void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
     }
 }
 
-void Application::runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize)
+//==============================================================================================================
+
+void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minibatchSize)
+//Algorithm 1 p.4 of generative-adversarial-nets by Goodfellow et al. 2014
+//Minibatch stockastic gradient descent training of generative adversarial nets
 {
-#warning Japillow must implement
-	throw std::logic_error("Not implemented yet");
-//	for (unsigned int i(0); i < nbTeachings; ++i)
-//	{
-//		auto samples(generateBatch(batchSize));
-//		for(auto itr = samples.begin(); itr != samples.end(); ++itr)
-//			mTeacher.miniBatchBackProp(itr->first, itr->second);
-//		mTeacher.updateNetworkWeights();
-//	}
+	for(unsigned int index{0}; index < nbTeachings; index++)
+	{
+#warning finish implementing
+
+		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
+		
+		for (unsigned long k(0); k < 1; k++)
+		{
+			//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
+			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(minibatchSize);
+			
+			//"Sample minibatch of batchSize examples {x_1, ..., x_m} from data-generating distribution p_data(x)
+			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatch,minibatchSize);
+			
+			//"Update the discriminator by ascending its stochastic gradient"
+			
+			//(this way of teaching is not correct as per the algorithm described in Goodfellow et al. 2014
+			//backpropagation must be done simultaneously
+			
+			//teach the Discriminator on a true image randomly selected in the mTeachingBatch
+//			Sample sample{mTeachingBatch[distribution(randomEngine)]};
+//			mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
+			
+			//teach the Discriminator on the previously generated image
+//			desiredOutput(0,0) = 0; //generated image
+//			mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
+		}
+			 
+		//Teach the Generator
+		
+		//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
+		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(minibatchSize);
+		
+		//"Update the generator by descending the stochastic gradient"
+		//Apply Backprop to Gen
+//		mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
+		
+		
+
+	}
 }
+
+//============================================================================================================
+
+
 
 float Application::runTest(int limit, bool returnErrorRate)
 {
@@ -169,6 +207,42 @@ Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
 {
 	return(mGenerator->processNetwork(input));
 }
+
+Application::Minibatch Application::sampleMinibatch(Application::Batch batch, unsigned long minibatchSize)
+{
+	Application::Minibatch minibatch(minibatchSize);
+	
+	//Tirage aléatoire sans remise
+	std::vector<unsigned long> randomizedIntVector(batch.size());
+	std::iota(randomizedIntVector.begin(), randomizedIntVector.end(), 0); 		//fills in with first int numbers starting at 0
+	std::random_shuffle(randomizedIntVector.begin(),randomizedIntVector.end());
+	
+	for (unsigned long i(0); i < minibatchSize ; ++i)
+	{
+		minibatch[i] = batch[randomizedIntVector[i]];
+	}
+	return minibatch;
+}
+
+Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch(unsigned long minibatchSize)
+{
+	Application::Minibatch generatedImagesFromNoiseMinibatch(minibatchSize);
+	
+	Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
+	desiredOutput(0,0) = 1; //generator want to create near-real images
+
+	for (unsigned long i(0); i < minibatchSize ; ++i)
+	{
+		Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
+		
+		Sample imageSample = std::make_pair(input, desiredOutput);
+		
+		generatedImagesFromNoiseMinibatch[i] = imageSample;
+	}
+	return generatedImagesFromNoiseMinibatch;
+}
+
 
 #pragma mark - Configuration
 //************CONFIGURATION*************

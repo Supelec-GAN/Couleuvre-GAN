@@ -56,13 +56,13 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
 #pragma mark Minibatch
 
 
-void Teacher::miniBatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
+void Teacher::minibatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
 {
 	//Same as backpropDiscriminator but no weight updating
 	Eigen::VectorXf xnPartialDerivative = calculateInitialErrorVector(network->processNetwork(input), desiredOutput, dx);
 	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
 	{
-		xnPartialDerivative = itr->miniBatchLayerBackprop(xnPartialDerivative, step);
+		xnPartialDerivative = itr->minibatchLayerBackprop(xnPartialDerivative, step);
 	}
 }
 

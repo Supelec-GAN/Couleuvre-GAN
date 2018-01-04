@@ -65,7 +65,7 @@ class NeuronLayer
 		 * @param step le pas d'apprentissage
 		 * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
 		 */
-	Eigen::MatrixXf miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
+	Eigen::MatrixXf minibatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
 #pragma mark - Autres
 

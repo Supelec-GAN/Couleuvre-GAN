@@ -54,7 +54,7 @@ void NeuralNetwork::reset()
 
 int NeuralNetwork::getInputSize()
 {
-    return ((*(begin())).getInputSize());
+    return (*(begin())).getInputSize();
 }
 
 #pragma mark - Auxiliaires

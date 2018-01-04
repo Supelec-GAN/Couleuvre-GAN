@@ -69,9 +69,9 @@ class Application
         /**
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
          * @param nbTeachings le nombre d'apprentissages à faire pendant la run
+		 * @param trigger permet de forcer l'apprentissage uniquement du générateur si le discriminateur devient trop bon 
          */
         void runStochasticTeach(unsigned int nbTeachings, bool trigger);
-#warning documenter @param trigger
 
 		/// Effectue une run d'apprentissage par la méthode par batch
 		/**

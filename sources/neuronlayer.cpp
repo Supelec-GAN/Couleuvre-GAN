@@ -60,6 +60,8 @@ Eigen::MatrixXf NeuronLayer::layerBackpropInvariant(Eigen::MatrixXf xnPartialDer
 
 Eigen::MatrixXf NeuronLayer::miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step)
 {
+	//Same as layerBackprop but no weight updating
+	
 	// Calcul de ynPartialDerivative
 	Eigen::MatrixXf ynPartialDerivative = xnPartialDerivative*fnDerivativeMatrix();
 	

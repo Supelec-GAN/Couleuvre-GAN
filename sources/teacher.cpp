@@ -55,15 +55,15 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
 
 #pragma mark Minibatch
 
+
 void Teacher::miniBatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
 {
-#warning Japillow must implement
-	throw std::logic_error("Not implemented yet");
-//	Eigen::VectorXf xnPartialDerivative = errorVector(mNetwork->process(input), desiredOutput, dx);
-//	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
-//	{
-//		xnPartialDerivative = itr->layerBackProp(xnPartialDerivative, step);
-//	}
+	//Same as backpropDiscriminator but no weight updating
+	Eigen::VectorXf xnPartialDerivative = calculateInitialErrorVector(network->processNetwork(input), desiredOutput, dx);
+	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
+	{
+		xnPartialDerivative = itr->miniBatchLayerBackprop(xnPartialDerivative, step);
+	}
 }
 
 void Teacher::updateNetworkWeights(NeuralNetwork::Ptr network)

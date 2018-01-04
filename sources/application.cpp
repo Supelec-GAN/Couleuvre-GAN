@@ -55,6 +55,8 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
     mStatsCollector.exportData(true);
 }
 
+double maximumScoreBeforeTrigger = 0.1 ; 
+
 void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
     mStatsCollector[0].addResult(runTest());
@@ -65,7 +67,7 @@ void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned i
         runStochasticTeach(nbTeachingsPerLoop, trigger);
         auto score = runTest();
         mStatsCollector[loopIndex+1].addResult(score);
-        if (score < 0.1) trigger = true;
+        if (score < maximumScoreBeforeTrigger) trigger = true;
         else trigger = false;
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
     }
@@ -83,33 +85,44 @@ void Application::resetExperiment()
 
 void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
 {
-	
+	//generate a random distribution to randomly select elements from the mTeachingBatch
     std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
 
+	
     for(unsigned int index{0}; index < nbTeachings; index++)
     {
+		//Teach the Generator
+		//generate the noise used for the input of the generator, then create the generated image
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-        Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
 
+		//set the desired output for the discriminator as a true image
+		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
         desiredOutput(0,0) = 1;
+		
+		//Apply Backprop to Gen
         mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
 
-        if (trigger)
+        if (trigger) //teach the Generator a second time
         {
+			
             noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
             input = mGenerator->processNetwork(noiseInput);
 
-            desiredOutput(0,0) = 1;
+            desiredOutput(0,0) = 1; //true image
             mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
         }
-        else
+        else //teach the Discriminator
+			//(this way of teaching is not correct as per the algorithm described in Goodfellow et al. 2014
+			//backpropagation must be done simultaneously
         {
+			//teach the Discriminator on a true image randomly selected in the mTeachingBatch
             Sample sample{mTeachingBatch[distribution(randomEngine)]};
             mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
 
-            desiredOutput(0,0) = 0;
+			//teach the Discriminator on the previously generated image
+            desiredOutput(0,0) = 0; //generated image
             mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
         }
     }
@@ -119,7 +132,8 @@ void Application::runMiniBatchTeach(unsigned int nbTeachings, unsigned int batch
 {
 #warning Japillow must implement
 	throw std::logic_error("Not implemented yet");
-//	for (unsigned int i(0); i < nbTeachings; ++i){
+//	for (unsigned int i(0); i < nbTeachings; ++i)
+//	{
 //		auto samples(generateBatch(batchSize));
 //		for(auto itr = samples.begin(); itr != samples.end(); ++itr)
 //			mTeacher.miniBatchBackProp(itr->first, itr->second);

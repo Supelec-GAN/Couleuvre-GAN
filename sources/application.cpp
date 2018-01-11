@@ -132,14 +132,15 @@ void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
 void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minibatchSize)
 //Algorithm 1 p.4 of generative-adversarial-nets by Goodfellow et al. 2014
 //Minibatch stockastic gradient descent training of generative adversarial nets
+//rq : Implementations may choose to sum the gradient over the mini-batch or take the average of the gradient which further reduces the variance of the gradient.
+//I chose to implement the sum
+
 {
 	for(unsigned int index{0}; index < nbTeachings; index++)
 	{
-#warning finish implementing
-
 		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 		
-		for (unsigned long k(0); k < 1; k++)
+		for (unsigned long k(0); k < 1; ++k)
 		{
 			//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
 			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(minibatchSize);
@@ -149,29 +150,29 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 			
 			//"Update the discriminator by ascending its stochastic gradient"
 			
-			//(this way of teaching is not correct as per the algorithm described in Goodfellow et al. 2014
-			//backpropagation must be done simultaneously
-			
-			//teach the Discriminator on a true image randomly selected in the mTeachingBatch
-//			Sample sample{mTeachingBatch[distribution(randomEngine)]};
-//			mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
-			
-			//teach the Discriminator on the previously generated image
-//			desiredOutput(0,0) = 0; //generated image
-//			mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
+			for (unsigned long i(0); i < minibatchSize; ++i)
+			{
+				Sample falseimagesample{generatedImagesFromNoiseMinibatch[i]};
+				Sample trueimagesample{exampleMinibatch[i]};
+				
+				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,falseimagesample.first, falseimagesample.second, mConfig.step, mConfig.dx);
+				mTeacher.minibatchGeneratorBackprop(mGenerator,trueimagesample.first, trueimagesample.second, mConfig.step, mConfig.dx);
+			}
+			mTeacher.updateNetworkWeights(mGenerator);
+			mTeacher.updateNetworkWeights(mDiscriminator);
+
 		}
 			 
-		//Teach the Generator
-		
 		//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
 		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(minibatchSize);
 		
 		//"Update the generator by descending the stochastic gradient"
-		//Apply Backprop to Gen
-//		mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
-		
-		
-
+		for(std::vector<Sample>::iterator itr = generatedImagesFromNoiseMinibatch.begin(); itr != generatedImagesFromNoiseMinibatch.end(); ++itr)
+		{
+			Sample sample{*itr};
+			mTeacher.minibatchDiscriminatorBackprop(mGenerator,sample.first, sample.second, mConfig.step, mConfig.dx);
+		}
+		mTeacher.updateNetworkWeights(mGenerator);
 	}
 }
 

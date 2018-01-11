@@ -49,6 +49,7 @@ Eigen::MatrixXf NeuronLayer::layerBackprop(Eigen::MatrixXf xnPartialDerivative, 
     return ynPartialDerivative*mWeight.transpose();
 }
 
+[[deprecated]] //use minibatchLayerBackprop instead
 Eigen::MatrixXf NeuronLayer::layerBackpropInvariant(Eigen::MatrixXf xnPartialDerivative)
 {
     // Calcul de ynPartialDerivative

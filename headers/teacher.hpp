@@ -50,7 +50,8 @@ class Teacher
 
         void            backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
-		/// Fonction appliquant la méthode de rétropropagation par mini-Batch sur mNetwork
+#pragma mark - minibatch
+		/// Fonction appliquant la méthode de rétropropagation par mini-Batch sur mDiscriminator
 		/**
 		 * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau
 		 * @param network le réseau à rétropropager (mGenerator ou mDicriminator)
@@ -59,7 +60,19 @@ class Teacher
 		 * @param step le pas d'apprentissage
 		 * @param dx le deplacement élémentaire pour calculer la dérivée
 		 */
-		void 			minibatchBackProp(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step = 0.2, float dx = 0.05);
+		void 			minibatchDiscriminatorBackprop(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step = 0.2, float dx = 0.05);
+
+		/// Fonction appliquant la méthode de rétropropagation par mini-Batch sur mDiscriminator
+		/**
+		 * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau
+		 * @param network le réseau à rétropropager (mGenerator ou mDicriminator)
+		 * @param input le vecteur d'input que le réseau va process
+		 * @param desiredOutput la sortie modèle dont on veut se rapprocher
+		 * @param step le pas d'apprentissage
+		 * @param dx le deplacement élémentaire pour calculer la dérivée
+		 */
+		void 			minibatchGeneratorBackprop(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step = 0.2, float dx = 0.05);
+
 	
 		/// Fonction mettant à jour les poids du réseau
 		/**
@@ -77,6 +90,15 @@ class Teacher
          */
         void            propagateError(NeuralNetwork::Ptr network, Eigen::MatrixXf xnPartialDerivative, float step);
 
+
+		/// Fonction propageant l'erreur itérativement à travers le réseau considéré sans toutefois l'améliorer
+		/**
+		 * La fonction itère sur toutes les couches de neurones et appliques les formules de récurrence
+		 * @param xnPartialDerivative la dérivée dE/dXn initiale
+		 * @param network le réseau à rétropropager (mGenerator ou mDicriminator)
+		 * @param step le pas d'apprentissage
+		 */
+		Eigen::MatrixXf propagateErrorMinibatch(NeuralNetwork::Ptr network, Eigen::MatrixXf xnPartialDerivative, float step);
 
 
         /// Fonction propageant l'erreur itérativement à travers le réseau discriminant
@@ -107,7 +129,7 @@ class Teacher
          * @return renvoie le vecteur dE/dXn
          */
         Eigen::MatrixXf calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx);
-
+	
     private:
         /// Des pointeur sur les réseaux dont on veut superviser l'apprentissage
         NeuralNetwork::Ptr  mGenerator;

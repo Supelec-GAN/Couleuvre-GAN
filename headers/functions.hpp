@@ -15,6 +15,8 @@ struct Functions
         /// Un alias sur une fonction d'erreur
         using ErrorFun      = std::function<float(Eigen::MatrixXf, Eigen::MatrixXf)>;
 
+	
+	
         /// Fonction d'activation sigmoide
         /**
          * @return f(x) = 1/(1-e(-x.lambda))
@@ -33,6 +35,8 @@ struct Functions
          */
         static ActivationFun    hyperTan();
 
+	
+	
         ///Fonction d'erreur norme 2
         static ErrorFun         l2Norm();
 

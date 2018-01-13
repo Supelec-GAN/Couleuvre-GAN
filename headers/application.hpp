@@ -9,7 +9,7 @@
 #include "headers/neuralnetwork.hpp"
 #include "headers/teacher.hpp"
 #include "headers/statscollector.hpp"
-
+#include "CSVFile.h"
 ///Classe destinée à gérer l'ensemble d'un projet
 /**
  * La classe supervise l'apprentissage d'un réseau de neurones par rapport au batchs de données qu'on lui fournit
@@ -101,6 +101,7 @@ class Application
         /// Fonction pour charger la configuration de l'application
         void loadConfig(const std::string& configFileName = "config.json");
         void setConfig(rapidjson::Document& document);
+        void exportPoids();
 
     private:
         /// Les réseaux avec lequel on travaille

@@ -68,8 +68,11 @@ void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned i
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
 
         //Création Image
-        Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-        mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*nbTeachingsPerLoop);
+        if (loopIndex%100==0)
+        {
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*nbTeachingsPerLoop);
+        }
     }
 }
 
@@ -190,4 +193,14 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.dx = document["dx"].GetFloat();
 
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
+}
+
+void Application::exportPoids() //A Implementer
+{
+    //Generateur
+    csvfile csvGen("generateur.csv");
+
+    //Discriminateur
+    csvfile csvDis("discriminateur.csv");
+
 }

@@ -58,16 +58,18 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
 void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
 {
     mStatsCollector[0].addResult(runTest());
-    bool trigger = false;
+    bool trigger = false; //A changer si vous voulez faire des expériences funs
     for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
     {
         std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
         runStochasticTeach(nbTeachingsPerLoop, trigger);
         auto score = runTest();
         mStatsCollector[loopIndex+1].addResult(score);
-        if (score < 0.1) trigger = true;
-        else trigger = false;
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
+
+        //Création Image
+        Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+        mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*nbTeachingsPerLoop);
     }
 }
 

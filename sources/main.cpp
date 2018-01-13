@@ -17,7 +17,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {       
-    csvfile csv("image.csv");
+    csvfile csv("imagefinale.csv");
 
     //QApplication app(argc, argv);
 
@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
         // Construction du réseau de neurones
         unsigned int nombreInputGen = 1200;
         //Le Generateur
-        std::vector<unsigned int> sizesGen{ {nombreInputGen,1000,800,784} };
-        std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::vector<unsigned int> sizesGen{ {nombreInputGen,2000,1000,800,784} };
+        std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f),Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
         std::shared_ptr<NeuralNetwork> generator(new NeuralNetwork(sizesGen, funsGen));
         //Le Discriminateur
-        std::vector<unsigned int> sizesDis{ {784,1000,300,1} };
-        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::vector<unsigned int> sizesDis{ {784,1000,500,300,1} };
+        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f),Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
         std::shared_ptr<NeuralNetwork> discriminator(new NeuralNetwork(sizesDis, funsDis));
 
         //Chargement de MNIST
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         {
             Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
             outputTrain(0,0) = 1;
-            if (labelTrain(i) == 1)
+            if (true)
             {
                 batchTrain.push_back(Application::Sample(imageTrain[i], outputTrain));
             }

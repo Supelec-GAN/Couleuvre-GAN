@@ -1,12 +1,11 @@
 #include "headers/statscollector.hpp"
 #include "headers/application.hpp"
-
 #include <stdexcept>
 
-Stats::StatsCollector::StatsCollector(const std::string& CSVFileName)
-: mCSV(CSVFileName + ".csv")
+Stats::StatsCollector::StatsCollector(const std::string& CSVFileNameRes, const std::string& CSVFileNameImg)
+: mCSVRes(CSVFileNameRes + ".csv"), mCSVImg(CSVFileNameImg + ".csv")
 {
-    mCSV << "Teach index" << "Mean" << "Deviation" << "Confidence Range" << "" << "";
+    mCSVRes << "Teach index" << "Mean" << "Deviation" << "Confidence Range" << "" << "";
 }
 
 Stats::ErrorCollector& Stats::StatsCollector::operator[](unsigned int teachIndex)
@@ -29,13 +28,24 @@ void Stats::StatsCollector::exportData(bool mustProcessData)
     {
         ErrorCollector::StatisticData data{mErrorStats[index].processData()};
 
-        mCSV << index << data.mean << data.deviation << data.confidenceRange << endrow;
+        mCSVRes << index << data.mean << data.deviation << data.confidenceRange << endrow;
     }
+}
+
+void Stats::StatsCollector::exportImage(Eigen::MatrixXf image, unsigned int teachIndex)
+{
+    mCSVImg << teachIndex << endrow;
+    for(int j(0); j<784; j++)
+    {
+        mCSVImg << image(j);
+        if (j%28 == 27) mCSVImg << endrow;
+    }
+    mCSVImg << endrow;
 }
 
 
 csvfile* Stats::StatsCollector::getCSVFile()
 {
-    return &mCSV;
+    return &mCSVRes;
 }
 

@@ -1,6 +1,6 @@
 #include "headers/neuralnetwork.hpp"
 
-#pragma mark - Constructeur
+//#pragma mark - Constructeur
 //*************CONSTRUCTEUR*************
 //**************************************
 
@@ -21,7 +21,16 @@ NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes)
         push_back(NeuronLayer(layerSizes[i], layerSizes[i+1]));
 }
 
-#pragma mark - Propagation
+NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns)
+{
+    if(layerSizes.size() != activationFuns.size() + 1)
+        throw std::logic_error("NeuralNetwork::NeuralNetwork error - Sizes of parameters do not match");
+
+    for(size_t i(0); i < layerSizes.size()-1; ++i)
+        push_back(NeuronLayer(layerSizes[i], layerSizes[i+1], weightVector[i], biasVector[i], activationFuns[i]));
+}
+
+//#pragma mark - Propagation
 //*************PROPAGATION**************
 //**************************************
 
@@ -42,7 +51,7 @@ Eigen::MatrixXf NeuralNetwork::processNetwork()
 	return input;
 }
 
-#pragma mark - Autres
+//#pragma mark - Autres
 //****************AUTRES****************
 //**************************************
 
@@ -57,7 +66,8 @@ int NeuralNetwork::getInputSize()
     return ((*(begin())).getInputSize());
 }
 
-#pragma mark - Auxiliaires
+
+//#pragma mark - Auxiliaires
 //*************AUXILIAIRES**************
 //**************************************
 

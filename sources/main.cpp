@@ -25,43 +25,13 @@ int main(int argc, char *argv[])
 
     try
     {
-        // Construction du réseau de neurones
-        unsigned int nombreInputGen = 1200;
-        //Le Generateur
-        std::vector<unsigned int> sizesGen{ {nombreInputGen,2000,1000,800,784} };
-        std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f),Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
-        std::shared_ptr<NeuralNetwork> generator(new NeuralNetwork(sizesGen, funsGen));
-        //Le Discriminateur
-        std::vector<unsigned int> sizesDis{ {784,1000,500,300,1} };
-        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f),Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
-        std::shared_ptr<NeuralNetwork> discriminator(new NeuralNetwork(sizesDis, funsDis));
-
         //Chargement de MNIST
         mnist_reader readerTrain("MNIST/train-images-60k", "MNIST/train-labels-60k");
         std::vector<Eigen::MatrixXf> imageTrain;
         Eigen::MatrixXi labelTrain;
         readerTrain.ReadMNIST(imageTrain, labelTrain);
 
-        //Création du vecteur de bruit pour les tests
-        std::vector<Eigen::MatrixXf> vectorTest;
-        int sizeTest(20);
-        for(int i(0); i < sizeTest; i++)
-        {
-            Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, nombreInputGen);
-            vectorTest.push_back(noise);
-        }
-
         Application::Batch batchTrain;
-        Application::Batch batchTest;
-
-        //Création du Batch de Test
-        for(auto i(0); i< sizeTest; i++)
-        {
-            Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
-            outputTest(0) = 0;
-            batchTest.push_back(Application::Sample(vectorTest[i], outputTest));
-        }
-        cout << "Chargement du Batch de test effectué !" << endl;
 
         //Création du Batch d'entrainement
         for(auto i(0); i< labelTrain.size(); i++)
@@ -76,11 +46,11 @@ int main(int argc, char *argv[])
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
 
         //Construction de l'application qui gère tout
-        Application appMNIST(discriminator, generator, batchTrain, batchTest);
-        appMNIST.runExperiments(1, 10000, 100);
+        Application appMNIST(batchTrain);
+        appMNIST.runExperiments();
 
         //Génération de 10 images et export pour analyse
-        std::vector<Eigen::MatrixXf> resultat;
+/*        std::vector<Eigen::MatrixXf> resultat;
         for(int i(0); i < 10; i++)
         {
             Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, nombreInputGen);
@@ -93,6 +63,7 @@ int main(int argc, char *argv[])
             csv << endrow;
         }
         cout << "Génération des images terminé !" << endl;
+*/
 
     }
     catch (const std::exception& ex)

@@ -8,6 +8,7 @@ class Teacher
 {
     public:
 
+                        Teacher();
         /// Constructeur par unique pointer
         /**
          *  Construit un teacher supervisant l'apprentissage d'un réseau de neurone
@@ -25,7 +26,7 @@ class Teacher
                         Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator);
 
 
-#pragma mark - Backpropagation
+//#pragma mark - Backpropagation
 	
         /// Fonction appliquant la méthode de rétropropagation sur mDiscriminator
         /**

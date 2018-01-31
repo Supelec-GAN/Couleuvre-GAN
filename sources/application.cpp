@@ -128,7 +128,10 @@ void Application::runExperiments()
     for(unsigned int index{0}; index < mConfig.nbExperiments; ++index)
     {
         if (!mConfig.networkAreImported)
+        {
             resetExperiment();
+            std::cout << "Réseau réinitialisé !" << std::endl;
+        }
         runSingleStochasticExperiment();
         exportPoids();
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
@@ -178,10 +181,12 @@ void Application::runStochasticTeach(bool trigger)
     {
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
-		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
 
         for(int i(0); i<mConfig.nbGenTeach; i++)
         {
+
+            Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
             noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
             input = mGenerator->processNetwork(noiseInput);
 
@@ -190,9 +195,11 @@ void Application::runStochasticTeach(bool trigger)
         }
         for(int i(0); i<mConfig.nbDisTeach; i++)
         {
+            noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
             Sample sample{mTeachingBatch[distribution(randomEngine)]};
             mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
 
+            Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
             desiredOutput(0,0) = 0;
             mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
         }

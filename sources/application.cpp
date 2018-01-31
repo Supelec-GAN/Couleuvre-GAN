@@ -6,11 +6,52 @@
 #include <ctime>
 #include <iostream>
 
-Application::Application(Batch teachingBatch) :
+Application::Application() :
 mStatsCollector()
 {
     // Charge la configuration de l'application
     loadConfig();
+
+    try
+    {
+        //Chargement de MNIST
+        mnist_reader readerTrain("MNIST/train-images-60k", "MNIST/train-labels-60k");
+        std::vector<Eigen::MatrixXf> imageTrain;
+        Eigen::MatrixXi labelTrain;
+        readerTrain.ReadMNIST(imageTrain, labelTrain);
+
+        mnist_reader readerTest("MNIST/test-images-10k", "MNIST/test-labels-10k");
+        std::vector<Eigen::MatrixXf> imageTest;
+        Eigen::MatrixXi labelTest;
+        readerTest.ReadMNIST(imageTest, labelTest);
+
+        //Création du Batch d'entrainement
+        for(auto i(0); i< labelTrain.size(); i++)
+        {
+            Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
+            outputTrain(0,0) = 1;
+            if (labelTrain(i) == mConfig.chiffreATracer)
+            {
+                mTeachingBatch.push_back(Application::Sample(imageTrain[i], outputTrain));
+            }
+        }
+        cout << "Chargement du Batch d'entrainement effectué !" << endl;
+
+        //Création du Batch de test
+        for(auto i(0); i< labelTest.size(); i++)
+        {
+            Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
+            outputTest(0) = 1;
+            if (labelTest(i) = mConfig.chiffreATracer)
+            {
+                mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        std::cout << "Exception was thrown: " << ex.what() << std::endl;
+    }
 
     //Création du vecteur de bruit pour les tests
     std::vector<Eigen::MatrixXf> vectorTest;
@@ -26,7 +67,7 @@ mStatsCollector()
     {
         Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
         outputTest(0) = 0;
-        mTestingBatch.push_back(Application::Sample(vectorTest[i], outputTest));
+        mTestingBatchGen.push_back(Application::Sample(vectorTest[i], outputTest));
     }
     std::cout << "Chargement du Batch de test effectué !" << std::endl;
 
@@ -44,17 +85,16 @@ mStatsCollector()
         // Construction du réseau de neurones
         //Le Generateur
         std::vector<Functions::ActivationFun> funsGen;
-        for(auto i(0); i < mConfig.genLayerSizes.size()-1;i++)
+        for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
             funsGen.push_back(Functions::sigmoid(0.1f));
         mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
         //Le Discriminateur
         std::vector<Functions::ActivationFun> funsDis;
 
-        for(auto i(0); i < mConfig.disLayerSizes.size()-1;i++)
+        for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
             funsDis.push_back(Functions::sigmoid(0.1f));
         mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
     }
-    mTeachingBatch = Batch(teachingBatch);
     mTeacher = Teacher(mGenerator,mDiscriminator);
     mTestCounter = 0;
 }
@@ -107,10 +147,12 @@ void Application::runSingleStochasticExperiment()
         std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
         runStochasticTeach(trigger);
         auto score = runTest();
+        auto scoreDis = runTestDis();
         mStatsCollector[loopIndex+1].addResult(score);
-        std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
+        mStatsCollector[loopIndex+1].addResultDis(scoreDis);
+        std::cout << "Le score est de " << score << " et le scoreDis de " << scoreDis << " !" << std::endl;
         //Création Image
-        if (loopIndex%100==0)
+        if (loopIndex%mConfig.intervalleImg==0)
         {
             Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
             mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
@@ -130,7 +172,6 @@ void Application::resetExperiment()
 
 void Application::runStochasticTeach(bool trigger)
 {
-	
     std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
 
@@ -176,13 +217,28 @@ float Application::runTest(int limit, bool returnErrorRate)
     float errorMean{0};
     if (returnErrorRate)
     {
-        for(std::vector<Sample>::iterator itr = mTestingBatch.begin(); itr != mTestingBatch.end() && limit-- != 0; ++itr)
+        for(std::vector<Sample>::iterator itr = mTestingBatchGen.begin(); itr != mTestingBatchGen.end() && limit-- != 0; ++itr)
         {
             Eigen::MatrixXf output{mDiscriminator->processNetwork(mGenerator->processNetwork(itr->first))};
             errorMean += sqrt((output - itr->second).squaredNorm());
         }
     }
-    return errorMean/static_cast<float>(mTestingBatch.size());
+    return errorMean/static_cast<float>(mTestingBatchGen.size());
+}
+
+
+float Application::runTestDis(int limit, bool returnErrorRate)
+{
+    float errorMean{0};
+    if (returnErrorRate)
+    {
+        for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end() && limit-- != 0; ++itr)
+        {
+            Eigen::MatrixXf output{mDiscriminator->processNetwork(itr->first)};
+            errorMean += sqrt((output - itr->second).squaredNorm());
+        }
+    }
+    return errorMean/static_cast<float>(mTestingBatchDis.size());
 }
 
 float Application::gameScore(int nbImages)
@@ -245,6 +301,8 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
     mConfig.nbDisTeach = document["nbDisTeach"].GetUint();
     mConfig.nbGenTeach = document["nbGenTeach"].GetUint();
+    mConfig.intervalleImg = document["intervalleImg"].GetUint();
+    mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();

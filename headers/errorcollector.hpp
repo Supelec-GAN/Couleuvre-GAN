@@ -12,6 +12,7 @@ class ErrorCollector
         struct StatisticData
         {
             float mean;
+            float meanDis;
             float deviation;
             float confidenceRange;
         };
@@ -21,12 +22,14 @@ class ErrorCollector
 
         StatisticData   processData() const;
         void            addResult(float result);
+        void            addResultDis(float result);
 
     private:
 
 
     private:
         std::vector<float> mErrors;
+        std::vector<float> mErrorsDis;
 
 };
 

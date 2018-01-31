@@ -5,7 +5,7 @@
 Stats::StatsCollector::StatsCollector(const std::string& CSVFileNameRes, const std::string& CSVFileNameImg)
 : mCSVRes(CSVFileNameRes + ".csv"), mCSVImg(CSVFileNameImg + ".csv")
 {
-    mCSVRes << "Teach index" << "Mean" << "Deviation" << "Confidence Range" << "" << "";
+    mCSVRes << "Teach index" << "Mean" << "MeanDis" << "Deviation" << "Confidence Range" << "" << "";
 }
 
 Stats::ErrorCollector& Stats::StatsCollector::operator[](unsigned int teachIndex)
@@ -28,7 +28,7 @@ void Stats::StatsCollector::exportData(bool mustProcessData)
     {
         ErrorCollector::StatisticData data{mErrorStats[index].processData()};
 
-        mCSVRes << index << data.mean << data.deviation << data.confidenceRange << endrow;
+        mCSVRes << index << data.mean << data.meanDis << data.deviation << data.confidenceRange << endrow;
     }
 }
 

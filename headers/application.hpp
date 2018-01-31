@@ -9,6 +9,7 @@
 #include "headers/neuralnetwork.hpp"
 #include "headers/teacher.hpp"
 #include "headers/statscollector.hpp"
+#include "headers/mnist_reader.h"
 #include "CSVFile.h"
 #include "string.h"
 
@@ -36,6 +37,8 @@ class Application
             unsigned int nbTeachingsPerLoop;
             unsigned int nbGenTeach;
             unsigned int nbDisTeach;
+            unsigned int intervalleImg;
+            unsigned int chiffreATracer;
 
             std::string generatorPath;
             std::string discriminatorPath;
@@ -56,12 +59,8 @@ class Application
         /// Constructeur par batchs
         /**
          * Ce constructeur supervise le projet par rapport au réseau de neurones donné et aux batchs de tests et d'apprentissages donnés en paramètre
-         * @param discriminator le discriminateur avec lequel on travaille
-		 * @param generator le generateur avec lequel on travaille
-         * @param teachingBatch le batch des données servant à l'apprentissage
-         * @param testBatch le batch des données de test
          */
-        Application(Batch teachingBatch);
+        Application();
 
         /// Constructeur par fonction modèle
         /**
@@ -101,11 +100,17 @@ class Application
 		 */
         void runMiniBatchTeach(unsigned int batchSize);
 	
-        /// Effectue une run de tests
+        /// Effectue une run de tests sur D(G(z))
         /**
          * Effectue une run de test sur le batch de test
          */
         float runTest(int limit = -1, bool returnErrorRate = 1);
+
+        /// Effectue une run de tests sur D(x)
+        /**
+         * Effectue une run de test sur le batch de test
+         */
+        float runTestDis(int limit = 40, bool returnErrorRate = 1);
 
         /// Effectue une approximation du score des réseaux
         float gameScore(int nbImages);
@@ -136,7 +141,8 @@ class Application
         /// Le batch contenant tous les samples d'apprentissage du projet
         Batch               mTeachingBatch;
         /// Le batch contenant tous les samples de test du projet
-        Batch               mTestingBatch;
+        Batch               mTestingBatchDis;
+        Batch               mTestingBatchGen;
 
         Stats::StatsCollector mStatsCollector;
         /// Un compteur permettant d'indicer les données exportées

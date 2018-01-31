@@ -241,7 +241,7 @@ float Application::runTestDis(int limit, bool returnErrorRate)
         for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end() && limit-- != 0; ++itr)
         {
             Eigen::MatrixXf output{mDiscriminator->processNetwork(itr->first)};
-            errorMean += sqrt((output - itr->second).squaredNorm());
+            errorMean += sqrt((output).squaredNorm());
         }
     }
     return errorMean/static_cast<float>(mTestingBatchDis.size());

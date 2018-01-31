@@ -19,14 +19,6 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 #pragma mark - Backpropagation
 
 #pragma mark Backprop
-
-void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
-{
-    Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
-    xnPartialDerivative = propagateErrorDiscriminatorInvariant(xnPartialDerivative);
-    propagateError(mGenerator, xnPartialDerivative, step);
-}
-
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
 	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
@@ -34,20 +26,27 @@ void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desir
 	propagateError(mDiscriminator, xnPartialDerivative, step);
 }
 
+void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
+{
+	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
+	xnPartialDerivative = propagateErrorDiscriminatorInvariant(xnPartialDerivative);
+	propagateError(mGenerator, xnPartialDerivative, step);
+}
+
 #pragma mark Minibatch
 
-void Teacher::minibatchDiscriminatorBackprop(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
+void Teacher::minibatchDiscriminatorBackprop(NeuralNetwork::Ptr network, Eigen::MatrixXf input,Eigen::MatrixXf desiredOutput, float step, float dx)
 //Same as backpropDiscriminator but no weight updating
 {
-	Eigen::VectorXf xnPartialDerivative = calculateInitialErrorVector(network->processNetwork(input), desiredOutput, dx);
+	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
 
 	propagateErrorMinibatch(network, xnPartialDerivative, step);
 }
 
-void Teacher::minibatchGeneratorBackprop(NeuralNetwork::Ptr network, Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
+void Teacher::minibatchGeneratorBackprop(NeuralNetwork::Ptr network, Eigen::MatrixXf input,Eigen::MatrixXf desiredOutput, float step, float dx)
 //Same as backpropGenerator but no weight updating
 {
-	Eigen::VectorXf xnPartialDerivative = calculateInitialErrorVector(network->processNetwork(input), desiredOutput, dx);
+	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
 	xnPartialDerivative = propagateErrorMinibatch(mDiscriminator, xnPartialDerivative, 0);
 	propagateErrorMinibatch(network, xnPartialDerivative, step);
 	

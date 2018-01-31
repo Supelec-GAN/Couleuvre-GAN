@@ -59,10 +59,12 @@ class Application
 
 #pragma mark - Expériences
 	
-		void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+		void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop, std::string typeOfExperiment  = "Stochastic", unsigned int minibatchSize = 0);
 	
 		void runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
 	
+		void runSingleMinibatchExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop, unsigned int minibatchSize = 10);
+
 		void resetExperiment();
 	
 #pragma mark - Apprentissage

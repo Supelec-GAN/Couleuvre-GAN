@@ -42,12 +42,24 @@ Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr ge
 //**************EXPERIENCES*************
 //**************************************
 
-void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
+void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop, std::string typeOfExperiment, unsigned int minibatchSize)
 {
     for(unsigned int index{0}; index < nbExperiments; ++index)
     {
         resetExperiment();
-        runSingleStochasticExperiment(nbLoops, nbTeachingsPerLoop);
+		if (typeOfExperiment == "Stochastic")
+		{
+			runSingleStochasticExperiment(nbLoops, nbTeachingsPerLoop);
+		}
+		else if (typeOfExperiment == "Minibatch")
+		{
+			runSingleMinibatchExperiment(nbLoops, nbTeachingsPerLoop, minibatchSize);
+		}
+		else
+		{
+			std::cout << "Application::runExperiments error : typeOfExperiment is unknown (" << stderr << ")" << std::endl;
+			exit(EXIT_FAILURE);
+		}
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
     }
 
@@ -71,6 +83,19 @@ void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned i
         else trigger = false;
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
     }
+}
+
+void Application::runSingleMinibatchExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop, unsigned int minibatchSize)
+{
+	mStatsCollector[0].addResult(runTest());
+	for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
+	{
+		std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
+		runMinibatchTeach(nbTeachingsPerLoop, minibatchSize);
+		auto score = runTest();
+		mStatsCollector[loopIndex+1].addResult(score);
+		std::cout << "Le score est de " << score << std::endl;
+	}
 }
 
 void Application::resetExperiment()
@@ -152,9 +177,10 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 			
 			for (unsigned long i(0); i < minibatchSize; ++i)
 			{
+				
 				Sample falseimagesample{generatedImagesFromNoiseMinibatch[i]};
 				Sample trueimagesample{exampleMinibatch[i]};
-				
+								
 				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,falseimagesample.first, falseimagesample.second, mConfig.step, mConfig.dx);
 				mTeacher.minibatchGeneratorBackprop(mGenerator,trueimagesample.first, trueimagesample.second, mConfig.step, mConfig.dx);
 			}
@@ -170,7 +196,7 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 		for(std::vector<Sample>::iterator itr = generatedImagesFromNoiseMinibatch.begin(); itr != generatedImagesFromNoiseMinibatch.end(); ++itr)
 		{
 			Sample sample{*itr};
-			mTeacher.minibatchDiscriminatorBackprop(mGenerator,sample.first, sample.second, mConfig.step, mConfig.dx);
+			mTeacher.minibatchGeneratorBackprop(mGenerator,sample.first, sample.second, mConfig.step, mConfig.dx);
 		}
 		mTeacher.updateNetworkWeights(mGenerator);
 	}
@@ -228,6 +254,7 @@ Application::Minibatch Application::sampleMinibatch(Application::Batch batch, un
 Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch(unsigned long minibatchSize)
 {
 	Application::Minibatch generatedImagesFromNoiseMinibatch(minibatchSize);
+	
 	
 	Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 	desiredOutput(0,0) = 1; //generator want to create near-real images

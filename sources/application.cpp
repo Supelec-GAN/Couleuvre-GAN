@@ -43,10 +43,15 @@ mStatsCollector()
     {
         // Construction du réseau de neurones
         //Le Generateur
-        std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::vector<Functions::ActivationFun> funsGen;
+        for(auto i(0); i < mConfig.genLayerSizes.size()-1;i++)
+            funsGen.push_back(Functions::sigmoid(0.1f));
         mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
         //Le Discriminateur
-        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f),Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        std::vector<Functions::ActivationFun> funsDis;
+
+        for(auto i(0); i < mConfig.disLayerSizes.size()-1;i++)
+            funsDis.push_back(Functions::sigmoid(0.1f));
         mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
     }
     mTeachingBatch = Batch(teachingBatch);

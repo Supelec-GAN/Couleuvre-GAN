@@ -10,6 +10,12 @@
 #include "headers/teacher.hpp"
 #include "headers/statscollector.hpp"
 #include "CSVFile.h"
+#include "string.h"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdlib.h>
 ///Classe destinée à gérer l'ensemble d'un projet
 /**
  * La classe supervise l'apprentissage d'un réseau de neurones par rapport au batchs de données qu'on lui fournit
@@ -22,6 +28,20 @@ class Application
         {
             float step;
             float dx;
+
+            bool networkAreImported;
+
+            unsigned int nbExperiments;
+            unsigned int nbLoopsPerExperiment;
+            unsigned int nbTeachingsPerLoop;
+
+            std::string generatorPath;
+            std::string discriminatorPath;
+            std::string generatorDest;
+            std::string discriminatorDest;
+
+            std::vector<unsigned int> disLayerSizes;
+            std::vector<unsigned int> genLayerSizes;
         };
 
     public:
@@ -39,7 +59,7 @@ class Application
          * @param teachingBatch le batch des données servant à l'apprentissage
          * @param testBatch le batch des données de test
          */
-        Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch);
+        Application(Batch teachingBatch);
 
         /// Constructeur par fonction modèle
         /**
@@ -55,29 +75,29 @@ class Application
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
 
-#pragma mark - Expériences
+////#pragma mark - Expériences
 	
-		void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+        void runExperiments();
 	
-		void runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+        void runSingleStochasticExperiment();
 	
 		void resetExperiment();
 	
-#pragma mark - Apprentissage
+//////#pragma mark - Apprentissage
 
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
          * @param nbTeachings le nombre d'apprentissages à faire pendant la run
          */
-        void runStochasticTeach(unsigned int nbTeachings, bool trigger);
+        void runStochasticTeach(bool trigger);
 
 		/// Effectue une run d'apprentissage par la méthode par batch
 		/**
 		 * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
 		 * @param nbTeachings le nombre d'apprentissages à faire pendant la run
 		 */
-		void runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize);
+        void runMiniBatchTeach(unsigned int batchSize);
 	
         /// Effectue une run de tests
         /**
@@ -95,13 +115,14 @@ class Application
          */
         Eigen::MatrixXf genProcessing(Eigen::MatrixXf input);
 	
-#pragma mark - Configuration
+//////#pragma mark - Configuration
 
     private:
         /// Fonction pour charger la configuration de l'application
         void loadConfig(const std::string& configFileName = "config.json");
         void setConfig(rapidjson::Document& document);
         void exportPoids();
+        NeuralNetwork* importNeuralNetwork(std::string networkPath, Functions::ActivationFun activationFun);
 
     private:
         /// Les réseaux avec lequel on travaille

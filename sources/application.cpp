@@ -4,18 +4,54 @@
 #include <math.h>
 #include <fstream>
 #include <ctime>
+#include <iostream>
 
-Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch)
-: mDiscriminator(discriminator)
-, mGenerator(generator)
-, mTeacher(mGenerator, mDiscriminator)
-, mTeachingBatch(teachingBatch)
-, mTestingBatch(testBatch)
-, mStatsCollector()
-, mTestCounter(0)
+Application::Application(Batch teachingBatch) :
+mStatsCollector()
 {
     // Charge la configuration de l'application
     loadConfig();
+
+    //Création du vecteur de bruit pour les tests
+    std::vector<Eigen::MatrixXf> vectorTest;
+    int sizeTest(20);
+    for(int i(0); i < sizeTest; i++)
+    {
+        Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
+        vectorTest.push_back(noise);
+    }
+
+    //Création du Batch de Test
+    for(auto i(0); i< sizeTest; i++)
+    {
+        Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
+        outputTest(0) = 0;
+        mTestingBatch.push_back(Application::Sample(vectorTest[i], outputTest));
+    }
+    std::cout << "Chargement du Batch de test effectué !" << std::endl;
+
+
+    if (mConfig.networkAreImported)
+    {
+        mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(0.1f)));
+        std::cout << "Chargement du Discriminateur effectué !" << std::endl;
+
+        mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(0.1f)));
+        std::cout << "Chargement du Générateur effectué !" << std::endl;
+    }
+    else
+    {
+        // Construction du réseau de neurones
+        //Le Generateur
+        std::vector<Functions::ActivationFun> funsGen{ {Functions::sigmoid(0.1f), Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
+        //Le Discriminateur
+        std::vector<Functions::ActivationFun> funsDis{ {Functions::sigmoid(0.1f),Functions::sigmoid(0.1f), Functions::sigmoid(0.1f)} };
+        mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
+    }
+    mTeachingBatch = Batch(teachingBatch);
+    mTeacher = Teacher(mGenerator,mDiscriminator);
+    mTestCounter = 0;
 }
 
 /*Application::Application(   NeuralNetwork::Ptr network,
@@ -38,16 +74,18 @@ Application::Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr ge
         mTestingBatch.push_back(Sample(testingInputs[i], modelFunction(testingInputs[i])));
 }*/
 
-#pragma mark - Expériences
+////#pragma mark - Expériences
 //**************EXPERIENCES*************
 //**************************************
 
-void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
+void Application::runExperiments()
 {
-    for(unsigned int index{0}; index < nbExperiments; ++index)
+    for(unsigned int index{0}; index < mConfig.nbExperiments; ++index)
     {
-        resetExperiment();
-        runSingleStochasticExperiment(nbLoops, nbTeachingsPerLoop);
+        if (!mConfig.networkAreImported)
+            resetExperiment();
+        runSingleStochasticExperiment();
+        exportPoids();
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
     }
 
@@ -55,23 +93,22 @@ void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoop
     mStatsCollector.exportData(true);
 }
 
-void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
+void Application::runSingleStochasticExperiment()
 {
     mStatsCollector[0].addResult(runTest());
     bool trigger = false; //A changer si vous voulez faire des expériences funs
-    for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
+    for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
     {
-        std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
-        runStochasticTeach(nbTeachingsPerLoop, trigger);
+        std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
+        runStochasticTeach(trigger);
         auto score = runTest();
         mStatsCollector[loopIndex+1].addResult(score);
         std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
-
         //Création Image
         if (loopIndex%100==0)
         {
             Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*nbTeachingsPerLoop);
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
         }
     }
 }
@@ -82,17 +119,17 @@ void Application::resetExperiment()
     mDiscriminator->reset();
 }
 
-#pragma mark - Apprentissage
+////#pragma mark - Apprentissage
 //************APPRENTISSAGE*************
 //**************************************
 
-void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
+void Application::runStochasticTeach(bool trigger)
 {
 	
     std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
 
-    for(unsigned int index{0}; index < nbTeachings; index++)
+    for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
     {
         Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
@@ -120,7 +157,7 @@ void Application::runStochasticTeach(unsigned int nbTeachings, bool trigger)
     }
 }
 
-void Application::runMiniBatchTeach(unsigned int nbTeachings, unsigned int batchSize)
+void Application::runMiniBatchTeach(unsigned int batchSize)
 {
 #warning Japillow must implement
 	throw std::logic_error("Not implemented yet");
@@ -161,7 +198,7 @@ Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
 	return(mGenerator->processNetwork(input));
 }
 
-#pragma mark - Configuration
+////#pragma mark - Configuration
 //************CONFIGURATION*************
 //**************************************
 
@@ -186,21 +223,132 @@ void Application::loadConfig(const std::string& configFileName)
     setConfig(doc);
 }
 
-
 void Application::setConfig(rapidjson::Document& document)
 {
     mConfig.step = document["step"].GetFloat();
     mConfig.dx = document["dx"].GetFloat();
 
+    mConfig.networkAreImported = document["networkAreImported"].GetBool();
+
+    auto layersSizesDis = document["layersSizesDis"].GetArray();
+    for(rapidjson::SizeType i = 0; i < layersSizesDis.Size(); i++)
+        mConfig.disLayerSizes.push_back(layersSizesDis[i].GetUint());
+
+    auto layersSizesGen = document["layersSizesGen"].GetArray();
+    for(rapidjson::SizeType i = 0; i < layersSizesGen.Size(); i++)
+        mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());
+
+    mConfig.nbExperiments = document["nbExperiments"].GetUint();
+    mConfig.nbLoopsPerExperiment = document["nbLoopsPerExperiment"].GetUint();
+    mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
+
+    mConfig.generatorPath = document["generatorPath"].GetString();
+    mConfig.discriminatorPath = document["discriminatorPath"].GetString();
+
+    mConfig.generatorDest = document["generatorDest"].GetString();
+    mConfig.discriminatorDest = document["discriminatorDest"].GetString();
+
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 }
 
-void Application::exportPoids() //A Implementer
+void Application::exportPoids()
 {
-    //Generateur
-    csvfile csvGen("generateur.csv");
+    csvfile csvGen(mConfig.generatorDest);
+    for(unsigned int i(0); i < mConfig.genLayerSizes.size(); i++)
+       csvGen << mConfig.genLayerSizes[i];
+    csvGen << endrow;
+    csvGen << *mGenerator;
 
-    //Discriminateur
-    csvfile csvDis("discriminateur.csv");
+    csvfile csvDis(mConfig.discriminatorDest);
+    for(unsigned int i(0); i < mConfig.disLayerSizes.size(); i++)
+       csvDis << mConfig.disLayerSizes[i];
+    csvDis << endrow;
+    csvDis << *mDiscriminator;
+    std::cout << "Export des réseaux effectués !" << std::endl;
+}
 
+NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Functions::ActivationFun activationFun)
+{
+    std::ifstream ifs (networkPath);
+    std::string a;
+    std::vector<Eigen::MatrixXf> neuralNetwork;
+    std::vector<Eigen::MatrixXf> bias;
+    std::vector<unsigned int> taille;
+    int k = 0;
+    getline(ifs, a,'\n');
+    std::string b = "";
+    for(auto i(0); i < a.length(); i++)
+    {
+        if (a[i] == ';')
+        {
+            if (b != "")
+
+            {
+                taille.push_back(stoi(b));
+                b = "";
+            }
+        }
+        else
+            b = b + a[i];
+    }
+    for(auto i(0); i < taille.size()-1; i++)
+    {
+        neuralNetwork.push_back(Eigen::MatrixXf::Zero(taille[i],taille[i+1]));
+        bias.push_back(Eigen::MatrixXf::Zero(1,taille[i+1]));
+    }
+    std::vector<Functions::ActivationFun> activationFunVector;
+    for(auto i(0); i < taille.size()-1; i++)
+    {
+        activationFunVector.push_back(activationFun);
+    }
+    int i = 0;
+    int j = 0;
+    while(k < taille.size()-1)
+    {
+        std::getline(ifs, a,'\n');
+        if (a != "")
+        {
+            for(auto itr=a.begin(); itr != a.end(); itr++)
+            {
+                if (*itr == ';')
+                {
+                    if (b != "")
+                    {
+                        neuralNetwork[k](j,i) = (std::stof(b));
+                        i++;
+                        b = "";
+                    }
+                }
+                else
+                    b = b + *itr;
+            }
+        j++;
+        i = 0;
+        }
+        else
+        {
+            j = 0;
+            std::getline(ifs, a,'\n');
+            for(auto itr=a.begin(); itr != a.end(); itr++)
+            {
+                if (*itr == ';')
+                {
+                    if (b != "")
+                    {
+                        bias[k](0,j) = (std::stof(b));
+                        j++;
+                        b = "";
+                    }
+                }
+                else
+                    b = b + *itr;
+            }
+            j=0;
+            std::getline(ifs, a, '\n');
+            std::getline(ifs, a, '\n');
+            k = k+1;
+        }
+    }
+    ifs.close();
+    return (new NeuralNetwork(taille, neuralNetwork, bias, activationFunVector));
 }

@@ -26,7 +26,17 @@ class NeuronLayer
          */
                         NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f));
 
-#pragma mark - Propagation
+        /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
+        /**
+         * \param inputSize le nombre d'inputs de cette couche
+         * \param outputSize le nombre d'outputs de cette couche
+         * \param activationF la fonction d'activation de tous les neurones de la couche
+         *
+         * La matrice de poids est de dimension outputSize x inputSize
+         */
+                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+
+//#pragma mark - Propagation
 	
         /// La fonction effectuant le calcul de la sortie en fonction de l'entrée
         /**
@@ -36,7 +46,7 @@ class NeuronLayer
          */
         Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
 
-#pragma mark - Backprop
+//#pragma mark - Backprop
         /// La fonction effectuant les calculs de rétropropagation
         /**
          * La fonction calcule les 3 équations matricielles, mets à jour les poids et renvoie le vecteur de dérivées partielles
@@ -67,10 +77,10 @@ class NeuronLayer
 		 */
 	Eigen::MatrixXf miniBatchLayerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
-#pragma mark - Autres
+//#pragma mark - Autres
 
 		/// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
-		void updateLayerWeights();
+        void            updateLayerWeights();
 
         void            reset();
 

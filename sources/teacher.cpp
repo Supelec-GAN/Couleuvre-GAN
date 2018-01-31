@@ -2,6 +2,8 @@
 
 #include "headers/teacher.hpp"
 
+Teacher::Teacher()
+{}
 
 Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator)
 : mGenerator(std::move(generator))
@@ -15,9 +17,9 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 , mErrorFun(Functions::coutDiscr())
 {}
 
-#pragma mark - Backpropagation
+//#pragma mark - Backpropagation
 
-#pragma mark Generator
+//#pragma mark Generator
 
 void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
@@ -34,7 +36,7 @@ void Teacher::propagateErrorGenerator(Eigen::MatrixXf xnPartialDerivative, float
 	}
 }
 
-#pragma mark Discriminator
+//#pragma mark Discriminator
 
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
@@ -60,7 +62,7 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
     return xnPartialDerivative;
 }
 
-#pragma mark Minibatch
+//#pragma mark Minibatch
 
 void Teacher::miniBatchBackProp(Eigen::VectorXf input,Eigen::VectorXf desiredOutput, float step, float dx)
 {
@@ -81,7 +83,7 @@ void Teacher::updateNetworkWeights()
 //		itr->updateLayerWeights();
 }
 
-#pragma mark initial vector calculation
+//#pragma mark initial vector calculation
 
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {

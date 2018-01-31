@@ -38,7 +38,7 @@ mStatsCollector()
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
 
         //Création du Batch de test
-        for(auto i(0); i< labelTest.size(); i++)
+        for(auto i(0); i<1000 /*labelTest.size()*/; i++)
         {
             Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
             outputTest(0) = 1;
@@ -133,7 +133,6 @@ void Application::runExperiments()
         exportPoids();
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
     }
-
 
     mStatsCollector.exportData(true);
 }

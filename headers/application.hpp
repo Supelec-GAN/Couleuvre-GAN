@@ -110,7 +110,7 @@ class Application
         /**
          * Effectue une run de test sur le batch de test
          */
-        float runTestDis(int limit = 40, bool returnErrorRate = 1);
+        float runTestDis(int limit = -1, bool returnErrorRate = 1);
 
         /// Effectue une approximation du score des réseaux
         float gameScore(int nbImages);

@@ -33,7 +33,7 @@ SOURCES += \
     sources/statscollector.cpp \
     sources/application.cpp
 
-INCLUDEPATH += D:\Users\Kvykv\Projet\C++\
+INCLUDEPATH += D:\Users\Kvykvzx\Projet\C++\SupelecGAN
 
 DISTFILES += \
     MNIST/test-images-10k \

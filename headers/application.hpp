@@ -34,6 +34,8 @@ class Application
             unsigned int nbExperiments;
             unsigned int nbLoopsPerExperiment;
             unsigned int nbTeachingsPerLoop;
+            unsigned int nbGenTeach;
+            unsigned int nbDisTeach;
 
             std::string generatorPath;
             std::string discriminatorPath;

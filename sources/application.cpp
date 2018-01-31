@@ -140,10 +140,7 @@ void Application::runStochasticTeach(bool trigger)
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
 
-        desiredOutput(0,0) = 1;
-        mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
-
-        if (trigger)
+        for(int i(0); i<mConfig.nbGenTeach; i++)
         {
             noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
             input = mGenerator->processNetwork(noiseInput);
@@ -151,7 +148,7 @@ void Application::runStochasticTeach(bool trigger)
             desiredOutput(0,0) = 1;
             mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
         }
-        else
+        for(int i(0); i<mConfig.nbDisTeach; i++)
         {
             Sample sample{mTeachingBatch[distribution(randomEngine)]};
             mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
@@ -246,6 +243,8 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.nbExperiments = document["nbExperiments"].GetUint();
     mConfig.nbLoopsPerExperiment = document["nbLoopsPerExperiment"].GetUint();
     mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
+    mConfig.nbDisTeach = document["nbDisTeach"].GetUint();
+    mConfig.nbGenTeach = document["nbGenTeach"].GetUint();
 
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();

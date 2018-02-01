@@ -163,7 +163,10 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 {
 	for(unsigned int index{0}; index < nbTeachings; index++)
 	{
-		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
+		Eigen::MatrixXf desiredOutput0 = Eigen::MatrixXf(1,1);
+		Eigen::MatrixXf desiredOutput1 = Eigen::MatrixXf(1,1);
+		desiredOutput0(0,0) = 0;
+		desiredOutput1(0,0) = 1;
 		
 		for (unsigned long k(0); k < 1; ++k)
 		{
@@ -180,11 +183,10 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 				
 				Sample falseimagesample{generatedImagesFromNoiseMinibatch[i]};
 				Sample trueimagesample{exampleMinibatch[i]};
-								
-				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,falseimagesample.first, falseimagesample.second, mConfig.step, mConfig.dx);
-				mTeacher.minibatchGeneratorBackprop(mGenerator,trueimagesample.first, trueimagesample.second, mConfig.step, mConfig.dx);
+				
+				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,falseimagesample.first, desiredOutput0, mConfig.step, mConfig.dx);
+				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,trueimagesample.first, desiredOutput1, mConfig.step, mConfig.dx);
 			}
-			mTeacher.updateNetworkWeights(mGenerator);
 			mTeacher.updateNetworkWeights(mDiscriminator);
 
 		}
@@ -196,7 +198,7 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 		for(std::vector<Sample>::iterator itr = generatedImagesFromNoiseMinibatch.begin(); itr != generatedImagesFromNoiseMinibatch.end(); ++itr)
 		{
 			Sample sample{*itr};
-			mTeacher.minibatchGeneratorBackprop(mGenerator,sample.first, sample.second, mConfig.step, mConfig.dx);
+			mTeacher.minibatchGeneratorBackprop(mGenerator,sample.first, desiredOutput1, mConfig.step, mConfig.dx);
 		}
 		mTeacher.updateNetworkWeights(mGenerator);
 	}
@@ -257,7 +259,7 @@ Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch(unsi
 	
 	
 	Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
-	desiredOutput(0,0) = 1; //generator want to create near-real images
+	desiredOutput(0,0) = 1;
 
 	for (unsigned long i(0); i < minibatchSize ; ++i)
 	{

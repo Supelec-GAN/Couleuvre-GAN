@@ -37,7 +37,7 @@ void Stats::StatsCollector::exportImage(Eigen::MatrixXf image, unsigned int teac
     mCSVImg << teachIndex << endrow;
     for(int j(0); j<784; j++)
     {
-        mCSVImg << image(j);
+        mCSVImg << image(0,j);
         if (j%28 == 27) mCSVImg << endrow;
     }
     mCSVImg << endrow;

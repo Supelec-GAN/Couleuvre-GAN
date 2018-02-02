@@ -25,7 +25,7 @@ class NeuralNetwork : public std::list<NeuronLayer>
          * @param layerSizes les tailles des vecteurs d'entrées/sorties
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
          */
-        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns);
+        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns, unsigned int batchSize);
 	
         /// Constructeur permettant d'initialiser un réseau neuronal avec choix des fonctions d'activation et des poids donnés
         /**
@@ -34,7 +34,7 @@ class NeuralNetwork : public std::list<NeuronLayer>
          * @param csvName est le nom du fichier contenant le réseau de neurones
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
          */
-        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns);
+        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns, unsigned int batchSize);
 
         /// Constructeur permettant d'initialiser un réseau neuronal avec la fonction par défaut
         /**

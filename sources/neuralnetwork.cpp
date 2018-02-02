@@ -6,13 +6,13 @@
 
 NeuralNetwork::NeuralNetwork(){}
 
-NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns)
+NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns, unsigned int batchSize)
 {
     if(layerSizes.size() != activationFuns.size() + 1)
         throw std::logic_error("NeuralNetwork::NeuralNetwork error - Sizes of parameters do not match");
 
     for(size_t i(0); i < layerSizes.size()-1; ++i)
-        push_back(NeuronLayer(layerSizes[i], layerSizes[i+1], activationFuns[i]));
+        push_back(NeuronLayer(layerSizes[i], layerSizes[i+1], activationFuns[i],batchSize));
 }
 
 NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes)
@@ -21,13 +21,13 @@ NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes)
         push_back(NeuronLayer(layerSizes[i], layerSizes[i+1]));
 }
 
-NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns)
+NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns, unsigned int batchSize)
 {
     if(layerSizes.size() != activationFuns.size() + 1)
         throw std::logic_error("NeuralNetwork::NeuralNetwork error - Sizes of parameters do not match");
 
     for(size_t i(0); i < layerSizes.size()-1; ++i)
-        push_back(NeuronLayer(layerSizes[i], layerSizes[i+1], weightVector[i], biasVector[i], activationFuns[i]));
+        push_back(NeuronLayer(layerSizes[i], layerSizes[i+1], weightVector[i], biasVector[i], activationFuns[i],batchSize));
 }
 
 //#pragma mark - Propagation

@@ -40,6 +40,9 @@ class Application
             unsigned int intervalleImg;
             unsigned int chiffreATracer;
 
+            unsigned int tailleBatchGen;
+            unsigned int tailleBatchDis;
+
             std::string generatorPath;
             std::string discriminatorPath;
             std::string generatorDest;
@@ -129,7 +132,7 @@ class Application
         void loadConfig(const std::string& configFileName = "config.json");
         void setConfig(rapidjson::Document& document);
         void exportPoids();
-        NeuralNetwork* importNeuralNetwork(std::string networkPath, Functions::ActivationFun activationFun);
+        NeuralNetwork* importNeuralNetwork(std::string networkPath, Functions::ActivationFun activationFun, unsigned int batchSize);
 
     private:
         /// Les réseaux avec lequel on travaille

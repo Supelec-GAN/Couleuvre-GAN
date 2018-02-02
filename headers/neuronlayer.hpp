@@ -24,7 +24,7 @@ class NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int batchSize = 1);
 
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
         /**
@@ -34,7 +34,7 @@ class NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int batchSize = 1);
 
 //#pragma mark - Propagation
 	
@@ -122,6 +122,8 @@ class NeuronLayer
 	
 		/// Buffer de la somme des variation de poids au sein d'un mini-batch
 		Eigen::MatrixXf 				mSumBiasVariation;
+
+        Eigen::MatrixXf                 mOnes;
 
 };
 

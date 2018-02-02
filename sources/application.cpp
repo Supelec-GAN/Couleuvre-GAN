@@ -58,7 +58,7 @@ mStatsCollector()
     int sizeTest(20);
     for(int i(0); i < sizeTest; i++)
     {
-        Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
+        Eigen::MatrixXf noise = Eigen::MatrixXf::Random(mConfig.tailleBatchGen, mConfig.genLayerSizes[0] );
         vectorTest.push_back(noise);
     }
 
@@ -74,10 +74,10 @@ mStatsCollector()
 
     if (mConfig.networkAreImported)
     {
-        mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(0.1f)));
+        mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(0.1f), mConfig.tailleBatchDis));
         std::cout << "Chargement du Discriminateur effectué !" << std::endl;
 
-        mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(0.1f)));
+        mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(0.1f), mConfig.tailleBatchGen));
         std::cout << "Chargement du Générateur effectué !" << std::endl;
     }
     else
@@ -87,13 +87,13 @@ mStatsCollector()
         std::vector<Functions::ActivationFun> funsGen;
         for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
             funsGen.push_back(Functions::sigmoid(0.1f));
-        mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
+        mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen,mConfig.tailleBatchGen));
         //Le Discriminateur
         std::vector<Functions::ActivationFun> funsDis;
 
         for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
             funsDis.push_back(Functions::sigmoid(0.1f));
-        mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
+        mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes, funsDis, mConfig.tailleBatchDis));
     }
     mTeacher = Teacher(mGenerator,mDiscriminator);
     mTestCounter = 0;
@@ -156,7 +156,7 @@ void Application::runSingleStochasticExperiment()
         //Création Image
         if (loopIndex%mConfig.intervalleImg==0)
         {
-            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(mConfig.tailleBatchGen, mGenerator->getInputSize());
             mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
         }
     }
@@ -176,18 +176,17 @@ void Application::runStochasticTeach(bool trigger)
 {
     std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
     std::mt19937 randomEngine((std::random_device())());
+    Eigen::MatrixXf input;
 
     for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
     {
-        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(mConfig.tailleBatchGen, mGenerator->getInputSize());
         Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 
         for(int i(0); i<mConfig.nbGenTeach; i++)
         {
 
-            Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
-            noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            noiseInput = Eigen::MatrixXf::Random(mConfig.tailleBatchGen, mGenerator->getInputSize());
             input = mGenerator->processNetwork(noiseInput);
 
             desiredOutput(0,0) = 1;
@@ -195,11 +194,21 @@ void Application::runStochasticTeach(bool trigger)
         }
         for(int i(0); i<mConfig.nbDisTeach; i++)
         {
-            noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            Eigen::MatrixXf input(mConfig.tailleBatchDis, mDiscriminator->getInputSize());
+            desiredOutput(0,0) = 1;
             Sample sample{mTeachingBatch[distribution(randomEngine)]};
-            mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
+            for(int i(0); i < mConfig.tailleBatchDis; i++)
+            {
+                Sample sample{mTeachingBatch[distribution(randomEngine)]};
+                for(int j(0); j < mDiscriminator->getInputSize(); j++)
+                {
+                    input(i,j) = sample.first(j);
+                }
+            }
+            mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
 
-            Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
+            noiseInput = Eigen::MatrixXf::Random(mConfig.tailleBatchGen, mGenerator->getInputSize());
+            input = mGenerator->processNetwork(noiseInput);
             desiredOutput(0,0) = 0;
             mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
         }
@@ -225,7 +234,7 @@ float Application::runTest(int limit, bool returnErrorRate)
     {
         for(std::vector<Sample>::iterator itr = mTestingBatchGen.begin(); itr != mTestingBatchGen.end() && limit-- != 0; ++itr)
         {
-            Eigen::MatrixXf output{mDiscriminator->processNetwork(mGenerator->processNetwork(itr->first))};
+            Eigen::MatrixXf output{Eigen::MatrixXf::Ones(1,mConfig.tailleBatchDis)*mDiscriminator->processNetwork(mGenerator->processNetwork(itr->first))};
             errorMean += sqrt((output - itr->second).squaredNorm());
         }
     }
@@ -238,13 +247,19 @@ float Application::runTestDis(int limit, bool returnErrorRate)
     float errorMean{0};
     if (returnErrorRate)
     {
-        for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end() && limit-- != 0; ++itr)
+        Eigen::MatrixXf input(mConfig.tailleBatchDis, mDiscriminator->getInputSize());
+        for(int i(0); i < mConfig.tailleBatchDis; i++)
         {
-            Eigen::MatrixXf output{mDiscriminator->processNetwork(itr->first)};
-            errorMean += sqrt((output).squaredNorm());
+            Sample sample{mTestingBatchDis[i]};
+            for(int j(0); j < mDiscriminator->getInputSize(); j++)
+            {
+                input(i,j) = sample.first(j);
+            }
         }
+        Eigen::MatrixXf output{Eigen::MatrixXf::Ones(1,mConfig.tailleBatchDis)*mDiscriminator->processNetwork(input)};
+        errorMean += sqrt((output).squaredNorm());
     }
-    return errorMean/static_cast<float>(mTestingBatchDis.size());
+    return errorMean/static_cast<float>(mConfig.tailleBatchDis);//mTestingBatchDis.size());
 }
 
 float Application::gameScore(int nbImages)
@@ -310,6 +325,9 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 
+    mConfig.tailleBatchDis = document["tailleBatchDis"].GetUint();
+    mConfig.tailleBatchGen = document["tailleBatchGen"].GetUint();
+
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();
 
@@ -317,6 +335,8 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.discriminatorDest = document["discriminatorDest"].GetString();
 
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
+
+    std::cout << "Chargement de la Config effectuée !" << std::endl;
 }
 
 void Application::exportPoids()
@@ -335,7 +355,7 @@ void Application::exportPoids()
     std::cout << "Export des réseaux effectués !" << std::endl;
 }
 
-NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Functions::ActivationFun activationFun)
+NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Functions::ActivationFun activationFun, unsigned int batchSize)
 {
     std::ifstream ifs (networkPath);
     std::string a;
@@ -418,5 +438,5 @@ NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Function
         }
     }
     ifs.close();
-    return (new NeuralNetwork(taille, neuralNetwork, bias, activationFunVector));
+    return (new NeuralNetwork(taille, neuralNetwork, bias, activationFunVector, batchSize));
 }

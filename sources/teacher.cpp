@@ -87,27 +87,32 @@ void Teacher::updateNetworkWeights()
 
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
-    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
+    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(output.rows(), output.cols());
     Eigen::MatrixXf discrOutput = mDiscriminator->processNetwork(output);
-
-    for(unsigned int i(0); i < output.size(); ++i)
+    for(unsigned int i(0); i < output.cols(); i++)
     {
-        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
-        deltaX(i) = dx;
-        errorVect(i) = (mErrorFun(mDiscriminator->processNetwork(output + deltaX), desiredOutput) - mErrorFun(discrOutput, desiredOutput))/dx;
+        for(unsigned int j(0); j < output.rows(); ++j)
+        {
+            Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.cols()));
+            deltaX(i) = dx;
+            errorVect(i,j) = (mErrorFun(mDiscriminator->processNetwork(output.row(j) + deltaX), desiredOutput) - mErrorFun(discrOutput.row(j), desiredOutput))/dx;
+        }
     }
     return errorVect;
 }
 
 Eigen::MatrixXf Teacher::calculateInitialErrorVector(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
-    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
+    Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(output.rows(), output.cols());
 
-    for(unsigned int i(0); i < output.size(); ++i)
+    for(unsigned int i(0); i < output.cols(); ++i)
     {
-        Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
-        deltaX(i) = dx;
-        errorVect(i) = (mErrorFun(output + deltaX, desiredOutput) - mErrorFun(output, desiredOutput))/dx;
+        for(unsigned int j(0); j < output.rows(); ++j)
+        {
+            Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.cols()));
+            deltaX(i) = dx;
+            errorVect(j,i) = (mErrorFun(output.row(j) + deltaX, desiredOutput) - mErrorFun(output.row(j), desiredOutput))/dx;
+        }
     }
     return errorVect;
 }

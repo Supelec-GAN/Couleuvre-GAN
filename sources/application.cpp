@@ -238,7 +238,7 @@ float Application::runTest(int limit, bool returnErrorRate)
             errorMean += sqrt((output - itr->second).squaredNorm());
         }
     }
-    return errorMean/static_cast<float>(mTestingBatchGen.size());
+    return errorMean/static_cast<float>(mConfig.tailleBatchGen*mTestingBatchGen.size());
 }
 
 

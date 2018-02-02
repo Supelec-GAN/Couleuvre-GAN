@@ -13,7 +13,7 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::f
 , mSumBiasVariation(Eigen::MatrixXf::Zero(batchSize, outputSize))
 , mOnes(Eigen::MatrixXf::Ones(batchSize, batchSize))
 {
-    mBias = mOnes*mBias;
+    mBias = (mOnes*mBias)/((float) batchSize);
 }
 
 NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF, unsigned int batchSize)

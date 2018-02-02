@@ -95,7 +95,7 @@ Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, 
         {
             Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.cols()));
             deltaX(i) = dx;
-            errorVect(i,j) = (mErrorFun(mDiscriminator->processNetwork(output.row(j) + deltaX), desiredOutput) - mErrorFun(discrOutput.row(j), desiredOutput))/dx;
+            errorVect(j,i) = (mErrorFun(mDiscriminator->processNetwork(output.row(j) + deltaX), desiredOutput) - mErrorFun(discrOutput.row(j), desiredOutput))/dx;
         }
     }
     return errorVect;

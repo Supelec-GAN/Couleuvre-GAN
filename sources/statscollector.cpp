@@ -34,7 +34,7 @@ void Stats::StatsCollector::exportData(bool mustProcessData)
 
 void Stats::StatsCollector::exportImage(Eigen::MatrixXf image, unsigned int teachIndex)
 {
-    mCSVImg << teachIndex << endrow;
+    mCSVImg << "#" << teachIndex << endrow;
     for(int j(0); j<784; j++)
     {
         mCSVImg << image(j);

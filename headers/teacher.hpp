@@ -10,6 +10,7 @@ class Teacher
 	
 #pragma mark - Constructeur
 
+                        Teacher();
         /// Constructeur par unique pointer
         /**
          *  Construit un teacher supervisant l'apprentissage d'un réseau de neurone

@@ -9,7 +9,14 @@
 #include "headers/neuralnetwork.hpp"
 #include "headers/teacher.hpp"
 #include "headers/statscollector.hpp"
+#include "headers/mnist_reader.h"
+#include "CSVFile.h"
+#include "string.h"
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdlib.h>
 ///Classe destinée à gérer l'ensemble d'un projet
 /**
  * La classe supervise l'apprentissage d'un réseau de neurones par rapport au batchs de données qu'on lui fournit
@@ -22,6 +29,24 @@ class Application
         {
             float step;
             float dx;
+
+            bool networkAreImported;
+
+            unsigned int nbExperiments;
+            unsigned int nbLoopsPerExperiment;
+            unsigned int nbTeachingsPerLoop;
+            unsigned int nbGenTeach;
+            unsigned int nbDisTeach;
+            unsigned int intervalleImg;
+            unsigned int chiffreATracer;
+
+            std::string generatorPath;
+            std::string discriminatorPath;
+            std::string generatorDest;
+            std::string discriminatorDest;
+
+            std::vector<unsigned int> disLayerSizes;
+            std::vector<unsigned int> genLayerSizes;
         };
 
     public:
@@ -36,12 +61,8 @@ class Application
         /// Constructeur par batchs
         /**
          * Ce constructeur supervise le projet par rapport au réseau de neurones donné et aux batchs de tests et d'apprentissages donnés en paramètre
-         * @param discriminator le discriminateur avec lequel on travaille
-		 * @param generator le generateur avec lequel on travaille
-         * @param teachingBatch le batch des données servant à l'apprentissage
-         * @param testBatch le batch des données de test
          */
-        Application(NeuralNetwork::Ptr discriminator, NeuralNetwork::Ptr generator, Batch teachingBatch, Batch testBatch);
+        Application();
 
         /// Constructeur par fonction modèle
         /**
@@ -57,17 +78,17 @@ class Application
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
 
-#pragma mark - Expériences
+////#pragma mark - Expériences
 	
 		void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop, std::string typeOfExperiment  = "Stochastic", unsigned int minibatchSize = 0);
 	
-		void runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop);
+        void runSingleStochasticExperiment();
 	
 		void runSingleMinibatchExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop, unsigned int minibatchSize = 10);
 
 		void resetExperiment();
 	
-#pragma mark - Apprentissage
+//////#pragma mark - Apprentissage
 
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
@@ -75,7 +96,7 @@ class Application
          * @param nbTeachings le nombre d'apprentissages à faire pendant la run
 		 * @param trigger permet de forcer l'apprentissage uniquement du générateur si le discriminateur devient trop bon 
          */
-        void runStochasticTeach(unsigned int nbTeachings, bool trigger);
+        void runStochasticTeach(bool trigger);
 
 		/// Effectue une run d'apprentissage par la méthode par batch
 		/**
@@ -84,11 +105,17 @@ class Application
 		 */
 		void runMinibatchTeach(unsigned int nbTeachings, unsigned int batchSize);
 	
-        /// Effectue une run de tests
+        /// Effectue une run de tests sur D(G(z))
         /**
          * Effectue une run de test sur le batch de test
          */
         float runTest(int limit = -1, bool returnErrorRate = 1);
+
+        /// Effectue une run de tests sur D(x)
+        /**
+         * Effectue une run de test sur le batch de test
+         */
+        float runTestDis(int limit = -1, bool returnErrorRate = 1);
 
         /// Effectue une approximation du score des réseaux
         float gameScore(int nbImages);
@@ -117,12 +144,14 @@ class Application
 		 */
 		Minibatch sampleGeneratedImagesFromNoiseMinibatch(unsigned long minibatchSize);
 	
-#pragma mark - Configuration
+//////#pragma mark - Configuration
 
     private:
         /// Fonction pour charger la configuration de l'application
         void loadConfig(const std::string& configFileName = "config.json");
         void setConfig(rapidjson::Document& document);
+        void exportPoids();
+        NeuralNetwork* importNeuralNetwork(std::string networkPath, Functions::ActivationFun activationFun);
 
     private:
         /// Les réseaux avec lequel on travaille
@@ -134,7 +163,8 @@ class Application
         /// Le batch contenant tous les samples d'apprentissage du projet
         Batch               mTeachingBatch;
         /// Le batch contenant tous les samples de test du projet
-        Batch               mTestingBatch;
+        Batch               mTestingBatchDis;
+        Batch               mTestingBatchGen;
 
         Stats::StatsCollector mStatsCollector;
         /// Un compteur permettant d'indicer les données exportées

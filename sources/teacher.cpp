@@ -16,7 +16,7 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 , mErrorFun(Functions::coutDiscr())
 {}
 
-#pragma mark - Backpropagation
+//#pragma mark - Backpropagation
 
 #pragma mark Backprop
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
@@ -89,7 +89,7 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
 }
 
 
-#pragma mark initial vector calculation
+//#pragma mark initial vector calculation
 
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {

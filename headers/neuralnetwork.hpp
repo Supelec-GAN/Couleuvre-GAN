@@ -14,7 +14,7 @@ class NeuralNetwork : public std::list<NeuronLayer>
 
     public:
 	
-#pragma mark - Constructeur
+//#pragma mark - Constructeur
 	    /// Constructeur permettant d'initialiser une réseau neuronal vide
         NeuralNetwork();
 	
@@ -27,12 +27,22 @@ class NeuralNetwork : public std::list<NeuronLayer>
          */
         NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns);
 	
+        /// Constructeur permettant d'initialiser un réseau neuronal avec choix des fonctions d'activation et des poids donnés
+        /**
+         * Constructeur permettant l'initialisation d'un réseau à n couches à partir des (n+1) tailles d'input/output
+         * (la sortie d'une couche est l'entrée de la suivante), avec choix des fonctions d'activation
+         * @param csvName est le nom du fichier contenant le réseau de neurones
+         * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
+         */
+        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns);
+
         /// Constructeur permettant d'initialiser un réseau neuronal avec la fonction par défaut
         /**
          * Constructeur permettant l'initialisation d'un réseau à n couches à partir des (n+1) tailles d'input/output
          * (la sortie d'une couche est l'entrée de la suivante). La fonction d'activation choisie est la fonction d'activation par défaut
          * @param layerSizes les tailles des vecteurs d'entrées/sorties
          */
+
         NeuralNetwork(std::vector<unsigned int> layerSizes);
 
 		/// Constructeur permettant d'initialiser le réseau neuronal avec un conteneur (vector, list...) de neuronLayer
@@ -42,17 +52,17 @@ class NeuralNetwork : public std::list<NeuronLayer>
 		template <typename Container>
 		NeuralNetwork(Container layerList);
 	
-#pragma mark - Propagation
+//#pragma mark - Propagation
 
         Eigen::MatrixXf processNetwork(Eigen::MatrixXf input);
         Eigen::MatrixXf processNetwork();
 
-#pragma mark - Autres
+//#pragma mark - Autres
 		void reset();
 	
         int getInputSize();
 
-#pragma mark - Auxiliaires
+//#pragma mark - Auxiliaires
 
     public:
         /// Fonction utilitaire permettant d'afficher le réseau de neurones

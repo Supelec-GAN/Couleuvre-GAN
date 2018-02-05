@@ -2,7 +2,9 @@
 
 #include "headers/teacher.hpp"
 
-#pragma mark Constructeur
+//#pragma mark Constructeur
+Teacher::Teacher()
+{}
 
 Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator)
 : mGenerator(std::move(generator))
@@ -18,7 +20,7 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 
 //#pragma mark - Backpropagation
 
-#pragma mark Backprop
+//#pragma mark Backprop
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
 	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
@@ -33,7 +35,7 @@ void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOu
 	propagateError(mGenerator, xnPartialDerivative, step);
 }
 
-#pragma mark Minibatch
+//#pragma mark Minibatch
 
 void Teacher::minibatchDiscriminatorBackprop(NeuralNetwork::Ptr network, Eigen::MatrixXf input,Eigen::MatrixXf desiredOutput, float step, float dx)
 //Same as backpropDiscriminator but no weight updating
@@ -59,7 +61,7 @@ void Teacher::updateNetworkWeights(NeuralNetwork::Ptr network)
 }
 
 
-#pragma mark Error Propagation
+//#pragma mark Error Propagation
 
 void Teacher::propagateError(NeuralNetwork::Ptr network, Eigen::MatrixXf xnPartialDerivative, float step)
 {

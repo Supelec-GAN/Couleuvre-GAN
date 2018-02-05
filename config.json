@@ -9,6 +9,7 @@
     "nbDisTeach": 4,
     "intervalleImg": 10,
     "chiffreATracer": 3,
+	"minibatchSize": 1,
 
     "layersSizesGen": [ 100, 784],
     "layersSizesDis": [ 784, 10, 1],
@@ -17,5 +18,6 @@
     "generatorPath": "generator.csv",
     "discriminatorPath": "discriminator.csv",
     "generatorDest": "generator.csv",
-    "discriminatorDest": "discriminator.csv"
+    "discriminatorDest": "discriminator.csv",
+	"typeOfExperiment": "Stochastic"
 }

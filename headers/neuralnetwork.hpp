@@ -31,7 +31,6 @@ class NeuralNetwork : public std::list<NeuronLayer>
         /**
          * Constructeur permettant l'initialisation d'un réseau à n couches à partir des (n+1) tailles d'input/output
          * (la sortie d'une couche est l'entrée de la suivante), avec choix des fonctions d'activation
-         * @param csvName est le nom du fichier contenant le réseau de neurones
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
          */
         NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns);

@@ -42,7 +42,7 @@ mStatsCollector()
         {
             Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
             outputTest(0) = 1;
-            if (labelTest(i) = mConfig.chiffreATracer)
+			if (labelTest(i) == mConfig.chiffreATracer)
             {
                 mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
             }
@@ -123,33 +123,38 @@ mStatsCollector()
 //**************EXPERIENCES*************
 //**************************************
 
-void Application::runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop, std::string typeOfExperiment, unsigned int minibatchSize)
+void Application::runExperiments()
 {
     for(unsigned int index{0}; index < mConfig.nbExperiments; ++index)
     {
-        resetExperiment();
-		if (typeOfExperiment == "Stochastic")
+
+		if (!mConfig.networkAreImported)
 		{
-			runSingleStochasticExperiment(nbLoops, nbTeachingsPerLoop);
+			resetExperiment();
+			std::cout << "Réseau réinitialisé !" << std::endl;
 		}
-		else if (typeOfExperiment == "Minibatch")
+		
+		if (mConfig.typeOfExperiment == "Stochastic")
 		{
-			runSingleMinibatchExperiment(nbLoops, nbTeachingsPerLoop, minibatchSize);
+			runSingleStochasticExperiment(); //mConfig.nbLoopsPerExperiment, mConfig.nbTeachingsPerLoop);
+		}
+		else if (mConfig.typeOfExperiment == "Minibatch")
+		{
+			runSingleMinibatchExperiment(); //mConfig.nbLoopsPerExperiment, mConfig.nbTeachingsPerLoop, mConfig.minibatchSize);
 		}
 		else
 		{
 			std::cout << "Application::runExperiments error : typeOfExperiment is unknown (" << stderr << ")" << std::endl;
 			exit(EXIT_FAILURE);
 		}
+		exportPoids();
         std::cout << "Exp num. " << (index+1) << " finie !" << std::endl;
     }
 
     mStatsCollector.exportData(true);
 }
 
-double minimumScoreBeforeTrigger = 0.1 ; 
-
-void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop)
+void Application::runSingleStochasticExperiment()
 {
     mStatsCollector[0].addResult(runTest());
     bool trigger = false; //A changer si vous voulez faire des expériences funs
@@ -160,19 +165,25 @@ void Application::runSingleStochasticExperiment(unsigned int nbLoops, unsigned i
         auto score = runTest();
         auto scoreDis = runTestDis();
         mStatsCollector[loopIndex+1].addResult(score);
-        if (score < minimumScoreBeforeTrigger) trigger = true;
-        else trigger = false;
-        std::cout << "Le score est de " << score << " et le trigger est en " << trigger << " !"<< std::endl;
-    }
+		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
+		std::cout << "Le score est de " << score << " et le scoreDis de " << scoreDis << " !" << std::endl;
+		//Création Image
+		if (loopIndex%mConfig.intervalleImg==0)
+		{
+			Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+			mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+		}
+		
+	}
 }
 
-void Application::runSingleMinibatchExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop, unsigned int minibatchSize)
+void Application::runSingleMinibatchExperiment()
 {
 	mStatsCollector[0].addResult(runTest());
-	for(unsigned int loopIndex{0}; loopIndex < nbLoops; ++loopIndex)
+	for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
 	{
-		std::cout << "Apprentissage num. : " << (loopIndex)*nbTeachingsPerLoop << std::endl;
-		runMinibatchTeach(nbTeachingsPerLoop, minibatchSize);
+		std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
+		runMinibatchTeach();
 		auto score = runTest();
 		mStatsCollector[loopIndex+1].addResult(score);
 		std::cout << "Le score est de " << score << std::endl;
@@ -191,58 +202,46 @@ void Application::resetExperiment()
 
 void Application::runStochasticTeach(bool trigger)
 {
-	//generate a random distribution (to later randomly select elements from the mTeachingBatch)
-    std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
-    std::mt19937 randomEngine((std::random_device())());
+	std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
+	std::mt19937 randomEngine((std::random_device())());
 	
-    for(unsigned int index{0}; index < nbTeachings; index++)
-    {
-		//Teach the Generator
-		//generate the noise used for the input of the generator, then create the generated image
-        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
-
-		//set the desired output for the discriminator as a true image
+	for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
+	{
+		Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
-        desiredOutput(0,0) = 1;
 		
-		//Apply Backprop to Gen
-        mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
-
-        if (trigger) //then teach the Generator a second time
-        {
+		for(int i(0); i<mConfig.nbGenTeach; i++)
+		{
 			
-            noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            input = mGenerator->processNetwork(noiseInput);
-
-            desiredOutput(0,0) = 1; //true image
-            mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
-        }
-        else //teach the Discriminator
-			//(this way of teaching is not correct as per the algorithm described in Goodfellow et al. 2014
-			//backpropagation must be done simultaneously
-        {
-			//teach the Discriminator on a true image randomly selected in the mTeachingBatch
-            Sample sample{mTeachingBatch[distribution(randomEngine)]};
-            mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
-
-			//teach the Discriminator on the previously generated image
-            desiredOutput(0,0) = 0; //generated image
-            mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
-        }
-    }
+			Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+			Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
+			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+			input = mGenerator->processNetwork(noiseInput);
+			
+			desiredOutput(0,0) = 1;
+			mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
+		}
+		for(int i(0); i<mConfig.nbDisTeach; i++)
+		{
+			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+			Sample sample{mTeachingBatch[distribution(randomEngine)]};
+			mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
+			
+			Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
+			desiredOutput(0,0) = 0;
+			mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
+		}
+	}
 }
 
-//==============================================================================================================
-
-void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minibatchSize)
+void Application::runMinibatchTeach()
 //Algorithm 1 p.4 of generative-adversarial-nets by Goodfellow et al. 2014
 //Minibatch stockastic gradient descent training of generative adversarial nets
 //rq : Implementations may choose to sum the gradient over the mini-batch or take the average of the gradient which further reduces the variance of the gradient.
 //I chose to implement the sum
 
 {
-	for(unsigned int index{0}; index < nbTeachings; index++)
+	for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
 	{
 		Eigen::MatrixXf desiredOutput0 = Eigen::MatrixXf(1,1);
 		Eigen::MatrixXf desiredOutput1 = Eigen::MatrixXf(1,1);
@@ -252,14 +251,14 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 		for (unsigned long k(0); k < 1; ++k)
 		{
 			//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
-			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(minibatchSize);
+			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch();
 			
 			//"Sample minibatch of batchSize examples {x_1, ..., x_m} from data-generating distribution p_data(x)
-			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatch,minibatchSize);
+			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatch);
 			
 			//"Update the discriminator by ascending its stochastic gradient"
 			
-			for (unsigned long i(0); i < minibatchSize; ++i)
+			for (unsigned long i(0); i < mConfig.minibatchSize; ++i)
 			{
 				
 				Sample falseimagesample{generatedImagesFromNoiseMinibatch[i]};
@@ -273,7 +272,7 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 		}
 			 
 		//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
-		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(minibatchSize);
+		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch();
 		
 		//"Update the generator by descending the stochastic gradient"
 		for(std::vector<Sample>::iterator itr = generatedImagesFromNoiseMinibatch.begin(); itr != generatedImagesFromNoiseMinibatch.end(); ++itr)
@@ -284,10 +283,6 @@ void Application::runMinibatchTeach(unsigned int nbTeachings, unsigned int minib
 		mTeacher.updateNetworkWeights(mGenerator);
 	}
 }
-
-//============================================================================================================
-
-
 
 float Application::runTest(int limit, bool returnErrorRate)
 {
@@ -333,31 +328,31 @@ Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
 	return(mGenerator->processNetwork(input));
 }
 
-Application::Minibatch Application::sampleMinibatch(Application::Batch batch, unsigned long minibatchSize)
+Application::Minibatch Application::sampleMinibatch(Application::Batch batch)
 {
-	Application::Minibatch minibatch(minibatchSize);
+	Application::Minibatch minibatch;
 	
 	//Tirage aléatoire sans remise
 	std::vector<unsigned long> randomizedIntVector(batch.size());
 	std::iota(randomizedIntVector.begin(), randomizedIntVector.end(), 0); 		//fills in with first int numbers starting at 0
 	std::random_shuffle(randomizedIntVector.begin(),randomizedIntVector.end());
 	
-	for (unsigned long i(0); i < minibatchSize ; ++i)
+	for (unsigned long i(0); i < mConfig.minibatchSize ; ++i)
 	{
 		minibatch[i] = batch[randomizedIntVector[i]];
 	}
 	return minibatch;
 }
 
-Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch(unsigned long minibatchSize)
+Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch()
 {
-	Application::Minibatch generatedImagesFromNoiseMinibatch(minibatchSize);
+	Application::Minibatch generatedImagesFromNoiseMinibatch;
 	
 	
 	Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 	desiredOutput(0,0) = 1;
 
-	for (unsigned long i(0); i < minibatchSize ; ++i)
+	for (unsigned long i(0); i < mConfig.minibatchSize ; ++i)
 	{
 		Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 		Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
@@ -417,12 +412,14 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.nbGenTeach = document["nbGenTeach"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
+	mConfig.minibatchSize = document["minibatchSize"].GetUint();
 
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();
 
     mConfig.generatorDest = document["generatorDest"].GetString();
     mConfig.discriminatorDest = document["discriminatorDest"].GetString();
+	mConfig.typeOfExperiment = document["typeOfExperiment"].GetString();
 
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 }

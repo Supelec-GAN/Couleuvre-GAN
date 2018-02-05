@@ -39,11 +39,13 @@ class Application
             unsigned int nbDisTeach;
             unsigned int intervalleImg;
             unsigned int chiffreATracer;
+			unsigned int minibatchSize;
 
             std::string generatorPath;
             std::string discriminatorPath;
             std::string generatorDest;
             std::string discriminatorDest;
+			std::string typeOfExperiment;
 
             std::vector<unsigned int> disLayerSizes;
             std::vector<unsigned int> genLayerSizes;
@@ -80,11 +82,11 @@ class Application
 
 ////#pragma mark - Expériences
 	
-		void runExperiments(unsigned int nbExperiments, unsigned int nbLoops, unsigned int nbTeachingsPerLoop, std::string typeOfExperiment  = "Stochastic", unsigned int minibatchSize = 0);
+		void runExperiments();
 	
         void runSingleStochasticExperiment();
 	
-		void runSingleMinibatchExperiment(unsigned int nbLoops, unsigned int nbTeachingsPerLoop, unsigned int minibatchSize = 10);
+		void runSingleMinibatchExperiment();
 
 		void resetExperiment();
 	
@@ -93,17 +95,15 @@ class Application
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
-         * @param nbTeachings le nombre d'apprentissages à faire pendant la run
-		 * @param trigger permet de forcer l'apprentissage uniquement du générateur si le discriminateur devient trop bon 
+		 * @param trigger permet de forcer l'apprentissage uniquement du générateur si le discriminateur devient trop bon
          */
         void runStochasticTeach(bool trigger);
 
 		/// Effectue une run d'apprentissage par la méthode par batch
 		/**
 		 * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
-		 * @param nbTeachings le nombre d'apprentissages à faire pendant la run
 		 */
-		void runMinibatchTeach(unsigned int nbTeachings, unsigned int batchSize);
+		void runMinibatchTeach();
 	
         /// Effectue une run de tests sur D(G(z))
         /**
@@ -132,17 +132,15 @@ class Application
 		/**
 		 * Génère un sous-ensemble du batch d'apprentissage ou du batch à partir de celui-ci
 		 * @param batch le batch d'apprentissage ou le batch de test
-		 * @param minibatchSize la taille du sous-ensemble à générer
 		 */
-		Minibatch sampleMinibatch(Batch batch, unsigned long minibatchSize);
+		Minibatch sampleMinibatch(Batch batch);
 	
 	
 		/// Génère un minibatch d'images obtenues par le générateur
 		/**
 		 * Génère un minibatch d'images obtenues par le générateur
-		 * @param minibatchSize la taille du minibatch à générer
 		 */
-		Minibatch sampleGeneratedImagesFromNoiseMinibatch(unsigned long minibatchSize);
+		Minibatch sampleGeneratedImagesFromNoiseMinibatch();
 	
 //////#pragma mark - Configuration
 

@@ -185,8 +185,15 @@ void Application::runSingleMinibatchExperiment()
 		std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
 		runMinibatchTeach();
 		auto score = runTest();
+		auto scoreDis = runTestDis();
 		mStatsCollector[loopIndex+1].addResult(score);
-		std::cout << "Le score est de " << score << std::endl;
+		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
+		std::cout << "Le score est de " << score << " et le scoreDis de " << scoreDis << " !" << std::endl;
+		if (loopIndex%mConfig.intervalleImg==0)
+		{
+			Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+			mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+		}
 	}
 }
 
@@ -330,7 +337,7 @@ Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
 
 Application::Minibatch Application::sampleMinibatch(Application::Batch batch)
 {
-	Application::Minibatch minibatch;
+	Application::Minibatch minibatch(mConfig.minibatchSize);
 	
 	//Tirage aléatoire sans remise
 	std::vector<unsigned long> randomizedIntVector(batch.size());
@@ -346,7 +353,7 @@ Application::Minibatch Application::sampleMinibatch(Application::Batch batch)
 
 Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch()
 {
-	Application::Minibatch generatedImagesFromNoiseMinibatch;
+	Application::Minibatch generatedImagesFromNoiseMinibatch(mConfig.minibatchSize);
 	
 	
 	Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);

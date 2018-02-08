@@ -1,23 +1,25 @@
 {
-    "step": 0.2,
-    "dx": 0.01,
+	"step": 0.2,
+	"dx": 0.01,
+	
+	"nbExperiments": 1,
+	"nbLoopsPerExperiment": 100,
+	"nbTeachingsPerLoop": 1000,
+	"nbGenTeach": 1,
+	"nbDisTeach": 1,
+	"intervalleImg": 10,
+	"chiffreATracer": 3,
+	"minibatchSize": 2,
+	
+	"layersSizesGen": [ 100, 400, 784],
+	"layersSizesDis": [ 784, 10, 1],
+	
+	"networkAreImported": false,
+	"generatorPath": "generator.csv",
+	"discriminatorPath": "discriminator.csv",
+	"generatorDest": "generator.csv",
+	"discriminatorDest": "discriminator.csv",
+	"typeOfExperiment": "Minibatch"
 
-    "nbExperiments": 1,
-    "nbLoopsPerExperiment": 100,
-    "nbTeachingsPerLoop": 1000,
-    "nbGenTeach": 1,
-    "nbDisTeach": 4,
-    "intervalleImg": 10,
-    "chiffreATracer": 3,
-	"minibatchSize": 1,
-
-    "layersSizesGen": [ 100, 784],
-    "layersSizesDis": [ 784, 10, 1],
-
-    "networkAreImported": true,
-    "generatorPath": "generator.csv",
-    "discriminatorPath": "discriminator.csv",
-    "generatorDest": "generator.csv",
-    "discriminatorDest": "discriminator.csv",
-	"typeOfExperiment": "Stochastic"
 }
+

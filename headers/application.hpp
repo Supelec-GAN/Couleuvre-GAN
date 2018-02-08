@@ -29,6 +29,7 @@ class Application
         {
             float step;
             float dx;
+			float sigmoidParameter;
 
             bool networkAreImported;
 
@@ -37,6 +38,7 @@ class Application
             unsigned int nbTeachingsPerLoop;
             unsigned int nbGenTeach;
             unsigned int nbDisTeach;
+			unsigned int sizeTest;
             unsigned int intervalleImg;
             unsigned int chiffreATracer;
 			unsigned int minibatchSize;

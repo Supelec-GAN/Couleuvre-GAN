@@ -1,12 +1,14 @@
 {
 	"step": 0.2,
 	"dx": 0.01,
+	"sigmoidParameter": 0.1,
 	
 	"nbExperiments": 1,
 	"nbLoopsPerExperiment": 100,
 	"nbTeachingsPerLoop": 1000,
 	"nbGenTeach": 1,
 	"nbDisTeach": 1,
+	"sizeTest": 20,
 	"intervalleImg": 10,
 	"chiffreATracer": 3,
 	"minibatchSize": 2,

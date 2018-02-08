@@ -25,7 +25,7 @@ mStatsCollector()
         Eigen::MatrixXi labelTest;
         readerTest.ReadMNIST(imageTest, labelTest);
 
-        //Création du Batch d'entrainement
+        //Création du Batch d'entrainement du discriminateur
         for(auto i(0); i< labelTrain.size(); i++)
         {
             Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
@@ -37,7 +37,7 @@ mStatsCollector()
         }
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
 
-        //Création du Batch de test
+        //Création du Batch de test du discriminateur
         for(auto i(0); i<1000 /*labelTest.size()*/; i++)
         {
             Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
@@ -47,77 +47,57 @@ mStatsCollector()
                 mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
             }
         }
+		
+		//Création du vecteur de bruit pour les tests du générateur
+		std::vector<Eigen::MatrixXf> vectorTest;
+		for(int i(0); i < mConfig.sizeTest; i++)
+		{
+			Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
+			vectorTest.push_back(noise);
+		}
+		
+		//Création du Batch de Test du générateur
+		for(auto i(0); i< mConfig.sizeTest; i++)
+		{
+			Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
+			outputTest(0) = 0;
+			mTestingBatchGen.push_back(Application::Sample(vectorTest[i], outputTest));
+		}
+		std::cout << "Chargement du Batch de test effectué !" << std::endl;
+		
+		
+		if (mConfig.networkAreImported)
+		{
+			mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
+			std::cout << "Chargement du Discriminateur effectué !" << std::endl;
+			
+			mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
+			std::cout << "Chargement du Générateur effectué !" << std::endl;
+		}
+		else
+		{
+			// Construction du réseau de neurones
+			//Le Generateur
+			std::vector<Functions::ActivationFun> funsGen;
+			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
+				funsGen.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
+			mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
+			//Le Discriminateur
+			std::vector<Functions::ActivationFun> funsDis;
+			
+			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
+				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
+			mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
+		}
+		mTeacher = Teacher(mGenerator,mDiscriminator);
+		mTestCounter = 0;
+		
     }
     catch (const std::exception& ex)
     {
         std::cout << "Exception was thrown: " << ex.what() << std::endl;
     }
-
-    //Création du vecteur de bruit pour les tests
-    std::vector<Eigen::MatrixXf> vectorTest;
-    int sizeTest(20);
-    for(int i(0); i < sizeTest; i++)
-    {
-        Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
-        vectorTest.push_back(noise);
-    }
-
-    //Création du Batch de Test
-    for(auto i(0); i< sizeTest; i++)
-    {
-        Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
-        outputTest(0) = 0;
-        mTestingBatchGen.push_back(Application::Sample(vectorTest[i], outputTest));
-    }
-    std::cout << "Chargement du Batch de test effectué !" << std::endl;
-
-
-    if (mConfig.networkAreImported)
-    {
-        mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(0.1f)));
-        std::cout << "Chargement du Discriminateur effectué !" << std::endl;
-
-        mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(0.1f)));
-        std::cout << "Chargement du Générateur effectué !" << std::endl;
-    }
-    else
-    {
-        // Construction du réseau de neurones
-        //Le Generateur
-        std::vector<Functions::ActivationFun> funsGen;
-        for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
-            funsGen.push_back(Functions::sigmoid(0.1f));
-        mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
-        //Le Discriminateur
-        std::vector<Functions::ActivationFun> funsDis;
-
-        for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
-            funsDis.push_back(Functions::sigmoid(0.1f));
-        mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
-    }
-    mTeacher = Teacher(mGenerator,mDiscriminator);
-    mTestCounter = 0;
 }
-
-/*Application::Application(   NeuralNetwork::Ptr network,
-                            std::function<Eigen::MatrixXf (Eigen::MatrixXf)> modelFunction,
-                            std::vector<Eigen::MatrixXf> teachingInputs,
-                            std::vector<Eigen::MatrixXf> testingInputs)
-: mNetwork(network)
-, mTeacher(mNetwork)
-, mStatsCollector()
-, mTestCounter(0)
-{
-    // Charge la configuration de l'application
-    loadConfig();
-
-    // Génère le batch d'apprentissage à partir des entrées et de la fonction à modéliser
-    for(size_t i{0}; i < teachingInputs.size(); ++i)
-        mTeachingBatch.push_back(Sample(teachingInputs[i], modelFunction(teachingInputs[i])));
-    // Génère le batch d'apprentissage à partir des entrées et de la fonction à modéliser
-    for(size_t i{0}; i < testingInputs.size(); ++i)
-        mTestingBatch.push_back(Sample(testingInputs[i], modelFunction(testingInputs[i])));
-}*/
 
 ////#pragma mark - Expériences
 //**************EXPERIENCES*************
@@ -136,11 +116,11 @@ void Application::runExperiments()
 		
 		if (mConfig.typeOfExperiment == "Stochastic")
 		{
-			runSingleStochasticExperiment(); //mConfig.nbLoopsPerExperiment, mConfig.nbTeachingsPerLoop);
+			runSingleStochasticExperiment();
 		}
 		else if (mConfig.typeOfExperiment == "Minibatch")
 		{
-			runSingleMinibatchExperiment(); //mConfig.nbLoopsPerExperiment, mConfig.nbTeachingsPerLoop, mConfig.minibatchSize);
+			runSingleMinibatchExperiment();
 		}
 		else
 		{
@@ -246,7 +226,6 @@ void Application::runMinibatchTeach()
 //Minibatch stockastic gradient descent training of generative adversarial nets
 //rq : Implementations may choose to sum the gradient over the mini-batch or take the average of the gradient which further reduces the variance of the gradient.
 //I chose to implement the sum
-
 {
 	for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
 	{
@@ -254,35 +233,24 @@ void Application::runMinibatchTeach()
 		Eigen::MatrixXf desiredOutput1 = Eigen::MatrixXf(1,1);
 		desiredOutput0(0,0) = 0;
 		desiredOutput1(0,0) = 1;
-		
 		for (unsigned long k(0); k < 1; ++k)
 		{
-			//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
-			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch();
-			
-			//"Sample minibatch of batchSize examples {x_1, ..., x_m} from data-generating distribution p_data(x)
-			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatch);
-			
+			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(); 	//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
+			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatch);								//"Sample minibatch of batchSize examples {x_1, ..., x_m} from data-generating distribution p_data(x)
+
 			//"Update the discriminator by ascending its stochastic gradient"
-			
 			for (unsigned long i(0); i < mConfig.minibatchSize; ++i)
 			{
-				
 				Sample falseimagesample{generatedImagesFromNoiseMinibatch[i]};
 				Sample trueimagesample{exampleMinibatch[i]};
-				
 				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,falseimagesample.first, desiredOutput0, mConfig.step, mConfig.dx);
 				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,trueimagesample.first, desiredOutput1, mConfig.step, mConfig.dx);
 			}
 			mTeacher.updateNetworkWeights(mDiscriminator);
-
 		}
-			 
-		//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
-		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch();
-		
-		//"Update the generator by descending the stochastic gradient"
-		for(std::vector<Sample>::iterator itr = generatedImagesFromNoiseMinibatch.begin(); itr != generatedImagesFromNoiseMinibatch.end(); ++itr)
+		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(); 		//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
+
+		for(std::vector<Sample>::iterator itr = generatedImagesFromNoiseMinibatch.begin(); itr != generatedImagesFromNoiseMinibatch.end(); ++itr) 	//"Update the generator by descending the stochastic gradient"
 		{
 			Sample sample{*itr};
 			mTeacher.minibatchGeneratorBackprop(mGenerator,sample.first, desiredOutput1, mConfig.step, mConfig.dx);
@@ -304,7 +272,6 @@ float Application::runTest(int limit, bool returnErrorRate)
     }
     return errorMean/static_cast<float>(mTestingBatchGen.size());
 }
-
 
 float Application::runTestDis(int limit, bool returnErrorRate)
 {
@@ -401,6 +368,8 @@ void Application::setConfig(rapidjson::Document& document)
 {
     mConfig.step = document["step"].GetFloat();
     mConfig.dx = document["dx"].GetFloat();
+	mConfig.sigmoidParameter = document["sigmoidParameter"].GetFloat();
+
 
     mConfig.networkAreImported = document["networkAreImported"].GetBool();
 
@@ -417,9 +386,11 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
     mConfig.nbDisTeach = document["nbDisTeach"].GetUint();
     mConfig.nbGenTeach = document["nbGenTeach"].GetUint();
+	mConfig.sizeTest = document["sizeTest"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
+
 
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();

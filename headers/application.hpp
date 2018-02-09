@@ -37,9 +37,10 @@ class Application
             unsigned int nbExperiments;
             unsigned int nbLoopsPerExperiment;
             unsigned int nbTeachingsPerLoop;
-            unsigned int nbGenTeach;
-            unsigned int nbDisTeach;
-			unsigned int sizeTest;
+			unsigned int nbDisTeach;
+			unsigned int nbGenTeach;
+			unsigned int nbDisTest;
+			unsigned int nbGenTest;
 			unsigned int labelTrainSize;
 			unsigned int labelTestSize;
             unsigned int intervalleImg;
@@ -115,12 +116,16 @@ class Application
         /// Effectue une run de tests sur D(G(z))
         /**
          * Effectue une run de test sur le batch de test
+		 * @param limit  permet de limiter le nombre d'entrées de tests
+		 * @param returnErrorRate
          */
         float runTestGen(int limit = -1, bool returnErrorRate = 1);
 
         /// Effectue une run de tests sur D(x)
         /**
          * Effectue une run de test sur le batch de test
+		 * @param limit permet de limiter le nombre d'entrées de tests
+		 * @param returnErrorRate
          */
         float runTestDis(int limit = -1, bool returnErrorRate = 1);
 
@@ -166,7 +171,7 @@ class Application
         Teacher             mTeacher;
 
         /// Le batch contenant tous les samples d'apprentissage du projet
-        Batch               mTeachingBatch;
+        Batch               mTeachingBatchDis;
         /// Le batch contenant tous les samples de test du projet
         Batch               mTestingBatchDis;
         Batch               mTestingBatchGen;

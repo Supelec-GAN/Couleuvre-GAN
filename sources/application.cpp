@@ -32,7 +32,7 @@ mStatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage)
             outputTrain(0,0) = 1;
             if (labelTrain(i) == mConfig.chiffreATracer)
             {
-                mTeachingBatch.push_back(Application::Sample(imageTrain[i], outputTrain));
+                mTeachingBatchDis.push_back(Application::Sample(imageTrain[i], outputTrain));
             }
         }
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
@@ -51,14 +51,14 @@ mStatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage)
 		
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;
-		for(int i(0); i < mConfig.sizeTest; i++)
+		for(int i(0); i < mConfig.nbGenTest; i++)
 		{
 			Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
 			vectorTest.push_back(noise);
 		}
 		
 		//Création du Batch de Test du générateur
-		for(auto i(0); i< mConfig.sizeTest; i++)
+		for(auto i(0); i< mConfig.nbGenTest; i++)
 		{
 			Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
 			outputTest(0) = 0;
@@ -144,7 +144,7 @@ void Application::runSingleStochasticExperiment()
         std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
         runStochasticTeach(trigger);
         auto scoreGen = runTestGen();
-        auto scoreDis = runTestDis();
+        auto scoreDis = runTestDis(mConfig.nbDisTest);
         mStatsCollector[loopIndex+1].addResult(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
@@ -166,7 +166,7 @@ void Application::runSingleMinibatchExperiment()
 		std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
 		runMinibatchTeach();
 		auto scoreGen = runTestGen();
-		auto scoreDis = runTestDis();
+		auto scoreDis = runTestDis(mConfig.nbDisTest);
 		mStatsCollector[loopIndex+1].addResult(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
@@ -190,7 +190,7 @@ void Application::resetExperiment()
 
 void Application::runStochasticTeach(bool trigger)
 {
-	std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatch.size())-1);
+	std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatchDis.size())-1);
 	std::mt19937 randomEngine((std::random_device())());
 	
 	for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
@@ -212,7 +212,7 @@ void Application::runStochasticTeach(bool trigger)
 		for(int i(0); i<mConfig.nbDisTeach; i++)
 		{
 			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-			Sample sample{mTeachingBatch[distribution(randomEngine)]};
+			Sample sample{mTeachingBatchDis[distribution(randomEngine)]};
 			mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
 			
 			Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
@@ -235,7 +235,7 @@ void Application::runMinibatchTeach()
 		for (unsigned long k(0); k < 1; ++k)
 		{
 			Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(); 	//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
-			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatch);								//"Sample minibatch of batchSize examples {x_1, ..., x_m} from data-generating distribution p_data(x)
+			Minibatch exampleMinibatch = sampleMinibatch(mTeachingBatchDis);							//"Sample minibatch of batchSize examples {x_1, ..., x_m} from data-generating distribution p_data(x)
 
 			//"Update the discriminator by ascending its stochastic gradient"
 			for (unsigned long i(0); i < mConfig.minibatchSize; ++i)
@@ -387,7 +387,8 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
     mConfig.nbDisTeach = document["nbDisTeach"].GetUint();
     mConfig.nbGenTeach = document["nbGenTeach"].GetUint();
-	mConfig.sizeTest = document["sizeTest"].GetUint();
+	mConfig.nbDisTest = document["nbDisTest"].GetUint();
+	mConfig.nbGenTest = document["nbGenTest"].GetUint();
 	mConfig.labelTrainSize = document["labelTrainSize"].GetUint();
 	mConfig.labelTestSize = document["labelTestSize"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();

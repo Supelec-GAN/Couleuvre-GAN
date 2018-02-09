@@ -80,7 +80,7 @@ class NeuronLayer
 //#pragma mark - Autres
 
 		/// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
-        void            updateLayerWeights();
+	void            updateLayerWeights(unsigned int minibatchSize = 1);
 
         void            reset();
 

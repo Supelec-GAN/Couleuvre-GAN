@@ -32,6 +32,7 @@ class Application
 			float sigmoidParameter;
 
             bool networkAreImported;
+			bool useAverageForBatchlearning;
 
             unsigned int nbExperiments;
             unsigned int nbLoopsPerExperiment;
@@ -39,6 +40,8 @@ class Application
             unsigned int nbGenTeach;
             unsigned int nbDisTeach;
 			unsigned int sizeTest;
+			unsigned int labelTrainSize;
+			unsigned int labelTestSize;
             unsigned int intervalleImg;
             unsigned int chiffreATracer;
 			unsigned int minibatchSize;
@@ -111,7 +114,7 @@ class Application
         /**
          * Effectue une run de test sur le batch de test
          */
-        float runTest(int limit = -1, bool returnErrorRate = 1);
+        float runTestGen(int limit = -1, bool returnErrorRate = 1);
 
         /// Effectue une run de tests sur D(x)
         /**

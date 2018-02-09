@@ -78,8 +78,9 @@ class Teacher
 		/// Fonction mettant à jour les poids du réseau
 		/**
 		 * @param network le réseau à mettre à jour (mGenerator ou mDicriminator)
+		 * @param minibatchSize la taille du batch sur lequel on moyenne la somme des erreurs
 		 */
-		void 			updateNetworkWeights(NeuralNetwork::Ptr network);
+	void 			updateNetworkWeights(NeuralNetwork::Ptr network, unsigned int minibatchSize = 1);
 	
     private:
         /// Fonction propageant l'erreur itérativement à travers le réseau considéré

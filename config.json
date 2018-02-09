@@ -10,6 +10,8 @@
 	"nbDisTeach": 1,
 	"sizeTest": 20,
 	"intervalleImg": 10,
+	"labelTrainSize": 60000,
+	"labelTestSize": 10000,
 	"chiffreATracer": 3,
 	"minibatchSize": 2,
 	
@@ -21,7 +23,8 @@
 	"discriminatorPath": "discriminator.csv",
 	"generatorDest": "generator.csv",
 	"discriminatorDest": "discriminator.csv",
-	"typeOfExperiment": "Minibatch"
+	"typeOfExperiment": "Minibatch",
+	"useAverageForBatchlearning": true
 
 }
 

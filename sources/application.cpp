@@ -26,7 +26,7 @@ mStatsCollector()
         readerTest.ReadMNIST(imageTest, labelTest);
 
         //Création du Batch d'entrainement du discriminateur
-        for(auto i(0); i< labelTrain.size(); i++)
+        for(auto i(0); i< mConfig.labelTrainSize; i++)
         {
             Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
             outputTrain(0,0) = 1;
@@ -38,7 +38,8 @@ mStatsCollector()
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
 
         //Création du Batch de test du discriminateur
-        for(auto i(0); i<1000 /*labelTest.size()*/; i++)
+        for(auto i(0); i<mConfig.labelTestSize; i++)
+			
         {
             Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
             outputTest(0) = 1;
@@ -136,17 +137,17 @@ void Application::runExperiments()
 
 void Application::runSingleStochasticExperiment()
 {
-    mStatsCollector[0].addResult(runTest());
+    mStatsCollector[0].addResult(runTestGen());
     bool trigger = false; //A changer si vous voulez faire des expériences funs
     for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
     {
         std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
         runStochasticTeach(trigger);
-        auto score = runTest();
+        auto scoreGen = runTestGen();
         auto scoreDis = runTestDis();
-        mStatsCollector[loopIndex+1].addResult(score);
+        mStatsCollector[loopIndex+1].addResult(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
-		std::cout << "Le score est de " << score << " et le scoreDis de " << scoreDis << " !" << std::endl;
+		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
 		//Création Image
 		if (loopIndex%mConfig.intervalleImg==0)
 		{
@@ -159,16 +160,16 @@ void Application::runSingleStochasticExperiment()
 
 void Application::runSingleMinibatchExperiment()
 {
-	mStatsCollector[0].addResult(runTest());
+	mStatsCollector[0].addResult(runTestGen());
 	for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
 	{
 		std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
 		runMinibatchTeach();
-		auto score = runTest();
+		auto scoreGen = runTestGen();
 		auto scoreDis = runTestDis();
-		mStatsCollector[loopIndex+1].addResult(score);
+		mStatsCollector[loopIndex+1].addResult(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
-		std::cout << "Le score est de " << score << " et le scoreDis de " << scoreDis << " !" << std::endl;
+		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
 		if (loopIndex%mConfig.intervalleImg==0)
 		{
 			Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
@@ -222,11 +223,9 @@ void Application::runStochasticTeach(bool trigger)
 }
 
 void Application::runMinibatchTeach()
-//Algorithm 1 p.4 of generative-adversarial-nets by Goodfellow et al. 2014
-//Minibatch stockastic gradient descent training of generative adversarial nets
-//rq : Implementations may choose to sum the gradient over the mini-batch or take the average of the gradient which further reduces the variance of the gradient.
-//I chose to implement the sum
 {
+	unsigned int minibatchWeightingCoefficient = mConfig.useAverageForBatchlearning ? mConfig.minibatchSize : 1;
+	
 	for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
 	{
 		Eigen::MatrixXf desiredOutput0 = Eigen::MatrixXf(1,1);
@@ -246,7 +245,7 @@ void Application::runMinibatchTeach()
 				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,falseimagesample.first, desiredOutput0, mConfig.step, mConfig.dx);
 				mTeacher.minibatchDiscriminatorBackprop(mDiscriminator,trueimagesample.first, desiredOutput1, mConfig.step, mConfig.dx);
 			}
-			mTeacher.updateNetworkWeights(mDiscriminator);
+			mTeacher.updateNetworkWeights(mDiscriminator, minibatchWeightingCoefficient);
 		}
 		Minibatch generatedImagesFromNoiseMinibatch = sampleGeneratedImagesFromNoiseMinibatch(); 		//"Sample minibatch of batchSize noise samples {z_1, ..., z_m} from noise prior p_g(z)"
 
@@ -255,11 +254,11 @@ void Application::runMinibatchTeach()
 			Sample sample{*itr};
 			mTeacher.minibatchGeneratorBackprop(mGenerator,sample.first, desiredOutput1, mConfig.step, mConfig.dx);
 		}
-		mTeacher.updateNetworkWeights(mGenerator);
+		mTeacher.updateNetworkWeights(mGenerator, minibatchWeightingCoefficient);
 	}
 }
 
-float Application::runTest(int limit, bool returnErrorRate)
+float Application::runTestGen(int limit, bool returnErrorRate)
 {
     float errorMean{0};
     if (returnErrorRate)
@@ -287,6 +286,7 @@ float Application::runTestDis(int limit, bool returnErrorRate)
     return errorMean/static_cast<float>(mTestingBatchDis.size());
 }
 
+[[deprecated]]
 float Application::gameScore(int nbImages)
 {
 	float mean = 0;
@@ -297,6 +297,7 @@ float Application::gameScore(int nbImages)
 	return(mean/(float)nbImages);
 }
 
+[[deprecated]]
 Eigen::MatrixXf Application::genProcessing(Eigen::MatrixXf input)
 {
 	return(mGenerator->processNetwork(input));
@@ -387,6 +388,8 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.nbDisTeach = document["nbDisTeach"].GetUint();
     mConfig.nbGenTeach = document["nbGenTeach"].GetUint();
 	mConfig.sizeTest = document["sizeTest"].GetUint();
+	mConfig.labelTrainSize = document["labelTrainSize"].GetUint();
+	mConfig.labelTestSize = document["labelTestSize"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
@@ -397,7 +400,11 @@ void Application::setConfig(rapidjson::Document& document)
 
     mConfig.generatorDest = document["generatorDest"].GetString();
     mConfig.discriminatorDest = document["discriminatorDest"].GetString();
+	
 	mConfig.typeOfExperiment = document["typeOfExperiment"].GetString();
+	mConfig.useAverageForBatchlearning = document["useAverageForBatchlearning"].GetBool();
+
+	
 
     *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 }

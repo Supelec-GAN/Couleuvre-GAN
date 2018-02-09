@@ -90,10 +90,10 @@ Eigen::MatrixXf NeuronLayer::minibatchLayerBackprop(Eigen::MatrixXf xnPartialDer
 //****************AUTRES****************
 //**************************************
 
-void NeuronLayer::updateLayerWeights()
+void NeuronLayer::updateLayerWeights(unsigned int minibatchSize)
 {
-	mWeight -= mSumWeightVariation;
-	mBias += mSumBiasVariation;
+	mWeight -= mSumWeightVariation/minibatchSize;
+	mBias += mSumBiasVariation/minibatchSize;
 	
 	//reset des buffer
 	mSumWeightVariation.setZero() ;

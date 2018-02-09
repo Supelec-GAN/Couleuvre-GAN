@@ -54,10 +54,10 @@ void Teacher::minibatchGeneratorBackprop(NeuralNetwork::Ptr network, Eigen::Matr
 	
 }
 
-void Teacher::updateNetworkWeights(NeuralNetwork::Ptr network)
+void Teacher::updateNetworkWeights(NeuralNetwork::Ptr network, unsigned int minibatchSize)
 {
 	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
-		itr->updateLayerWeights();
+		itr->updateLayerWeights(minibatchSize);
 }
 
 

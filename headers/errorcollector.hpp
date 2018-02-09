@@ -11,24 +11,27 @@ class ErrorCollector
     public:
         struct StatisticData
         {
-            float mean;
+            float meanGen;
             float meanDis;
-            float deviation;
-            float confidenceRange;
-        };
+            float deviationGen;
+            float confidenceRangeGen;
+			float deviationDis;
+			float confidenceRangeDis;
+
+		};
 
     public:
                         ErrorCollector();
 
         StatisticData   processData() const;
-        void            addResult(float result);
+        void            addResultGen(float result);
         void            addResultDis(float result);
 
     private:
 
 
     private:
-        std::vector<float> mErrors;
+        std::vector<float> mErrorsGen;
         std::vector<float> mErrorsDis;
 
 };

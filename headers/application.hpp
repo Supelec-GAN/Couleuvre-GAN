@@ -117,7 +117,7 @@ class Application
         /**
          * Effectue une run de test sur le batch de test
 		 * @param limit  permet de limiter le nombre d'entrées de tests
-		 * @param returnErrorRate
+		 * @param returnErrorRate deprecated
          */
         float runTestGen(int limit = -1, bool returnErrorRate = 1);
 
@@ -125,7 +125,7 @@ class Application
         /**
          * Effectue une run de test sur le batch de test
 		 * @param limit permet de limiter le nombre d'entrées de tests
-		 * @param returnErrorRate
+		 * @param returnErrorRate deprecated
          */
         float runTestDis(int limit = -1, bool returnErrorRate = 1);
 

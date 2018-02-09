@@ -137,7 +137,7 @@ void Application::runExperiments()
 
 void Application::runSingleStochasticExperiment()
 {
-    mStatsCollector[0].addResult(runTestGen());
+    mStatsCollector[0].addResultGen(runTestGen());
     bool trigger = false; //A changer si vous voulez faire des expériences funs
     for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
     {
@@ -145,7 +145,7 @@ void Application::runSingleStochasticExperiment()
         runStochasticTeach(trigger);
         auto scoreGen = runTestGen();
         auto scoreDis = runTestDis(mConfig.nbDisTest);
-        mStatsCollector[loopIndex+1].addResult(scoreGen);
+        mStatsCollector[loopIndex+1].addResultGen(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
 		//Création Image
@@ -160,14 +160,14 @@ void Application::runSingleStochasticExperiment()
 
 void Application::runSingleMinibatchExperiment()
 {
-	mStatsCollector[0].addResult(runTestGen());
+	mStatsCollector[0].addResultGen(runTestGen());
 	for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
 	{
 		std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
 		runMinibatchTeach();
 		auto scoreGen = runTestGen();
 		auto scoreDis = runTestDis(mConfig.nbDisTest);
-		mStatsCollector[loopIndex+1].addResult(scoreGen);
+		mStatsCollector[loopIndex+1].addResultGen(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
 		if (loopIndex%mConfig.intervalleImg==0)

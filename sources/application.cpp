@@ -7,7 +7,7 @@
 #include <iostream>
 
 Application::Application() :
-mStatsCollector()
+mStatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage)
 {
     // Charge la configuration de l'application
     loadConfig();
@@ -400,6 +400,8 @@ void Application::setConfig(rapidjson::Document& document)
 
     mConfig.generatorDest = document["generatorDest"].GetString();
     mConfig.discriminatorDest = document["discriminatorDest"].GetString();
+	mConfig.CSVFileNameResult = document["CSVFileNameResult"].GetString();
+	mConfig.CSVFileNameImage = document["CSVFileNameImage"].GetString();
 	
 	mConfig.typeOfExperiment = document["typeOfExperiment"].GetString();
 	mConfig.useAverageForBatchlearning = document["useAverageForBatchlearning"].GetBool();

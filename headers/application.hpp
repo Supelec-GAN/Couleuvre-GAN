@@ -51,7 +51,9 @@ class Application
             std::string generatorDest;
             std::string discriminatorDest;
 			std::string typeOfExperiment;
-
+			std::string CSVFileNameImage;
+			std::string CSVFileNameResult;
+			
             std::vector<unsigned int> disLayerSizes;
             std::vector<unsigned int> genLayerSizes;
         };

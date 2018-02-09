@@ -23,6 +23,8 @@
 	"discriminatorPath": "discriminator.csv",
 	"generatorDest": "generator.csv",
 	"discriminatorDest": "discriminator.csv",
+	"CSVFileNameResult":"resultat",
+	"CSVFileNameImage":"image",
 	"typeOfExperiment": "Minibatch",
 	"useAverageForBatchlearning": true
 

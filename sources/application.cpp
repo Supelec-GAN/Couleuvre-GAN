@@ -153,6 +153,13 @@ void Application::runSingleStochasticExperiment()
 		{
 			Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 			mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+
+            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+
+            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+
 		}
 		
 	}

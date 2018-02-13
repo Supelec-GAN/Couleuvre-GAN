@@ -7,7 +7,7 @@
 #include <iostream>
 
 Application::Application() :
-mStatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage)
+mStatsCollector()
 {
     // Charge la configuration de l'application
     loadConfig();

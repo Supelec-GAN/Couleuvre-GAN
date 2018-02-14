@@ -179,8 +179,9 @@ void Application::runSingleMinibatchExperiment()
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
 		if (loopIndex%mConfig.intervalleImg==0)
 		{
-			Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 			mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+           Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+           mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
 		}
 	}
 }
@@ -281,16 +282,17 @@ float Application::runTestGen(int limit, bool returnErrorRate)
 
 float Application::runTestDis(int limit, bool returnErrorRate)
 {
+    int i(limit);
     float errorMean{0};
     if (returnErrorRate)
     {
-        for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end() && limit-- != 0; ++itr)
+        for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end() && i-- != 0; ++itr)
         {
             Eigen::MatrixXf output{mDiscriminator->processNetwork(itr->first)};
             errorMean += sqrt((output).squaredNorm());
         }
     }
-    return errorMean/static_cast<float>(mTestingBatchDis.size());
+    return errorMean/static_cast<float>(min((int)mTestingBatchDis.size(),limit));
 }
 
 [[deprecated]]

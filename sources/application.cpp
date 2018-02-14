@@ -6,11 +6,13 @@
 #include <ctime>
 #include <iostream>
 
-Application::Application() :
-mStatsCollector()
+Application::Application()
 {
     // Charge la configuration de l'application
     loadConfig();
+	mStatsCollector : Stats::StatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage);
+	*mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
+
 
     try
     {
@@ -406,10 +408,6 @@ void Application::setConfig(rapidjson::Document& document)
 	
 	mConfig.typeOfExperiment = document["typeOfExperiment"].GetString();
 	mConfig.useAverageForBatchlearning = document["useAverageForBatchlearning"].GetBool();
-
-	
-
-    *mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 }
 
 void Application::exportPoids()

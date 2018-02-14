@@ -179,9 +179,15 @@ void Application::runSingleMinibatchExperiment()
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
 		if (loopIndex%mConfig.intervalleImg==0)
 		{
-			mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-           Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-           mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+
+            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+
+            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+
 		}
 	}
 }

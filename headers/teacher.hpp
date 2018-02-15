@@ -17,7 +17,7 @@ class Teacher
          *  @param generator un smart pointeur sur le générateur dont on veut superviser l'apprentissage
 		 *  @param discriminator un smart pointeur sur le discriminateur dont on veut superviser l'apprentissage
          */
-                        Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator);
+                        Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator, int genFun);
 
         /// Constructeur par pointer
         /**
@@ -25,7 +25,7 @@ class Teacher
 		 *  @param generator un pointeur sur le générateur dont on veut superviser l'apprentissage
 		 *  @param discriminator un pointeur sur le discriminateur dont on veut superviser l'apprentissage
          */
-                        Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator);
+                        Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, int genFun);
 
 	
 #pragma mark - Backpropagation
@@ -138,7 +138,8 @@ class Teacher
         NeuralNetwork::Ptr  mDiscriminator;
 
         /// La fonction d'erreur utilisée
-        Functions::ErrorFun mErrorFun;
+        Functions::ErrorFun mErrorFunDis;
+        Functions::ErrorFun mErrorFunGen;
 };
 
 #endif // TEACHER_HPP

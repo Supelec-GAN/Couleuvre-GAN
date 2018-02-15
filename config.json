@@ -15,6 +15,10 @@
 	"labelTestSize": 10000,
 	"chiffreATracer": 3,
 	"minibatchSize": 2,
+    
+    "_commentaire": "0 = Heuristic; 1 = MinMax; 2 = KLDiv",
+    "genFunction": 0,
+
 	
 	"layersSizesGen": [ 100, 400, 784],
 	"layersSizesDis": [ 784, 10, 1],

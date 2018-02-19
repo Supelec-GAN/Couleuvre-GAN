@@ -46,7 +46,6 @@ class Application
             unsigned int intervalleImg;
             unsigned int chiffreATracer;
 			unsigned int minibatchSize;
-            int genFunction; //0 = Heuristic; 1 = MinMax; 2 = KLDiv
 
             std::string generatorPath;
             std::string discriminatorPath;

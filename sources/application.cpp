@@ -92,7 +92,7 @@ Application::Application()
 				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
 			mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
 		}
-        mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
+		mTeacher = Teacher(mGenerator,mDiscriminator);
 		mTestCounter = 0;
 		
     }
@@ -411,8 +411,6 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
-
-    mConfig.genFunction = document["genFunction"].GetUint();
 
 
     mConfig.generatorPath = document["generatorPath"].GetString();

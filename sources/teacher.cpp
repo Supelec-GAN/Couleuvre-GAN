@@ -6,40 +6,17 @@
 Teacher::Teacher()
 {}
 
-Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator, int genFunction)
+Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator)
 : mGenerator(std::move(generator))
 , mDiscriminator(std::move(discriminator))
-, mErrorFunDis(Functions::disCout())
-{
-    switch (genFunction) {
-        case 0 : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-        case 1 : mErrorFunGen = (Functions::genMinMax());
-                           break;
-        case 2 : mErrorFunGen = (Functions::genKLDiv());
-                           break;
-        default : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-    };
-}
+, mErrorFun(Functions::l2Norm())
+{}
 
-Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, int genFunction)
+Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator)
 : mGenerator(generator)
 , mDiscriminator(discriminator)
-, mErrorFunDis(Functions::disCout())
-{
-    switch (genFunction) {
-        case 0 : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-        case 1 : mErrorFunGen = (Functions::genMinMax());
-                           break;
-        case 2 : mErrorFunGen = (Functions::genKLDiv());
-                           break;
-        default : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-    };
-
-}
+, mErrorFun(Functions::coutDiscr())
+{}
 
 //#pragma mark - Backpropagation
 
@@ -103,7 +80,7 @@ Eigen::MatrixXf Teacher::propagateErrorMinibatch(NeuralNetwork::Ptr network, Eig
 	return xnPartialDerivative;
 }
 
-//[[deprecated]] //use propagateErrorMinibatch(mDiscriminator, xnPartialDerivative, 0) instead
+[[deprecated]] //use propagateErrorMinibatch(mDiscriminator, xnPartialDerivative, 0) instead
 Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xnPartialDerivative)
 {
     for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
@@ -125,7 +102,7 @@ Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, 
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFunGen(mDiscriminator->processNetwork(output + deltaX), desiredOutput) - mErrorFunGen(discrOutput, desiredOutput))/dx;
+        errorVect(i) = (mErrorFun(mDiscriminator->processNetwork(output + deltaX), desiredOutput) - mErrorFun(discrOutput, desiredOutput))/dx;
     }
     return errorVect;
 }
@@ -138,7 +115,7 @@ Eigen::MatrixXf Teacher::calculateInitialErrorVector(Eigen::MatrixXf output, Eig
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFunDis(output + deltaX, desiredOutput) - mErrorFunDis(output, desiredOutput))/dx;
+        errorVect(i) = (mErrorFun(output + deltaX, desiredOutput) - mErrorFun(output, desiredOutput))/dx;
     }
     return errorVect;
 }

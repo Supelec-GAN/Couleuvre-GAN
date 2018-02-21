@@ -6,39 +6,48 @@
 Teacher::Teacher()
 {}
 
-Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator, int genFunction)
+Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator, unsigned int genFun)
 : mGenerator(std::move(generator))
 , mDiscriminator(std::move(discriminator))
-, mErrorFunDis(Functions::disCout())
+, mErrorFunDis(Functions::coutDiscr())
 {
-    switch (genFunction) {
-        case 0 : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-        case 1 : mErrorFunGen = (Functions::genMinMax());
-                           break;
-        case 2 : mErrorFunGen = (Functions::genKLDiv());
-                           break;
-        default : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-    };
+    switch (genFun)
+    {
+    case 0 :
+        mErrorFunGen = Functions::coutGen();
+        break;
+    case 1 :
+        mErrorFunGen = Functions::genMinMax();
+        break;
+    case 2 :
+        mErrorFunGen = Functions::genKLDiv();
+        break;
+    default :
+        mErrorFunGen = Functions::coutGen();
+        break;
+    }
 }
 
-Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, int genFunction)
+Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigned int genFun)
 : mGenerator(generator)
 , mDiscriminator(discriminator)
-, mErrorFunDis(Functions::disCout())
+, mErrorFunDis(Functions::coutDiscr())
 {
-    switch (genFunction) {
-        case 0 : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-        case 1 : mErrorFunGen = (Functions::genMinMax());
-                           break;
-        case 2 : mErrorFunGen = (Functions::genKLDiv());
-                           break;
-        default : mErrorFunGen = (Functions::genHeuristic());
-                           break;
-    };
-
+    switch (genFun)
+    {
+    case 0 :
+        mErrorFunGen = Functions::coutGen();
+        break;
+    case 1 :
+        mErrorFunGen = Functions::genMinMax();
+        break;
+    case 2 :
+        mErrorFunGen = Functions::genKLDiv();
+        break;
+    default :
+        mErrorFunGen = Functions::coutGen();
+        break;
+    }
 }
 
 //#pragma mark - Backpropagation
@@ -53,7 +62,7 @@ void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desir
 
 void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
-	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
+    Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVectorGen(mDiscriminator->processNetwork(input), desiredOutput, dx);
 	xnPartialDerivative = propagateErrorDiscriminatorInvariant(xnPartialDerivative);
 	propagateError(mGenerator, xnPartialDerivative, step);
 }
@@ -71,7 +80,7 @@ void Teacher::minibatchDiscriminatorBackprop(NeuralNetwork::Ptr network, Eigen::
 void Teacher::minibatchGeneratorBackprop(NeuralNetwork::Ptr network, Eigen::MatrixXf input,Eigen::MatrixXf desiredOutput, float step, float dx)
 //Same as backpropGenerator but no weight updating
 {
-	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
+    Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVectorGen(mDiscriminator->processNetwork(input), desiredOutput, dx);
 	xnPartialDerivative = propagateErrorMinibatch(mDiscriminator, xnPartialDerivative, 0);
 	propagateErrorMinibatch(network, xnPartialDerivative, step);
 	
@@ -115,17 +124,16 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
 
 
 //#pragma mark initial vector calculation
-
+//Quasiment la meme que pour le Discriminateur, à la fonction d'erreur pret
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {
     Eigen::MatrixXf errorVect = Eigen::MatrixXf::Zero(1, output.size());
-    Eigen::MatrixXf discrOutput = mDiscriminator->processNetwork(output);
 
     for(unsigned int i(0); i < output.size(); ++i)
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFunGen(mDiscriminator->processNetwork(output + deltaX), desiredOutput) - mErrorFunGen(discrOutput, desiredOutput))/dx;
+        errorVect(i) = (mErrorFunGen(output + deltaX, desiredOutput) - mErrorFunGen(output, desiredOutput))/dx;
     }
     return errorVect;
 }

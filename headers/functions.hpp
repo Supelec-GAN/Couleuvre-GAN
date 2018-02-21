@@ -41,13 +41,14 @@ struct Functions
         static ErrorFun         l2Norm();
 
         ///Fonction d'erreur pour le D du GAN
-        static ErrorFun         disCout();
+        static ErrorFun         coutDiscr();
 
-        static ErrorFun         genHeuristic();
 
-        static ErrorFun         genKLDiv();
+        static ErrorFun         coutGen();
 
         static ErrorFun         genMinMax();
+
+        static ErrorFun         genKLDiv();
 };
 
 #endif // FUNCTIONS_HPP

@@ -17,7 +17,7 @@ class Teacher
          *  @param generator un smart pointeur sur le générateur dont on veut superviser l'apprentissage
 		 *  @param discriminator un smart pointeur sur le discriminateur dont on veut superviser l'apprentissage
          */
-                        Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator, int genFun);
+                        Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator, unsigned int genFun);
 
         /// Constructeur par pointer
         /**
@@ -25,7 +25,7 @@ class Teacher
 		 *  @param generator un pointeur sur le générateur dont on veut superviser l'apprentissage
 		 *  @param discriminator un pointeur sur le discriminateur dont on veut superviser l'apprentissage
          */
-                        Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, int genFun);
+                        Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigned int genFun);
 
 	
 #pragma mark - Backpropagation

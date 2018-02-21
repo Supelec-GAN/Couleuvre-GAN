@@ -12,6 +12,7 @@ Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator,
 , mErrorFunDis(Functions::coutDiscr())
 {
     switch (genFun)
+    {
     case 0 :
         mErrorFunGen = Functions::coutGen();
         break;
@@ -24,15 +25,16 @@ Teacher::Teacher(NeuralNetwork::Ptr generator, NeuralNetwork::Ptr discriminator,
     default :
         mErrorFunGen = Functions::coutGen();
         break;
+    }
 }
 
 Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigned int genFun)
 : mGenerator(generator)
 , mDiscriminator(discriminator)
 , mErrorFunDis(Functions::coutDiscr())
-, mErrorFunGen(Functions::coutGen())
 {
     switch (genFun)
+    {
     case 0 :
         mErrorFunGen = Functions::coutGen();
         break;
@@ -45,6 +47,7 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigne
     default :
         mErrorFunGen = Functions::coutGen();
         break;
+    }
 }
 
 //#pragma mark - Backpropagation

@@ -46,6 +46,7 @@ class Application
             unsigned int intervalleImg;
             unsigned int chiffreATracer;
 			unsigned int minibatchSize;
+            unsigned int genFunction;
 
             std::string generatorPath;
             std::string discriminatorPath;

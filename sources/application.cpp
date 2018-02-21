@@ -10,7 +10,7 @@ Application::Application()
 {
     // Charge la configuration de l'application
     loadConfig();
-	mStatsCollector : Stats::StatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage);
+    mStatsCollector : Stats::StatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage);
 	*mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 
 
@@ -44,7 +44,7 @@ Application::Application()
 			
         {
             Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
-            outputTest(0) = 1;
+            outputTest(0) = 1.0;
 			if (labelTest(i) == mConfig.chiffreATracer)
             {
                 mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
@@ -92,7 +92,7 @@ Application::Application()
 				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
 			mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
 		}
-		mTeacher = Teacher(mGenerator,mDiscriminator);
+        mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
 		mTestCounter = 0;
 		
     }
@@ -411,6 +411,7 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
+    mConfig.genFunction = document["genFunction"].GetUint();
 
 
     mConfig.generatorPath = document["generatorPath"].GetString();

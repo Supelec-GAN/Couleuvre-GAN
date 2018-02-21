@@ -42,6 +42,13 @@ struct Functions
 
         ///Fonction d'erreur pour le D du GAN
         static ErrorFun         coutDiscr();
+
+
+        static ErrorFun         coutGen();
+
+        static ErrorFun         genMinMax();
+
+        static ErrorFun         genKLDiv();
 };
 
 #endif // FUNCTIONS_HPP

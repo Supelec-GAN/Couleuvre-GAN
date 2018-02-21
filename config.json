@@ -1,20 +1,24 @@
 {
-	"step": 0.2,
+	"step": 1.0,
 	"dx": 0.01,
 	"sigmoidParameter": 0.1,
 	
 	"nbExperiments": 3,
 	"nbLoopsPerExperiment": 100,
-	"nbTeachingsPerLoop": 1000,
+	"nbTeachingsPerLoop": 10,
 	"nbGenTeach": 1,
-	"nbDisTeach": 1,
-	"nbGenTest": 10,
-	"nbDisTest": 1000,
+	"nbDisTeach": 1,	
+	"nbGenTest": 1,
+	"nbDisTest": 1,
 	"intervalleImg": 10,
 	"labelTrainSize": 60000,
 	"labelTestSize": 10000,
 	"chiffreATracer": 3,
-	"minibatchSize": 2,
+	"minibatchSize": 10,
+    
+	"genFunction": 0,
+   		"_commentaire": "0 = Heuristic;1 = MinMax; 2 = KLDiv",
+
 	
 	"layersSizesGen": [ 100, 400, 784],
 	"layersSizesDis": [ 784, 10, 1],
@@ -26,8 +30,9 @@
 	"discriminatorDest": "discriminator.csv",
 	"CSVFileNameResult":"resultat",
 	"CSVFileNameImage":"image",
-	"typeOfExperiment": "Minibatch",
-	"useAverageForBatchlearning": true
+	"typeOfExperiment": "Stochastic",
+		"_commentaire": "Stochastic ou Minibatch",
+	"useAverageForBatchlearning": false
 
 }
 

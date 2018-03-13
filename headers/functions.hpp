@@ -35,7 +35,10 @@ struct Functions
          */
         static ActivationFun    hyperTan();
 
-	
+        static ActivationFun    reLu();
+
+        static ActivationFun    reLuLeaky(float lambda = 0.01);
+
 	
         ///Fonction d'erreur norme 2
         static ErrorFun         l2Norm();

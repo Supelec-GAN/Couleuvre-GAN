@@ -17,6 +17,24 @@ Functions::ActivationFun Functions::hyperTan()
     return [=] (float x) {return tanh(2*x/3);};
 }
 
+Functions::ActivationFun Functions::reLu()
+{
+    return [=] (float x)
+    {
+        if (x > 0) return x;
+        else return 0;
+    };
+}
+
+Functions::ActivationFun Functions::reLuLeaky(float lambda)
+{
+    return [=] (float x)
+    {
+        if (x > 0) return x;
+        else return lambda*x;
+    };
+}
+
 Functions::ErrorFun Functions::l2Norm()
 {
     return [] (Eigen::MatrixXf v1, Eigen::MatrixXf v2) {return (v1-v2).squaredNorm();};

@@ -22,7 +22,7 @@ Functions::ActivationFun Functions::reLu()
     return [=] (float x)
     {
         if (x > 0) return x;
-        else return 0;
+        else return 0.f;
     };
 }
 

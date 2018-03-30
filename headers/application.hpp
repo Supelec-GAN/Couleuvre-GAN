@@ -58,6 +58,12 @@ class Application
 			
             std::vector<unsigned int> disLayerSizes;
             std::vector<unsigned int> genLayerSizes;
+
+            std::vector<unsigned int> disLayerNbFiltres;
+            std::vector<unsigned int> genLayerNbFiltres;
+
+            std::vector<unsigned int> disLayerTypes;
+            std::vector<unsigned int> genLayerTypes;
         };
 
     public:
@@ -88,8 +94,6 @@ class Application
                     std::function<Eigen::MatrixXf(Eigen::MatrixXf)> modelFunction,
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
-
-////#pragma mark - Expériences
 	
 		void runExperiments();
 	
@@ -98,8 +102,7 @@ class Application
 		void runSingleMinibatchExperiment();
 
 		void resetExperiment();
-	
-//////#pragma mark - Apprentissage
+
 
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
@@ -154,8 +157,7 @@ class Application
 		 * Génère un minibatch d'images obtenues par le générateur
 		 */
 		Minibatch sampleGeneratedImagesFromNoiseMinibatch();
-	
-//////#pragma mark - Configuration
+
 
     private:
         /// Fonction pour charger la configuration de l'application

@@ -7,8 +7,7 @@
 class Teacher
 {
     public:
-	
-#pragma mark - Constructeur
+
 
                         Teacher();
         /// Constructeur par unique pointer
@@ -27,8 +26,7 @@ class Teacher
          */
                         Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigned int genFun);
 
-	
-#pragma mark - Backpropagation
+
 	
         /// Fonction appliquant la méthode de rétropropagation sur mDiscriminator
         /**
@@ -51,7 +49,6 @@ class Teacher
 
         void            backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step = 0.2, float dx = 0.05);
 
-//#pragma mark - minibatch
 		/// Fonction appliquant la méthode de rétropropagation par mini-Batch sur mDiscriminator
 		/**
 		 * Calcule la première dérivée dE/dXn puis propage l'erreur à travers le réseau

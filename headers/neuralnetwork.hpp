@@ -4,17 +4,17 @@
 #include <list>
 #include <vector>
 
-#include "neuronlayer.hpp"
 #include "headers/functions.hpp"
+#include "fullconnectedlayer.hpp"
+#include "convolutionallayer.hpp"
 
-class NeuralNetwork : public std::list<NeuronLayer>
+class NeuralNetwork : public std::list<NeuronLayer::Ptr>
 {
     public:
         using Ptr = std::shared_ptr<NeuralNetwork>;
 
     public:
 	
-//#pragma mark - Constructeur
 	    /// Constructeur permettant d'initialiser une réseau neuronal vide
         NeuralNetwork();
 	
@@ -25,7 +25,7 @@ class NeuralNetwork : public std::list<NeuronLayer>
          * @param layerSizes les tailles des vecteurs d'entrées/sorties
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
          */
-        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns);
+        NeuralNetwork(std::vector<unsigned int> layerTypes, std::vector<unsigned int> layerSizes, std::vector<unsigned int> layerNbFiltres, std::vector<Functions::ActivationFun> activationFuns);
 	
         /// Constructeur permettant d'initialiser un réseau neuronal avec choix des fonctions d'activation et des poids donnés
         /**
@@ -33,7 +33,7 @@ class NeuralNetwork : public std::list<NeuronLayer>
          * (la sortie d'une couche est l'entrée de la suivante), avec choix des fonctions d'activation
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
          */
-        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns);
+        //NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns);
 
         /// Constructeur permettant d'initialiser un réseau neuronal avec la fonction par défaut
         /**
@@ -51,17 +51,15 @@ class NeuralNetwork : public std::list<NeuronLayer>
 		template <typename Container>
 		NeuralNetwork(Container layerList);
 	
-//#pragma mark - Propagation
+
 
         Eigen::MatrixXf processNetwork(Eigen::MatrixXf input);
         Eigen::MatrixXf processNetwork();
 
-//#pragma mark - Autres
 		void reset();
 	
         int getInputSize();
 
-//#pragma mark - Auxiliaires
 
     public:
         /// Fonction utilitaire permettant d'afficher le réseau de neurones

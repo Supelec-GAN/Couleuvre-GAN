@@ -83,12 +83,15 @@ Application::Application()
 			//Le Generateur
 			std::vector<Functions::ActivationFun> funsGen;
 			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
-				funsGen.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
+            {
+                if (i==mConfig.genLayerSizes.size()-2) funsGen.push_back(Functions::sigmoid(0.1f));
+                else funsGen.push_back(Functions::reLu());
+            }
             mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerNbFiltres, funsGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
 			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
-				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
+                funsDis.push_back(Functions::sigmoid(0.1f));
             mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerNbFiltres, funsDis));
 		}
         mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
@@ -145,6 +148,7 @@ void Application::runSingleStochasticExperiment()
         runStochasticTeach(trigger);
         auto scoreGen = runTestGen();
         auto scoreDis = runTestDis(mConfig.nbDisTest);
+
         mStatsCollector[loopIndex+1].addResultGen(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;

@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "convolution.hpp"
 #include "headers/functions.hpp"
 #include "neuronlayer.hpp"
 
@@ -89,6 +90,8 @@ class ConvolutionalLayer : public NeuronLayer
         int             getInputSize();
 
         static Eigen::MatrixXf convolution(Eigen::MatrixXf input, Eigen::MatrixXf filtre, bool sommerLignes = true);
+
+        static Eigen::MatrixXf convolutionMonothreade(Eigen::MatrixXf input, Eigen::MatrixXf filtre, bool sommerLignes = true);
 
     public:
         /// Fonction utilitaire permettant d'afficher le neurone

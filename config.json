@@ -4,7 +4,7 @@
     "sigmoidParameter": 0.1,
 
     "nbExperiments": 1,
-    "nbLoopsPerExperiment": 100,
+    "nbLoopsPerExperiment": 5000,
     "nbTeachingsPerLoop": 10,
     "nbGenTeach": 1,
     "nbDisTeach": 1,
@@ -20,12 +20,12 @@
         "_commentaire": "0 = Heuristic;1 = MinMax; 2 = KLDiv",
 
     "layersTypesGen": [ 2, 2, 0],
-    "layersTypesDis": [ 2, 2, 0],
+    "layersTypesDis": [ 2, 0, 0],
         "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional",
-    "layersSizesGen": [ 1600, 100, 16, 784],
-    "layersNbFiltresGen": [ 64, 1, 0],
-    "layersSizesDis": [ 784, 400, 100, 1],
-    "layersNbFiltresDis": [ 32, 1, 0],
+    "layersSizesGen": [ 400, 100, 16, 784],
+    "layersNbFiltresGen": [ 24, 1, 0],
+    "layersSizesDis": [ 784, 676, 100, 1],
+    "layersNbFiltresDis": [ 300, 0, 0],
         "_commentaire": "2e Arguments pour les layers à convolution, l'argument est inutile pour une couche normale (laisser quand meme un 0). La taille de l'input pour le layer à convolution correspond à la dimension n de l'entrée (taille entrée = n*n)).",
         "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! (Sauf ZeroPadding (non implémenté)",
     "networkAreImported": false,
@@ -40,3 +40,4 @@
     "useAverageForBatchlearning": false
 
 }
+

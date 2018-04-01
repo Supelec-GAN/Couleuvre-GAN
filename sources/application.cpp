@@ -32,9 +32,12 @@ Application::Application()
         {
             Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
             outputTrain(0,0) = 1;
-            if (labelTrain(i) == mConfig.chiffreATracer)
+            for (unsigned int j(0); j< mConfig.chiffreATracer.size(); j++)
             {
-                mTeachingBatchDis.push_back(Application::Sample(imageTrain[i], outputTrain));
+                if (labelTrain(i) == mConfig.chiffreATracer[j])
+                {
+                    mTeachingBatchDis.push_back(Application::Sample(imageTrain[i], outputTrain));
+                }
             }
         }
         cout << "Chargement du Batch d'entrainement effectué !" << endl;
@@ -45,9 +48,12 @@ Application::Application()
         {
             Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
             outputTest(0) = 1.0;
-			if (labelTest(i) == mConfig.chiffreATracer)
+            for (unsigned int j(0); j< mConfig.chiffreATracer.size(); j++)
             {
-                mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
+                if (labelTest(i) == mConfig.chiffreATracer[j])
+                {
+                    mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
+                }
             }
         }
 		
@@ -415,6 +421,10 @@ void Application::setConfig(rapidjson::Document& document)
     for(rapidjson::SizeType i = 0; i < layersTypesGen.Size(); i++)
         mConfig.genLayerTypes.push_back(layersTypesGen[i].GetUint());
 
+    auto chiffreATracer = document["chiffreATracer"].GetArray();
+    for(rapidjson::SizeType i = 0; i < chiffreATracer.Size(); i++)
+        mConfig.chiffreATracer.push_back(chiffreATracer[i].GetUint());
+
     mConfig.nbExperiments = document["nbExperiments"].GetUint();
     mConfig.nbLoopsPerExperiment = document["nbLoopsPerExperiment"].GetUint();
     mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
@@ -425,7 +435,6 @@ void Application::setConfig(rapidjson::Document& document)
 	mConfig.labelTrainSize = document["labelTrainSize"].GetUint();
 	mConfig.labelTestSize = document["labelTestSize"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
-    mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
     mConfig.genFunction = document["genFunction"].GetUint();
 

@@ -44,7 +44,7 @@ class Application
 			unsigned int labelTrainSize;
 			unsigned int labelTestSize;
             unsigned int intervalleImg;
-            unsigned int chiffreATracer;
+            std::vector<unsigned int> chiffreATracer;
 			unsigned int minibatchSize;
             unsigned int genFunction;
 

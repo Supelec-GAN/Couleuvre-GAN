@@ -19,7 +19,10 @@ HEADERS += \
     headers/application.hpp \
     headers/errorcollector.hpp \
     headers/functions.hpp \
-    headers/statscollector.hpp
+    headers/statscollector.hpp \
+    headers/convolution.hpp \
+    headers/convolutionallayer.hpp \
+    headers/fullconnectedlayer.hpp
 
 SOURCES += \
     sources/functions.cpp \
@@ -31,7 +34,10 @@ SOURCES += \
     headers/neuralnetwork.inl \
     sources/errorcollector.cpp \
     sources/statscollector.cpp \
-    sources/application.cpp
+    sources/application.cpp \
+    sources/convolution.cpp \
+    sources/convolutionallayer.cpp \
+    sources/fullconnectedlayer.cpp
 
 INCLUDEPATH += D:\Users\Kvykvzx\Projet\C++\SupelecGAN
 

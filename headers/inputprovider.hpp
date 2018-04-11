@@ -3,10 +3,13 @@
 
 #include <eigen3/Eigen/Dense>
 #include <vector>
+#include <memory>
 
 class InputProvider
 {
     public:
+        /// Un alias pour désigner un pointeur sur in InputProvider
+        using Ptr = std::unique_ptr<InputProvider>;
         /// Un alias pour désigner un donnée (Entrée, Sortie)
         using Sample = std::pair<Eigen::MatrixXf, Eigen::MatrixXf>;
         /// Un alias pour désigner un batch de données (Entrée, Sortie)
@@ -23,12 +26,15 @@ class InputProvider
 class MnistProvider : public InputProvider
 {
     public:
-        MnistProvider();
+        MnistProvider(unsigned int labelTrainSize = 60000, unsigned int labelTestSize = 10000);
 
-        Batch trainingBatch(unsigned int labelTrainSize = 60000) const;
-        Batch testingBatch(unsigned int labelTestSize = 10000) const;
+        Batch trainingBatch() const;
+        Batch testingBatch() const;
 
     private:
+        unsigned int mLabelTrainSize;
+        unsigned int mLabelTestSize;
+
         std::vector<Eigen::MatrixXf>    mImageTrain;
         Eigen::MatrixXi                 mLabelTrain;
 

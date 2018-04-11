@@ -8,6 +8,7 @@
 #include <headers/rapidjson/document.h>
 #include "headers/neuralnetwork.hpp"
 #include "headers/teacher.hpp"
+#include "headers/inputprovider.hpp"
 #include "headers/statscollector.hpp"
 #include "headers/mnist_reader.h"
 #include "CSVFile.h"
@@ -165,6 +166,7 @@ class Application
         NeuralNetwork* importNeuralNetwork(std::string networkPath, Functions::ActivationFun activationFun);
 
     private:
+
         /// Les réseaux avec lequel on travaille
         NeuralNetwork::Ptr  mDiscriminator;
         NeuralNetwork::Ptr  mGenerator;

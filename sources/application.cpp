@@ -13,43 +13,12 @@ Application::Application()
     mStatsCollector : Stats::StatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage);
 	*mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 
-
     try
     {
-        //Chargement de MNIST
-        mnist_reader readerTrain("MNIST/train-images-60k", "MNIST/train-labels-60k");
-        std::vector<Eigen::MatrixXf> imageTrain;
-        Eigen::MatrixXi labelTrain;
-        readerTrain.ReadMNIST(imageTrain, labelTrain);
+        InputProvider::Ptr inputProvider(new MnistProvider);
 
-        mnist_reader readerTest("MNIST/test-images-10k", "MNIST/test-labels-10k");
-        std::vector<Eigen::MatrixXf> imageTest;
-        Eigen::MatrixXi labelTest;
-        readerTest.ReadMNIST(imageTest, labelTest);
-
-        //Création du Batch d'entrainement du discriminateur
-        for(auto i(0); i< mConfig.labelTrainSize; i++)
-        {
-            Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
-            outputTrain(0,0) = 1;
-            if (labelTrain(i) == mConfig.chiffreATracer)
-            {
-                mTeachingBatchDis.push_back(Application::Sample(imageTrain[i], outputTrain));
-            }
-        }
-        cout << "Chargement du Batch d'entrainement effectué !" << endl;
-
-        //Création du Batch de test du discriminateur
-        for(auto i(0); i<mConfig.labelTestSize; i++)
-			
-        {
-            Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
-            outputTest(0) = 1.0;
-			if (labelTest(i) == mConfig.chiffreATracer)
-            {
-                mTestingBatchDis.push_back(Application::Sample(imageTest[i], outputTest));
-            }
-        }
+        mTeachingBatchDis = inputProvider->trainingBatch();
+        mTestingBatchDis = inputProvider->testingBatch();
 		
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;

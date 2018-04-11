@@ -325,8 +325,6 @@ Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch()
 	return generatedImagesFromNoiseMinibatch;
 }
 
-
-#pragma mark - Configuration
 //************CONFIGURATION*************
 //**************************************
 

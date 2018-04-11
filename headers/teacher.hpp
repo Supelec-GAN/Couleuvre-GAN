@@ -7,8 +7,6 @@
 class Teacher
 {
     public:
-	
-#pragma mark - Constructeur
 
                         Teacher();
         /// Constructeur par unique pointer
@@ -27,8 +25,6 @@ class Teacher
          */
                         Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigned int genFun);
 
-	
-#pragma mark - Backpropagation
 	
         /// Fonction appliquant la méthode de rétropropagation sur mDiscriminator
         /**

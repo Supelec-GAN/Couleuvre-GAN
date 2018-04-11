@@ -15,7 +15,7 @@
 
 using namespace std;
 
-int main(int argc, char *argv[])
+int main()
 {
 
     //QApplication app(argc, argv);

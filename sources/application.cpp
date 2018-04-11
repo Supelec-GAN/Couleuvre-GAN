@@ -10,8 +10,10 @@ Application::Application()
 {
     // Charge la configuration de l'application
     loadConfig();
-    mStatsCollector : Stats::StatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage);
-	*mStatsCollector.getCSVFile() << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
+
+    /// A réparer, cette fonctionnalité est pétée (et n'a jamais marché en fait)
+    /// mStatsCollector : Stats::StatsCollector(mConfig.CSVFileNameResult,mConfig.CSVFileNameImage);
+    *(mStatsCollector.getCSVFile()) << "Step" << mConfig.step << "dx" << mConfig.dx << endrow;
 
     try
     {
@@ -19,7 +21,7 @@ Application::Application()
 
         mTeachingBatchDis = inputProvider->trainingBatch();
         mTestingBatchDis = inputProvider->testingBatch();
-		
+
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;
         for(unsigned int i(0); i < mConfig.nbGenTest; i++)
@@ -71,7 +73,6 @@ Application::Application()
     }
 }
 
-////#pragma mark - Expériences
 //**************EXPERIENCES*************
 //**************************************
 
@@ -109,11 +110,11 @@ void Application::runExperiments()
 void Application::runSingleStochasticExperiment()
 {
     mStatsCollector[0].addResultGen(runTestGen());
-    bool trigger = false; //A changer si vous voulez faire des expériences funs
+
     for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
     {
         std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
-        runStochasticTeach(trigger);
+        runStochasticTeach();
         auto scoreGen = runTestGen();
         auto scoreDis = runTestDis(mConfig.nbDisTest);
         mStatsCollector[loopIndex+1].addResultGen(scoreGen);
@@ -169,11 +170,10 @@ void Application::resetExperiment()
     mDiscriminator->reset();
 }
 
-////#pragma mark - Apprentissage
 //************APPRENTISSAGE*************
 //**************************************
 
-void Application::runStochasticTeach(bool trigger)
+void Application::runStochasticTeach()
 {
 	std::uniform_int_distribution<> distribution(0, static_cast<int>(mTeachingBatchDis.size())-1);
 	std::mt19937 randomEngine((std::random_device())());

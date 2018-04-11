@@ -90,7 +90,7 @@ class Application
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
 
-////#pragma mark - Expériences
+//// Expériences
 	
 		void runExperiments();
 	
@@ -100,14 +100,14 @@ class Application
 
 		void resetExperiment();
 	
-//////#pragma mark - Apprentissage
+//// Apprentissage
 
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
          * Effectue une run d'apprentissage dont le nombre d'apprentissages est passé en paramètres
 		 * @param trigger permet de forcer l'apprentissage uniquement du générateur si le discriminateur devient trop bon
          */
-        void runStochasticTeach(bool trigger);
+        void runStochasticTeach();
 
 		/// Effectue une run d'apprentissage par la méthode par batch
 		/**
@@ -156,7 +156,7 @@ class Application
 		 */
 		Minibatch sampleGeneratedImagesFromNoiseMinibatch();
 	
-//////#pragma mark - Configuration
+//// Configuration
 
     private:
         /// Fonction pour charger la configuration de l'application

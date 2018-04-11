@@ -22,14 +22,14 @@ Application::Application()
 		
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;
-		for(int i(0); i < mConfig.nbGenTest; i++)
+        for(unsigned int i(0); i < mConfig.nbGenTest; i++)
 		{
 			Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
 			vectorTest.push_back(noise);
 		}
 		
 		//Création du Batch de Test du générateur
-		for(auto i(0); i< mConfig.nbGenTest; i++)
+        for(unsigned int i(0); i< mConfig.nbGenTest; i++)
 		{
 			Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
 			outputTest(0) = 0;
@@ -51,13 +51,13 @@ Application::Application()
 			// Construction du réseau de neurones
 			//Le Generateur
 			std::vector<Functions::ActivationFun> funsGen;
-			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
+            for(unsigned int i(0); i < mConfig.genLayerSizes.size()-1;i++)
 				funsGen.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
 			mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
 			
-			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
+            for(unsigned int i(0); i < mConfig.disLayerSizes.size()-1;i++)
 				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
 			mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
 		}
@@ -183,7 +183,7 @@ void Application::runStochasticTeach(bool trigger)
 		Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 		
-		for(int i(0); i<mConfig.nbGenTeach; i++)
+        for(unsigned int i(0); i<mConfig.nbGenTeach; i++)
 		{
 			
 			Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
@@ -194,7 +194,7 @@ void Application::runStochasticTeach(bool trigger)
 			desiredOutput(0,0) = 1;
 			mTeacher.backpropGenerator(input, desiredOutput, mConfig.step, mConfig.dx);
 		}
-		for(int i(0); i<mConfig.nbDisTeach; i++)
+        for(unsigned int i(0); i<mConfig.nbDisTeach; i++)
 		{
 			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 			Sample sample{mTeachingBatchDis[distribution(randomEngine)]};
@@ -416,10 +416,10 @@ NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Function
     std::vector<Eigen::MatrixXf> neuralNetwork;
     std::vector<Eigen::MatrixXf> bias;
     std::vector<unsigned int> taille;
-    int k = 0;
+    unsigned int k = 0;
     getline(ifs, a,'\n');
     std::string b = "";
-    for(auto i(0); i < a.length(); i++)
+    for(unsigned int i(0); i < a.length(); i++)
     {
         if (a[i] == ';')
         {
@@ -433,13 +433,13 @@ NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Function
         else
             b = b + a[i];
     }
-    for(auto i(0); i < taille.size()-1; i++)
+    for(unsigned int i(0); i < taille.size()-1; i++)
     {
         neuralNetwork.push_back(Eigen::MatrixXf::Zero(taille[i],taille[i+1]));
         bias.push_back(Eigen::MatrixXf::Zero(1,taille[i+1]));
     }
     std::vector<Functions::ActivationFun> activationFunVector;
-    for(auto i(0); i < taille.size()-1; i++)
+    for(unsigned int i(0); i < taille.size()-1; i++)
     {
         activationFunVector.push_back(activationFun);
     }

@@ -54,7 +54,7 @@ Functions::ErrorFun Functions::coutDiscr()
 
 Functions::ErrorFun Functions::coutGen()
 {
-    return [] (Eigen::MatrixXf v1, Eigen::MatrixXf v2) {
+    return [] (Eigen::MatrixXf v1, Eigen::MatrixXf) {
         float resultat = 0;
         for(int i=0; i<v1.size(); i++)
         {
@@ -66,7 +66,7 @@ Functions::ErrorFun Functions::coutGen()
 
 Functions::ErrorFun Functions::genMinMax()
 {
-    return [] (Eigen::MatrixXf v1, Eigen::MatrixXf v2) {
+    return [] (Eigen::MatrixXf v1, Eigen::MatrixXf) {
         float resultat = 0;
         for(int i=0; i<v1.size(); i++)
         {
@@ -78,7 +78,7 @@ Functions::ErrorFun Functions::genMinMax()
 
 Functions::ErrorFun Functions::genKLDiv()
 {
-    return [] (Eigen::MatrixXf v1, Eigen::MatrixXf v2) {
+    return [] (Eigen::MatrixXf v1, Eigen::MatrixXf) {
         float resultat = 0;
         for(int i=0; i<v1.size(); i++)
             resultat += -exp(-(1/1.0f)*log((1/v1(i))-1));

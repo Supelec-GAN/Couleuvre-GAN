@@ -123,17 +123,13 @@ void Application::runSingleStochasticExperiment()
 		//Création Image
 		if (loopIndex%mConfig.intervalleImg==0)
 		{
-			Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-			mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-
-            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-
-            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-
+            Eigen::MatrixXf input;
+            for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
+            {
+                input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+            }
 		}
-		
 	}
 }
 
@@ -149,18 +145,15 @@ void Application::runSingleMinibatchExperiment()
 		mStatsCollector[loopIndex+1].addResultGen(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
-		if (loopIndex%mConfig.intervalleImg==0)
-		{
-            Eigen::MatrixXf input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-
-            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-
-            input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
-            mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
-
-		}
+        if (loopIndex%mConfig.intervalleImg==0)
+        {
+            Eigen::MatrixXf input;
+            for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
+            {
+                input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+            }
+        }
 	}
 }
 
@@ -376,6 +369,7 @@ void Application::setConfig(rapidjson::Document& document)
 	mConfig.labelTrainSize = document["labelTrainSize"].GetUint();
 	mConfig.labelTestSize = document["labelTestSize"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
+    mConfig.nbImgParIntervalleImg = document["nbImgParIntervalleImg"].GetUint();
     mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
     mConfig.genFunction = document["genFunction"].GetUint();

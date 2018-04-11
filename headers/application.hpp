@@ -45,6 +45,7 @@ class Application
 			unsigned int labelTrainSize;
 			unsigned int labelTestSize;
             unsigned int intervalleImg;
+            unsigned int nbImgParIntervalleImg;
             unsigned int chiffreATracer;
 			unsigned int minibatchSize;
             unsigned int genFunction;

@@ -21,8 +21,10 @@ Functions::ActivationFun Functions::reLu()
 {
     return [=] (float x)
     {
-        if (x > 0.f) return x;
-        else return 0.f;
+        if (x > 0.f)
+            return x;
+        else
+            return 0.f;
     };
 }
 

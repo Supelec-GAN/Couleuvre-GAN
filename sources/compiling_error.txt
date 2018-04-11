@@ -1,0 +1,4 @@
+/home/thelistener/Projets/Couleuvre-GAN/sources/functions.cpp:1:10: erreur fatale: headers/functions.hpp : Aucun fichier ou dossier de ce type
+ #include "headers/functions.hpp"
+          ^~~~~~~~~~~~~~~~~~~~~~~
+compilation terminée.

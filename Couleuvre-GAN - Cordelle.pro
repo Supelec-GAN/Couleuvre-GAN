@@ -22,7 +22,8 @@ HEADERS += \
     headers/statscollector.hpp \
     headers/convolution.hpp \
     headers/convolutionallayer.hpp \
-    headers/fullconnectedlayer.hpp
+    headers/fullconnectedlayer.hpp \
+    headers/noisylayer.h
 
 SOURCES += \
     sources/functions.cpp \
@@ -37,7 +38,8 @@ SOURCES += \
     sources/application.cpp \
     sources/convolution.cpp \
     sources/convolutionallayer.cpp \
-    sources/fullconnectedlayer.cpp
+    sources/fullconnectedlayer.cpp \
+    sources/noisylayer.cpp
 
 INCLUDEPATH += D:\Users\Kvykvzx\Projet\C++\SupelecGAN
 

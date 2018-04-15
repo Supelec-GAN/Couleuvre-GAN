@@ -14,6 +14,8 @@ NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerTypes, std::vector<u
     {
         if (layerTypes[i]==0)
             push_back(NeuronLayer::Ptr(new FullConnectedLayer(layerSizes[i], layerSizes[i+1], activationFuns[i])));
+        else if(layerTypes[i]==3)
+            push_back(NeuronLayer::Ptr(new NoisyLayer(layerSizes[i], layerSizes[i+1], activationFuns[i])));
         else
         {
             if (i==0)

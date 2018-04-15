@@ -21,7 +21,7 @@
 
     "layersTypesGen": [ 2, 2, 0],
     "layersTypesDis": [ 2, 0, 0],
-        "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional",
+        "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = noisyLayer",
     "layersSizesGen": [ 400, 100, 16, 784],
     "layersNbFiltresGen": [ 24, 1, 0],
     "layersSizesDis": [ 784, 676, 100, 1],

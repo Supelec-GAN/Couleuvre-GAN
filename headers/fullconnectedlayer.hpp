@@ -91,7 +91,7 @@ class FullConnectedLayer : public NeuronLayer
          */
         //friend std::ostream& operator<<(std::ostream& flux, FullConnectedLayer nl);
 
-    private:
+    protected:
         /// Fonction renvoyant le vecteur des dérivées de Fn évalué en Yn
         /**
          * Cette fonction calcule Fn'(Yn) ou Yn = mBufferActivationLevel
@@ -99,7 +99,7 @@ class FullConnectedLayer : public NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
-    private:
+    protected:
         /// La matrice des poids de la couche de neurones
         Eigen::MatrixXf                 mWeight;
 

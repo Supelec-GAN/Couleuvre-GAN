@@ -18,16 +18,16 @@ Application::Application()
 
     try
     {
-        Cifar10Provider::CifarLabel CifVehicle =   Cifar10Provider::CifarLabel::airplane | Cifar10Provider::CifarLabel::automobile |
-                                                Cifar10Provider::CifarLabel::ship | Cifar10Provider::CifarLabel::truck;
+        //Cifar10Provider::CifarLabel CifVehicle =    Cifar10Provider::CifarLabel::airplane | Cifar10Provider::CifarLabel::automobile |
+        //                                            Cifar10Provider::CifarLabel::ship | Cifar10Provider::CifarLabel::truck;
 
         Cifar10Provider::CifarLabel CifAnimals =   Cifar10Provider::CifarLabel::bird | Cifar10Provider::CifarLabel::cat |
                                                 Cifar10Provider::CifarLabel::deer | Cifar10Provider::CifarLabel::dog |
                                                 Cifar10Provider::CifarLabel::horse | Cifar10Provider::CifarLabel::frog;
 
-        Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
+        //Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
 
-        InputProvider::Ptr inputProvider(new Cifar10Provider(CifAll, 10000, 10000));
+        InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
 
         mTeachingBatchDis = inputProvider->trainingBatch();
         mTestingBatchDis = inputProvider->testingBatch();

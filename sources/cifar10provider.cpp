@@ -5,7 +5,7 @@ Cifar10Provider::Cifar10Provider(CifarLabel labels, unsigned int labelTrainSize,
 , mDataset(cifar::read_dataset<std::vector, std::vector, uint8_t, uint8_t>())
 , mLabels(labels)
 {
-    if(mLabelTrainSize > 60000)
+    if(mLabelTrainSize > 50000)
         throw std::logic_error("Erreur : dépassement d'indice sur le batch de train");
     if(mLabelTestSize > 10000)
         throw std::logic_error("Erreur : dépassement d'indice sur le batch de test");
@@ -20,19 +20,24 @@ InputProvider::Batch Cifar10Provider::trainingBatch() const
     Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
     outputTrain(0,0) = 1.0;
 
-    for(unsigned int i(0); i < mLabelTrainSize; i++)
+    // Compteur permet de compter le nombre d'images dans le batch, pour ne pas dépasser mLabelTrainSize
+    unsigned int compteur(0);
+    for(unsigned int i(0); i < 50000 && compteur < mLabelTrainSize; i++)
     {
-        std::cout << "Chargement de l'image no " << i << std::endl;
-        trainingBatch.push_back(Sample(getMatrix(i, true), outputTrain));
+        if(Cifar10Provider::matchLabelWithId(mLabels, mDataset.training_labels[i]))
+        {
+            trainingBatch.push_back(Sample(getMatrix(i, true), outputTrain));
+            compteur++;
+        }
     }
 
     std::cout << "Chargement du Batch d'entrainement Cifar10 effectué !" << std::endl;
-
     return trainingBatch;
 }
 
 InputProvider::Batch Cifar10Provider::testingBatch() const
 {
+
     std::cout << "Création du Batch de test Cifar10 du discriminateur" << std::endl;
 
     Batch testBatch;
@@ -40,9 +45,15 @@ InputProvider::Batch Cifar10Provider::testingBatch() const
     Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
     outputTest(0,0) = 1.0;
 
-    for(unsigned int i(0); i < mLabelTrainSize; i++)
+    // Compteur permet de compter le nombre d'images dans le batch, pour ne pas dépasser mLabelTestSize
+    unsigned int compteur(0);
+    for(unsigned int i(0); i < 50000 && compteur < mLabelTestSize; i++)
     {
-        testBatch.push_back(Sample(getMatrix(i, false), outputTest));
+        if(Cifar10Provider::matchLabelWithId(mLabels, mDataset.test_labels[i]))
+        {
+            testBatch.push_back(Sample(getMatrix(i, true), outputTest));
+            compteur++;
+        }
     }
 
     std::cout << "Chargement du Batch de test Cifar10 effectué !" << std::endl;

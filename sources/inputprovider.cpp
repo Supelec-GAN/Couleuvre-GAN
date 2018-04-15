@@ -1,10 +1,10 @@
 #include "headers/inputprovider.hpp"
-#include "headers/mnist_reader.h"
+
 
 #include <iostream>
 
 MnistProvider::MnistProvider(unsigned int labelTrainSize, unsigned int labelTestSize)
-: mLabelTrainSize(labelTrainSize), mLabelTestSize(labelTestSize)
+: InputProvider(labelTrainSize, labelTestSize)
 {
         std::cout << "Chargement de MNIST" << std::endl;
 
@@ -52,3 +52,4 @@ InputProvider::Batch MnistProvider::testingBatch() const
 
     return testingBatch;
 }
+

@@ -28,7 +28,7 @@ class InputProvider
         virtual Batch trainingBatch() const =0;
         virtual Batch testingBatch() const =0;
 
-    private:
+    protected:
         unsigned int mLabelTrainSize;
         unsigned int mLabelTestSize;
 
@@ -51,19 +51,5 @@ class MnistProvider : public InputProvider
 
 };
 
-class Cifar10Provider : public InputProvider
-{
-    public:
-        Cifar10Provider(unsigned int labelTrainSize = 50000, unsigned int labelTestSize = 10000);
-
-        Batch trainingBatch() const;
-        Batch testingBatch() const;
-
-    private:
-        cifar::CIFAR10_dataset< std::vector,
-                                std::vector,
-                                uint8_t,
-                                uint8_t> mDataset;
-};
 
 #endif // INPUTPROVIDER_HPP

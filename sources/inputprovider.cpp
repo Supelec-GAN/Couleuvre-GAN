@@ -53,17 +53,3 @@ InputProvider::Batch MnistProvider::testingBatch() const
     return testingBatch;
 }
 
-Cifar10Provider::Cifar10Provider(unsigned int labelTrainSize, unsigned int labelTestSize)
-: InputProvider(labelTrainSize, labelTestSize)
-, mDataset(cifar::read_dataset<std::vector, std::vector, uint8_t, uint8_t>())
-{}
-
-InputProvider::Batch Cifar10Provider::trainingBatch() const
-{
-
-}
-
-InputProvider::Batch Cifar10Provider::testingBatch() const
-{
-
-}

@@ -1,4 +1,5 @@
 #include "headers/application.hpp"
+#include "headers/cifar10provider.hpp"
 #include <headers/rapidjson/error/en.h>
 
 #include <math.h>
@@ -17,7 +18,7 @@ Application::Application()
 
     try
     {
-        InputProvider::Ptr inputProvider(new Cifar10Provider);
+        InputProvider::Ptr inputProvider(new Cifar10Provider(Cifar10Provider::CifarLabel::airplane, 10, 10));
 
         mTeachingBatchDis = inputProvider->trainingBatch();
         mTestingBatchDis = inputProvider->testingBatch();
@@ -262,7 +263,7 @@ float Application::runTestDis(int limit, bool returnErrorRate)
             errorMean += sqrt((output).squaredNorm());
         }
     }
-    return errorMean/static_cast<float>(min((int)mTestingBatchDis.size(),limit));
+    return errorMean/static_cast<float>(std::min((int)mTestingBatchDis.size(),limit));
 }
 
 [[deprecated]]

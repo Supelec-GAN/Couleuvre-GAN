@@ -18,7 +18,7 @@ Application::Application()
 
     try
     {
-        InputProvider::Ptr inputProvider(new Cifar10Provider(Cifar10Provider::CifarLabel::airplane, 10, 10));
+        InputProvider::Ptr inputProvider(new Cifar10Provider(Cifar10Provider::CifarLabel::airplane, 10000, 10000));
 
         mTeachingBatchDis = inputProvider->trainingBatch();
         mTestingBatchDis = inputProvider->testingBatch();

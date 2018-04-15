@@ -55,12 +55,12 @@ Eigen::MatrixXf Cifar10Provider::getMatrix(unsigned int index, bool isTrainOrTes
     // Le 3072 est hardcodé car c'est la taille d'une image cifar (32 * 32 = 1024 (nombre de pixels) et 1024 * 3 = 3072 (3 couleurs))
     unsigned int cifarSize = 3072;
 
-    auto dSet = isTrainOrTestRequired ? mDataset.training_images : mDataset.test_images;
+    auto dSet = isTrainOrTestRequired ? &mDataset.training_images : &mDataset.test_images;
 
     Eigen::MatrixXf mat = Eigen::MatrixXf::Zero(1,cifarSize);
     for(unsigned int pixel(0); pixel < cifarSize; pixel++)
     {
-        mat(0,pixel) = dSet[index][pixel];
+        mat(0,pixel) = (*dSet)[index][pixel];
     }
 
     return mat;

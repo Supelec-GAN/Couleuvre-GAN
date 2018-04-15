@@ -37,12 +37,14 @@ class InputProvider
 class MnistProvider : public InputProvider
 {
     public:
-        MnistProvider(unsigned int labelTrainSize = 60000, unsigned int labelTestSize = 10000);
+        MnistProvider(std::vector<unsigned int> labels, unsigned int labelTrainSize = 60000, unsigned int labelTestSize = 10000);
 
         Batch trainingBatch() const;
         Batch testingBatch() const;
 
     private:
+        std::array<unsigned int, 10>    mLabels;
+
         std::vector<Eigen::MatrixXf>    mImageTrain;
         Eigen::MatrixXi                 mLabelTrain;
 

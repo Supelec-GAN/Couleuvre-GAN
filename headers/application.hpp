@@ -46,7 +46,6 @@ class Application
 			unsigned int labelTestSize;
             unsigned int intervalleImg;
             unsigned int nbImgParIntervalleImg;
-            unsigned int chiffreATracer;
 			unsigned int minibatchSize;
             unsigned int genFunction;
 
@@ -57,9 +56,13 @@ class Application
 			std::string typeOfExperiment;
 			std::string CSVFileNameImage;
 			std::string CSVFileNameResult;
+
+            std::string bddToUse;
 			
             std::vector<unsigned int> disLayerSizes;
             std::vector<unsigned int> genLayerSizes;
+            std::vector<unsigned int> chiffresATracer;
+            std::vector<std::string> classesCifar;
         };
 
     public:

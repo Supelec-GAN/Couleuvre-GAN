@@ -358,7 +358,6 @@ void Application::setConfig(rapidjson::Document& document)
     mConfig.dx = document["dx"].GetFloat();
 	mConfig.sigmoidParameter = document["sigmoidParameter"].GetFloat();
 
-
     mConfig.networkAreImported = document["networkAreImported"].GetBool();
 
     auto layersSizesDis = document["layersSizesDis"].GetArray();
@@ -368,6 +367,16 @@ void Application::setConfig(rapidjson::Document& document)
     auto layersSizesGen = document["layersSizesGen"].GetArray();
     for(rapidjson::SizeType i = 0; i < layersSizesGen.Size(); i++)
         mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());
+
+    mConfig.bddToUse = document["bddToUse"].GetString();
+
+    auto chiffresATracer = document["chiffreATracer"].GetArray();
+    for(rapidjson::SizeType i(0); i < chiffresATracer.Size(); i++)
+        mConfig.chiffresATracer.push_back(chiffresATracer[i].GetUint());
+
+    auto classesCifar = document["classesCifar"].GetArray();
+    for(rapidjson::SizeType i(0); i < classesCifar.Size(); i++)
+        mConfig.classesCifar.push_back(classesCifar[i].GetString());
 
     mConfig.nbExperiments = document["nbExperiments"].GetUint();
     mConfig.nbLoopsPerExperiment = document["nbLoopsPerExperiment"].GetUint();
@@ -380,10 +389,8 @@ void Application::setConfig(rapidjson::Document& document)
 	mConfig.labelTestSize = document["labelTestSize"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.nbImgParIntervalleImg = document["nbImgParIntervalleImg"].GetUint();
-    mConfig.chiffreATracer = document["chiffreATracer"].GetUint();
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
     mConfig.genFunction = document["genFunction"].GetUint();
-
 
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();

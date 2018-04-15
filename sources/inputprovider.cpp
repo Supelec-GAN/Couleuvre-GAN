@@ -3,8 +3,9 @@
 
 #include <iostream>
 
-MnistProvider::MnistProvider(unsigned int labelTrainSize, unsigned int labelTestSize)
+MnistProvider::MnistProvider(std::vector<unsigned int> labels, unsigned int labelTrainSize, unsigned int labelTestSize)
 : InputProvider(labelTrainSize, labelTestSize)
+, mLabels{0}
 {
         std::cout << "Chargement de MNIST" << std::endl;
 
@@ -13,6 +14,9 @@ MnistProvider::MnistProvider(unsigned int labelTrainSize, unsigned int labelTest
 
         mnist_reader readerTest("MNIST/test-images-10k", "MNIST/test-labels-10k");
         readerTest.ReadMNIST(mImageTest, mLabelTest);
+
+        for(size_t i(0); i< labels.size(); i++)
+            mLabels[labels[i]] = 1;
 }
 
 InputProvider::Batch MnistProvider::trainingBatch() const
@@ -24,9 +28,14 @@ InputProvider::Batch MnistProvider::trainingBatch() const
     Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
     outputTrain(0,0) = 1.0;
 
-    for(unsigned int i(0); i < mLabelTrainSize; i++)
+    unsigned int compteur(0);
+    for(unsigned int i(0); i < 60000 && compteur < mLabelTrainSize; i++)
     {
-        trainingBatch.push_back(Sample(mImageTrain[i], outputTrain));
+        if(mLabels[mLabelTrain(i)])
+        {
+            trainingBatch.push_back(Sample(mImageTrain[i], outputTrain));
+            compteur++;
+        }
     }
 
     std::cout << "Chargement du Batch d'entrainement effectué !" << std::endl;
@@ -43,11 +52,15 @@ InputProvider::Batch MnistProvider::testingBatch() const
     Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
     outputTest(0,0) = 1.0;
 
+    unsigned int compteur(0);
     for(unsigned int i(0); i < mLabelTestSize; i++)
     {
-        testingBatch.push_back(Sample(mImageTest[i], outputTest));
+        if(mLabels[mLabelTest(i)])
+        {
+           testingBatch.push_back(Sample(mImageTest[i], outputTest));
+            compteur++;
+        }
     }
-
     std::cout << "Chargement du Batch de test effectué !" << std::endl;
 
     return testingBatch;

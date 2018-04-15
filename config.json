@@ -14,7 +14,11 @@
 	"nbImgParIntervalleImg": 1,
 	"labelTrainSize": 60000,
 	"labelTestSize": 10000,
-	"chiffreATracer": 3,
+
+	"bddToUse": "mnist",
+	"classesCifar": ["dog", "automobile", "deer", "bird", "ship", "truck", "cat", "airplane", "frog", "horse"], 
+	"chiffreATracer": [1, 2],
+	
 	"minibatchSize": 10,
     
 	"genFunction": 0,

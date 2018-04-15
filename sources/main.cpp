@@ -12,6 +12,7 @@
 #include "headers/CSVFile.h"
 #include "headers/application.hpp"
 #include "headers/mnist_reader.h"
+#include "headers/cifar10_reader.hpp"
 
 using namespace std;
 
@@ -24,8 +25,8 @@ int main()
 
 
     //Construction de l'application qui gère tout
-    Application appMNIST;
-    appMNIST.runExperiments();
+    Application appCifar;
+    appCifar.runExperiments();
 
     return 0;
 }

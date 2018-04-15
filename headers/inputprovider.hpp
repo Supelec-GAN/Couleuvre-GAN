@@ -5,6 +5,9 @@
 #include <vector>
 #include <memory>
 
+#include "headers/mnist_reader.h"
+#include "headers/cifar10_reader.hpp"
+
 class InputProvider
 {
     public:
@@ -18,8 +21,16 @@ class InputProvider
         using Minibatch = Batch;
 
     public:
+        InputProvider(unsigned int labelTrainSize, unsigned int labelTestSize)
+            : mLabelTrainSize(labelTrainSize)
+            , mLabelTestSize(labelTestSize) {}
+
         virtual Batch trainingBatch() const =0;
         virtual Batch testingBatch() const =0;
+
+    private:
+        unsigned int mLabelTrainSize;
+        unsigned int mLabelTestSize;
 
 };
 
@@ -32,15 +43,27 @@ class MnistProvider : public InputProvider
         Batch testingBatch() const;
 
     private:
-        unsigned int mLabelTrainSize;
-        unsigned int mLabelTestSize;
-
         std::vector<Eigen::MatrixXf>    mImageTrain;
         Eigen::MatrixXi                 mLabelTrain;
 
         std::vector<Eigen::MatrixXf>    mImageTest;
         Eigen::MatrixXi                 mLabelTest;
 
+};
+
+class Cifar10Provider : public InputProvider
+{
+    public:
+        Cifar10Provider(unsigned int labelTrainSize = 50000, unsigned int labelTestSize = 10000);
+
+        Batch trainingBatch() const;
+        Batch testingBatch() const;
+
+    private:
+        cifar::CIFAR10_dataset< std::vector,
+                                std::vector,
+                                uint8_t,
+                                uint8_t> mDataset;
 };
 
 #endif // INPUTPROVIDER_HPP

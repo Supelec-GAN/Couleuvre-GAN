@@ -20,7 +20,8 @@ HEADERS += \
     headers/errorcollector.hpp \
     headers/functions.hpp \
     headers/statscollector.hpp \
-    headers/inputprovider.hpp
+    headers/inputprovider.hpp \
+    headers/cifar10_reader.hpp
 
 SOURCES += \
     sources/functions.cpp \

@@ -17,7 +17,7 @@ Application::Application()
 
     try
     {
-        InputProvider::Ptr inputProvider(new MnistProvider);
+        InputProvider::Ptr inputProvider(new Cifar10Provider);
 
         mTeachingBatchDis = inputProvider->trainingBatch();
         mTestingBatchDis = inputProvider->testingBatch();

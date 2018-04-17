@@ -74,7 +74,7 @@ Application::Application()
 			mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
 			std::cout << "Chargement du Discriminateur effectué !" << std::endl;
 			
-			mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
+            mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
 			std::cout << "Chargement du Générateur effectué !" << std::endl;
 		}
 		else
@@ -84,13 +84,13 @@ Application::Application()
 			std::vector<Functions::ActivationFun> funsGen;
 			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
 				funsGen.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
-			mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen));
+            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen, mConfig.descentTypeGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
 			
 			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
 				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
-			mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis));
+            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis, mConfig.descentTypeDis));
 		}
         mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
 		mTestCounter = 0;
@@ -413,6 +413,8 @@ void Application::setConfig(rapidjson::Document& document)
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
     mConfig.genFunction = document["genFunction"].GetUint();
 
+    mConfig.descentTypeGen = document["descentTypeGen"].GetUint();
+    mConfig.descentTypeDis = document["descentTypeDis"].GetUint();
 
     mConfig.generatorPath = document["generatorPath"].GetString();
     mConfig.discriminatorPath = document["discriminatorPath"].GetString();

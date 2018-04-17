@@ -24,18 +24,20 @@ class NeuralNetwork : public std::list<NeuronLayer>
          * (la sortie d'une couche est l'entrée de la suivante), avec choix des fonctions d'activation
          * @param layerSizes les tailles des vecteurs d'entrées/sorties
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
+         * @param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          */
-        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns);
+        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Functions::ActivationFun> activationFuns, unsigned int descentType = 0);
 	
         /// Constructeur permettant d'initialiser un réseau neuronal avec choix des fonctions d'activation et des poids donnés
         /**
          * Constructeur permettant l'initialisation d'un réseau à n couches à partir des (n+1) tailles d'input/output
          * (la sortie d'une couche est l'entrée de la suivante), avec choix des fonctions d'activation
          * @param activationFuns le vector contenant les fonctions d'activation de chaque couche
+         * @param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          */
-        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns);
+        NeuralNetwork(std::vector<unsigned int> layerSizes, std::vector<Eigen::MatrixXf> weightVector, std::vector<Eigen::MatrixXf> biasVector, std::vector<Functions::ActivationFun> activationFuns, unsigned int descentType = 0);
 
-        /// Constructeur permettant d'initialiser un réseau neuronal avec la fonction par défaut
+        /// Constructeur permettant d'initialiser un réseau neuronal avec la fonction par défaut et une descente normale
         /**
          * Constructeur permettant l'initialisation d'un réseau à n couches à partir des (n+1) tailles d'input/output
          * (la sortie d'une couche est l'entrée de la suivante). La fonction d'activation choisie est la fonction d'activation par défaut

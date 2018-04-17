@@ -3,7 +3,7 @@
 //*************CONSTRUCTEUR*************
 //**************************************
 
-NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF)
+NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF, unsigned int descentType)
 : mWeight(Eigen::MatrixXf::Random(inputSize,outputSize))
 , mBias(Eigen::MatrixXf::Random(1, outputSize)) 				//ligne
 , mActivationFun(activationF)
@@ -13,9 +13,10 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::f
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
 , mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
 , mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
+, mDescentType(descentType)
 {}
 
-NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF)
+NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF, unsigned int descentType)
 : mWeight(weight)
 , mBias(bias) 				//ligne
 , mActivationFun(activationF)
@@ -25,6 +26,7 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen:
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
 , mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
 , mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
+, mDescentType(descentType)
 {}
 
 //#pragma mark - Propagation
@@ -56,13 +58,7 @@ Eigen::MatrixXf NeuronLayer::layerBackprop(Eigen::MatrixXf xnPartialDerivative, 
     //Mise à jour des poids
     Eigen::MatrixXf wnPartialDerivative = (mBufferInput.transpose())*ynPartialDerivative;
 
-    if (false)
-    {
-        mSumBiasVariation += step*ynPartialDerivative;
-        mSumWeightVariation += step*wnPartialDerivative;
-        updateLayerWeights();
-    }
-    else
+    if (mDescentType == 1)
     {
         updateBiasStep(ynPartialDerivative, step);
         updateWeightStep(wnPartialDerivative, step);
@@ -70,6 +66,12 @@ Eigen::MatrixXf NeuronLayer::layerBackprop(Eigen::MatrixXf xnPartialDerivative, 
         mSumWeightVariation -= ((1.0/(sqrt(mAdaptativeWeightStep.array()+0.000001)))*wnPartialDerivative.array()).matrix();
         updateLayerWeights();
     }
+    else
+    {
+        mSumBiasVariation += step*ynPartialDerivative;
+        mSumWeightVariation += step*wnPartialDerivative;
+        updateLayerWeights();
+     }
     //Retour de x(n-1)PartialDerivative
     return ynPartialDerivative*mWeight.transpose();
 }

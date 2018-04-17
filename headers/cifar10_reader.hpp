@@ -224,7 +224,6 @@ void read_cifar10_file_categorical(Images& images, Labels& labels, const std::st
  * The dataset is assumed to be in a cifar-10 subfolder
  *
  * \param limit The maximum number of elements to read (0: no limit)
- * \param func The functor to create the image objects.
  */
 template <typename Images, typename Labels>
 void read_training_categorical(const std::string& folder, std::size_t limit, Images& images, Labels& labels) {
@@ -241,7 +240,6 @@ void read_training_categorical(const std::string& folder, std::size_t limit, Ima
  * The dataset is assumed to be in a cifar-10 subfolder
  *
  * \param limit The maximum number of elements to read (0: no limit)
- * \param func The functor to create the image objects.
  */
 template <typename Images, typename Labels>
 void read_test_categorical(const std::string& folder, std::size_t limit, Images& images, Labels& labels) {
@@ -254,7 +252,6 @@ void read_test_categorical(const std::string& folder, std::size_t limit, Images&
  * The dataset is assumed to be in a cifar-10 subfolder
  *
  * \param limit The maximum number of elements to read (0: no limit)
- * \param func The functor to create the image objects.
  */
 template <typename Images, typename Labels>
 void read_training_categorical(std::size_t limit, Images& images, Labels& labels) {
@@ -267,7 +264,6 @@ void read_training_categorical(std::size_t limit, Images& images, Labels& labels
  * The dataset is assumed to be in a cifar-10 subfolder
  *
  * \param limit The maximum number of elements to read (0: no limit)
- * \param func The functor to create the image objects.
  */
 template <typename Images, typename Labels>
 void read_test_categorical(std::size_t limit, Images& images, Labels& labels) {

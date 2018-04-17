@@ -4,6 +4,7 @@
 #include <eigen3/Eigen/Dense>
 #include <vector>
 #include <memory>
+#include <array>
 
 #include "headers/mnist_reader.h"
 #include "headers/cifar10_reader.hpp"

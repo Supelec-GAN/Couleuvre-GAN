@@ -101,6 +101,12 @@ class NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
+        /// Fonction mettant à jour le step adaptatif des poids
+        void updateWeightStep(Eigen::MatrixXf wnPartialDerivative, float step);
+
+        /// Fonction mettant à jour le step adaptatif du biais
+        void updateBiasStep(Eigen::MatrixXf ynPartialDerivative, float step);
+
     private:
         /// La matrice des poids de la couche de neurones
         Eigen::MatrixXf                 mWeight;
@@ -123,6 +129,11 @@ class NeuronLayer
 		/// Buffer de la somme des variation de poids au sein d'un mini-batch
 		Eigen::MatrixXf 				mSumBiasVariation;
 
+        /// Buffer contenant les step variables pour chaque poids
+        Eigen::MatrixXf                 mAdaptativeWeightStep;
+
+        /// Buffer contenant les step variables pour le biais
+        Eigen::MatrixXf       mAdaptativeBiasStep;
 };
 
 #endif // NEURONLAYER_HPP

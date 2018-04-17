@@ -230,11 +230,11 @@ void Application::runStochasticTeach(bool trigger)
 			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
 			Sample sample{mTeachingBatchDis[distribution(randomEngine)]};
 			mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
-			
+
 			Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
 			desiredOutput(0,0) = 0;
 			mTeacher.backpropDiscriminator(input, desiredOutput, mConfig.step, mConfig.dx);
-		}
+        }
 	}
 }
 

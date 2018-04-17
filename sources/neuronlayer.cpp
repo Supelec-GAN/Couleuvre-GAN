@@ -11,6 +11,8 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::f
 , mBufferInput(Eigen::MatrixXf::Zero(1, inputSize))				//ligne
 , mSumWeightVariation(Eigen::MatrixXf::Zero(inputSize, outputSize))
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
+, mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
+, mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
 {}
 
 NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF)
@@ -21,6 +23,8 @@ NeuronLayer::NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen:
 , mBufferInput(Eigen::MatrixXf::Zero(1, inputSize))				//ligne
 , mSumWeightVariation(Eigen::MatrixXf::Zero(inputSize, outputSize))
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
+, mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
+, mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
 {}
 
 //#pragma mark - Propagation
@@ -51,10 +55,21 @@ Eigen::MatrixXf NeuronLayer::layerBackprop(Eigen::MatrixXf xnPartialDerivative, 
 
     //Mise à jour des poids
     Eigen::MatrixXf wnPartialDerivative = (mBufferInput.transpose())*ynPartialDerivative;
-	mSumBiasVariation += step*ynPartialDerivative;
-	mSumWeightVariation += step*wnPartialDerivative;
-	updateLayerWeights();
-	
+
+    if (false)
+    {
+        mSumBiasVariation += step*ynPartialDerivative;
+        mSumWeightVariation += step*wnPartialDerivative;
+        updateLayerWeights();
+    }
+    else
+    {
+        updateBiasStep(ynPartialDerivative, step);
+        updateWeightStep(wnPartialDerivative, step);
+        mSumBiasVariation -= ((1.0/(sqrt(mAdaptativeBiasStep.array()+0.000001)))*ynPartialDerivative.array()).matrix();
+        mSumWeightVariation -= ((1.0/(sqrt(mAdaptativeWeightStep.array()+0.000001)))*wnPartialDerivative.array()).matrix();
+        updateLayerWeights();
+    }
     //Retour de x(n-1)PartialDerivative
     return ynPartialDerivative*mWeight.transpose();
 }
@@ -113,6 +128,17 @@ Eigen::MatrixXf NeuronLayer::fnDerivativeMatrix() const
 	
     return Eigen::MatrixXf(fnDerivativeMat.asDiagonal());
 }
+
+void NeuronLayer::updateWeightStep(Eigen::MatrixXf wnPartialDerivative, float step)
+{
+     mAdaptativeWeightStep = step*mAdaptativeWeightStep + (1-step)*abs(wnPartialDerivative.array()).matrix();
+}
+
+void NeuronLayer::updateBiasStep(Eigen::MatrixXf ynPartialDerivative, float step)
+{
+    mAdaptativeBiasStep = step*mAdaptativeBiasStep + (1-step)*abs(ynPartialDerivative.array()).matrix();
+}
+
 
 void NeuronLayer::reset()
 {

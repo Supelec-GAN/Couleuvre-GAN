@@ -33,7 +33,7 @@ class Application
 			float sigmoidParameter;
 
             bool networkAreImported;
-			bool useAverageForBatchlearning;
+            bool useAverageForBatchlearning;
 
             unsigned int nbExperiments;
             unsigned int nbLoopsPerExperiment;
@@ -48,6 +48,8 @@ class Application
             unsigned int nbImgParIntervalleImg;
 			unsigned int minibatchSize;
             unsigned int genFunction;
+            unsigned int descentTypeGen;
+            unsigned int descentTypeDis;
 
             std::string generatorPath;
             std::string discriminatorPath;

@@ -28,6 +28,9 @@
 	"layersSizesGen": [ 1, 2, 3072],
 	"layersSizesDis": [ 3072, 2, 1],
 	
+	"descentTypeGen": 1,
+	"descentTypeDis": 0,
+		"_commentaire": "0 : descente normale; 1 : RMSProp"
 	"networkAreImported": false,
 	"generatorPath": "generator.csv",
 	"discriminatorPath": "discriminator.csv",

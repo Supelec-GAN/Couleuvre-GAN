@@ -21,20 +21,22 @@ class NeuronLayer
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
+         * @param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
 
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
         /**
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
+         * @param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        NeuronLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
 
 //#pragma mark - Propagation
 	
@@ -101,6 +103,12 @@ class NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
+        /// Fonction mettant à jour le step adaptatif des poids
+        void updateWeightStep(Eigen::MatrixXf wnPartialDerivative, float step);
+
+        /// Fonction mettant à jour le step adaptatif du biais
+        void updateBiasStep(Eigen::MatrixXf ynPartialDerivative, float step);
+
     private:
         /// La matrice des poids de la couche de neurones
         Eigen::MatrixXf                 mWeight;
@@ -120,9 +128,19 @@ class NeuronLayer
 		/// Buffer de la somme des variations du biais au sein d'un mini-batch
 		Eigen::MatrixXf					mSumWeightVariation;
 	
+        /// Type de descente
+
 		/// Buffer de la somme des variation de poids au sein d'un mini-batch
 		Eigen::MatrixXf 				mSumBiasVariation;
 
+        /// Buffer contenant les step variables pour chaque poids
+        Eigen::MatrixXf                 mAdaptativeWeightStep;
+
+        /// Buffer contenant les step variables pour le biais
+        Eigen::MatrixXf                 mAdaptativeBiasStep;
+
+        /// Int déterminant le type de descente dans l'apprentissage
+        unsigned int                    mDescentType;
 };
 
 #endif // NEURONLAYER_HPP

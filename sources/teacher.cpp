@@ -1,5 +1,6 @@
 #include <eigen3/Eigen/Dense>
 
+#include <math.h>
 #include "headers/teacher.hpp"
 
 //#pragma mark Constructeur
@@ -133,7 +134,7 @@ Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, 
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFunGen(output + deltaX, desiredOutput) - mErrorFunGen(output, desiredOutput))/dx;
+        errorVect(i) = std::min(100.f,(mErrorFunGen(output + deltaX, desiredOutput) - mErrorFunGen(output, desiredOutput))/dx);
     }
     return errorVect;
 }
@@ -146,7 +147,7 @@ Eigen::MatrixXf Teacher::calculateInitialErrorVector(Eigen::MatrixXf output, Eig
     {
         Eigen::MatrixXf deltaX(Eigen::MatrixXf::Zero(1, output.size()));
         deltaX(i) = dx;
-        errorVect(i) = (mErrorFunDis(output + deltaX, desiredOutput) - mErrorFunDis(output, desiredOutput))/dx;
+        errorVect(i) = std::min(100.f,(mErrorFunDis(output + deltaX, desiredOutput) - mErrorFunDis(output, desiredOutput))/dx);
     }
     return errorVect;
 }

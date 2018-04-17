@@ -19,7 +19,10 @@ HEADERS += \
     headers/application.hpp \
     headers/errorcollector.hpp \
     headers/functions.hpp \
-    headers/statscollector.hpp
+    headers/statscollector.hpp \
+    headers/inputprovider.hpp \
+    headers/cifar10_reader.hpp \
+    headers/cifar10provider.hpp
 
 SOURCES += \
     sources/functions.cpp \
@@ -31,7 +34,9 @@ SOURCES += \
     headers/neuralnetwork.inl \
     sources/errorcollector.cpp \
     sources/statscollector.cpp \
-    sources/application.cpp
+    sources/application.cpp \
+    sources/inputprovider.cpp \
+    sources/cifar10provider.cpp
 
 INCLUDEPATH += D:\Users\Kvykvzx\Projet\C++\SupelecGAN
 

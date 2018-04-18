@@ -38,7 +38,7 @@ Application::Application()
 		std::vector<Eigen::MatrixXf> vectorTest;
         for(unsigned int i(0); i < mConfig.nbGenTest; i++)
 		{
-			Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
+            Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
 			vectorTest.push_back(noise);
 		}
 		
@@ -54,26 +54,28 @@ Application::Application()
 		
 		if (mConfig.networkAreImported)
 		{
-			mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
+            /*mDiscriminator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.discriminatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
 			std::cout << "Chargement du Discriminateur effectué !" << std::endl;
-			
-            mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
-			std::cout << "Chargement du Générateur effectué !" << std::endl;
+
+			mGenerator = NeuralNetwork::Ptr(importNeuralNetwork(mConfig.generatorPath,Functions::sigmoid(mConfig.sigmoidParameter)));
+            std::cout << "Chargement du Générateur effectué !" << std::endl;*/
 		}
 		else
 		{
 			// Construction du réseau de neurones
 			//Le Generateur
 			std::vector<Functions::ActivationFun> funsGen;
-            for(unsigned int i(0); i < mConfig.genLayerSizes.size()-1;i++)
-				funsGen.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
-            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerSizes, funsGen, mConfig.descentTypeGen));
+			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
+            {
+                if (i==mConfig.genLayerSizes.size()-2) funsGen.push_back(Functions::sigmoid(0.1f));
+                else funsGen.push_back(Functions::reLu());
+            }
+            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerNbFiltres, funsGen, mConfig.descentTypeGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
-			
-            for(unsigned int i(0); i < mConfig.disLayerSizes.size()-1;i++)
-				funsDis.push_back(Functions::sigmoid(mConfig.sigmoidParameter));
-            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerSizes , funsDis, mConfig.descentTypeDis));
+			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
+                funsDis.push_back(Functions::sigmoid(0.1f));
+            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerNbFiltres, funsDis, mConfig.descentTypeDis));
 		}
         mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
 		mTestCounter = 0;
@@ -95,7 +97,7 @@ void Application::runExperiments()
 
 		if (!mConfig.networkAreImported)
 		{
-			resetExperiment();
+            resetExperiment();
 			std::cout << "Réseau réinitialisé !" << std::endl;
 		}
 		
@@ -129,6 +131,7 @@ void Application::runSingleStochasticExperiment()
         runStochasticTeach();
         auto scoreGen = runTestGen();
         auto scoreDis = runTestDis(mConfig.nbDisTest);
+
         mStatsCollector[loopIndex+1].addResultGen(scoreGen);
 		mStatsCollector[loopIndex+1].addResultDis(scoreDis);
 		std::cout << "Le scoreGen est de " << scoreGen << " et le scoreDis de " << scoreDis << " !" << std::endl;
@@ -330,6 +333,7 @@ Application::Minibatch Application::sampleGeneratedImagesFromNoiseMinibatch()
 	return generatedImagesFromNoiseMinibatch;
 }
 
+
 //************CONFIGURATION*************
 //**************************************
 
@@ -380,6 +384,26 @@ void Application::setConfig(rapidjson::Document& document)
     for(rapidjson::SizeType i(0); i < classesCifar.Size(); i++)
         mConfig.classesCifar.push_back(classesCifar[i].GetString());
 
+    auto disLayerNbFiltres = document["layersNbFiltresDis"].GetArray();
+    for(rapidjson::SizeType i = 0; i < disLayerNbFiltres.Size(); i++)
+        mConfig.disLayerNbFiltres.push_back(disLayerNbFiltres[i].GetUint());
+
+    auto genLayerNbFiltres = document["layersNbFiltresGen"].GetArray();
+    for(rapidjson::SizeType i = 0; i < genLayerNbFiltres.Size(); i++)
+        mConfig.genLayerNbFiltres.push_back(genLayerNbFiltres[i].GetUint());
+
+    auto layersTypesDis = document["layersTypesDis"].GetArray();
+    for(rapidjson::SizeType i = 0; i < layersTypesDis.Size(); i++)
+        mConfig.disLayerTypes.push_back(layersTypesDis[i].GetUint());
+
+    auto layersTypesGen = document["layersTypesGen"].GetArray();
+    for(rapidjson::SizeType i = 0; i < layersTypesGen.Size(); i++)
+        mConfig.genLayerTypes.push_back(layersTypesGen[i].GetUint());
+
+    auto chiffreATracer = document["chiffreATracer"].GetArray();
+    for(rapidjson::SizeType i = 0; i < chiffreATracer.Size(); i++)
+        mConfig.chiffreATracer.push_back(chiffreATracer[i].GetUint());
+
     mConfig.nbExperiments = document["nbExperiments"].GetUint();
     mConfig.nbLoopsPerExperiment = document["nbLoopsPerExperiment"].GetUint();
     mConfig.nbTeachingsPerLoop = document["nbTeachingsPerLoop"].GetUint();
@@ -391,6 +415,7 @@ void Application::setConfig(rapidjson::Document& document)
 	mConfig.labelTestSize = document["labelTestSize"].GetUint();
     mConfig.intervalleImg = document["intervalleImg"].GetUint();
     mConfig.nbImgParIntervalleImg = document["nbImgParIntervalleImg"].GetUint();
+
 	mConfig.minibatchSize = document["minibatchSize"].GetUint();
     mConfig.genFunction = document["genFunction"].GetUint();
 
@@ -415,13 +440,13 @@ void Application::exportPoids()
     for(unsigned int i(0); i < mConfig.genLayerSizes.size(); i++)
        csvGen << mConfig.genLayerSizes[i];
     csvGen << endrow;
-    csvGen << *mGenerator;
+    //csvGen << *mGenerator;
 
     csvfile csvDis(mConfig.discriminatorDest);
     for(unsigned int i(0); i < mConfig.disLayerSizes.size(); i++)
        csvDis << mConfig.disLayerSizes[i];
     csvDis << endrow;
-    csvDis << *mDiscriminator;
+    //csvDis << *mDiscriminator;
     std::cout << "Export des réseaux effectués !" << std::endl;
 }
 
@@ -508,5 +533,5 @@ NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Function
         }
     }
     ifs.close();
-    return (new NeuralNetwork(taille, neuralNetwork, bias, activationFunVector));
+    return (nullptr);//new NeuralNetwork(taille, neuralNetwork, bias, activationFunVector));
 }

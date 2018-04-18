@@ -3,7 +3,6 @@
 #include <math.h>
 #include "headers/teacher.hpp"
 
-//#pragma mark Constructeur
 Teacher::Teacher()
 {}
 
@@ -51,9 +50,7 @@ Teacher::Teacher(NeuralNetwork* generator, NeuralNetwork* discriminator, unsigne
     }
 }
 
-//#pragma mark - Backpropagation
 
-//#pragma mark Backprop
 void Teacher::backpropDiscriminator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOutput, float step, float dx)
 {
 	Eigen::MatrixXf xnPartialDerivative = calculateInitialErrorVector(mDiscriminator->processNetwork(input), desiredOutput, dx);
@@ -68,7 +65,6 @@ void Teacher::backpropGenerator(Eigen::MatrixXf input, Eigen::MatrixXf desiredOu
 	propagateError(mGenerator, xnPartialDerivative, step);
 }
 
-//#pragma mark Minibatch
 
 void Teacher::minibatchDiscriminatorBackprop(NeuralNetwork::Ptr network, Eigen::MatrixXf input,Eigen::MatrixXf desiredOutput, float step, float dx)
 //Same as backpropDiscriminator but no weight updating
@@ -90,17 +86,16 @@ void Teacher::minibatchGeneratorBackprop(NeuralNetwork::Ptr network, Eigen::Matr
 void Teacher::updateNetworkWeights(NeuralNetwork::Ptr network, unsigned int minibatchSize)
 {
 	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
-		itr->updateLayerWeights(minibatchSize);
+        (*itr)->updateLayerWeights(minibatchSize);
 }
 
 
-//#pragma mark Error Propagation
 
 void Teacher::propagateError(NeuralNetwork::Ptr network, Eigen::MatrixXf xnPartialDerivative, float step)
 {
     for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
     {
-		xnPartialDerivative = itr->layerBackprop(xnPartialDerivative, step);
+        xnPartialDerivative = (*itr)->layerBackprop(xnPartialDerivative, step);
 	}
 }
 
@@ -108,7 +103,7 @@ Eigen::MatrixXf Teacher::propagateErrorMinibatch(NeuralNetwork::Ptr network, Eig
 {
 	for(auto itr = network->rbegin(); itr != network->rend(); ++itr)
 	{
-		xnPartialDerivative = itr->minibatchLayerBackprop(xnPartialDerivative, step);
+        xnPartialDerivative = (*itr)->minibatchLayerBackprop(xnPartialDerivative, step);
 	}
 	return xnPartialDerivative;
 }
@@ -118,13 +113,12 @@ Eigen::MatrixXf Teacher::propagateErrorDiscriminatorInvariant(Eigen::MatrixXf xn
 {
     for(auto itr = mDiscriminator->rbegin(); itr != mDiscriminator->rend(); ++itr)
     {
-		xnPartialDerivative = itr->layerBackpropInvariant(xnPartialDerivative);
+        xnPartialDerivative = (*itr)->layerBackpropInvariant(xnPartialDerivative);
     }
     return xnPartialDerivative;
 }
 
 
-//#pragma mark initial vector calculation
 //Quasiment la meme que pour le Discriminateur, à la fonction d'erreur pret
 Eigen::MatrixXf Teacher::calculateInitialErrorVectorGen(Eigen::MatrixXf output, Eigen::MatrixXf desiredOutput, float dx)
 {

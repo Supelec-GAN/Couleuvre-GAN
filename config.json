@@ -1,46 +1,50 @@
 {
-	"step": 0.5,
-	"dx": 0.01,
-	"sigmoidParameter": 0.1,
-	
-	"nbExperiments": 1,
-	"nbLoopsPerExperiment": 1000,
-	"nbTeachingsPerLoop": 10,
-	"nbGenTeach": 1,
-	"nbDisTeach": 1,	
-	"nbGenTest": 1,
-	"nbDisTest": 1,
-	"intervalleImg": 1,
+    "step": 0.5,
+    "dx": 0.01,
+    "sigmoidParameter": 0.1,
+
+    "nbExperiments": 1,
+    "nbLoopsPerExperiment": 5000,
+    "nbTeachingsPerLoop": 10,
+    "nbGenTeach": 1,
+    "nbDisTeach": 1,
+    "nbGenTest": 1,
+    "nbDisTest": 1,
+    "intervalleImg": 10,
 	"nbImgParIntervalleImg": 1,
-	"labelTrainSize": 60000,
-	"labelTestSize": 10000,
-
+    "labelTrainSize": 60000,
+    "labelTestSize": 10000,
 	"bddToUse": "mnist",
-	"classesCifar": ["dog", "automobile", "deer", "bird", "ship", "truck", "cat", "airplane", "frog", "horse"], 
-	"chiffreATracer": [1, 2],
-	
-	"minibatchSize": 10,
-    
-	"genFunction": 0,
-   		"_commentaire": "0 = Heuristic;1 = MinMax; 2 = KLDiv",
+	"classesCifar": ["dog", "automobile", "deer", "bird", "ship", "truck", "cat", "airplane", "frog", "horse"],
+    "chiffreATracer": [3],
+    "minibatchSize": 10,
 
-	
-	"layersSizesGen": [ 1, 2, 3072],
-	"layersSizesDis": [ 3072, 2, 1],
-	
+    "genFunction": 0,
+        "_commentaire": "0 = Heuristic;1 = MinMax; 2 = KLDiv",
+
+    "layersTypesGen": [ 2, 2, 0],
+    "layersTypesDis": [ 2, 0, 0],
+        "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = noisyLayer",
+    "layersSizesGen": [ 400, 100, 16, 784],
+    "layersNbFiltresGen": [ 24, 1, 0],
+    "layersSizesDis": [ 784, 676, 100, 1],
+    "layersNbFiltresDis": [ 1, 0, 0],
+        "_commentaire": "2e Arguments pour les layers à convolution, l'argument est inutile pour une couche normale (laisser quand meme un 0). La taille de l'input pour le layer à convolution correspond à la dimension n de l'entrée (taille entrée = n*n)).",
+        "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! (Sauf ZeroPadding (non implémenté), de plus, il faut finir la derniere couche de convoution par 1 seul filtre",
 	"descentTypeGen": 1,
-	"descentTypeDis": 0,
-		"_commentaire": "0 : descente normale; 1 : RMSProp"
+	"descentTypeDis": 1,
+		"_commentaire": "0 : descente normale; 1 : RMSProp",
 	"networkAreImported": false,
-	"generatorPath": "generator.csv",
-	"discriminatorPath": "discriminator.csv",
-	"generatorDest": "generator.csv",
-	"discriminatorDest": "discriminator.csv",
-	"CSVFileNameResult":"resultat",
-	"CSVFileNameImage":"image",
-	"typeOfExperiment": "Stochastic",
-		"_commentaire": "Stochastic ou Minibatch",
-	"useAverageForBatchlearning": false
+    "generatorPath": "generator.csv",
+    "discriminatorPath": "discriminator.csv",
+    "generatorDest": "generator.csv",
+    "discriminatorDest": "discriminator.csv",
+    "CSVFileNameResult":"resultat",
+    "CSVFileNameImage":"image",
+    "typeOfExperiment": "Stochastic",
+        "_commentaire": "Stochastic ou Minibatch",
+    "useAverageForBatchlearning": false
 
 }
+
 

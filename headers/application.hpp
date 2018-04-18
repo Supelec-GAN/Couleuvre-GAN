@@ -46,6 +46,7 @@ class Application
 			unsigned int labelTestSize;
             unsigned int intervalleImg;
             unsigned int nbImgParIntervalleImg;
+            std::vector<unsigned int> chiffreATracer;
 			unsigned int minibatchSize;
             unsigned int genFunction;
             unsigned int descentTypeGen;
@@ -65,6 +66,12 @@ class Application
             std::vector<unsigned int> genLayerSizes;
             std::vector<unsigned int> chiffresATracer;
             std::vector<std::string> classesCifar;
+
+            std::vector<unsigned int> disLayerNbFiltres;
+            std::vector<unsigned int> genLayerNbFiltres;
+
+            std::vector<unsigned int> disLayerTypes;
+            std::vector<unsigned int> genLayerTypes;
         };
 
     public:
@@ -96,8 +103,6 @@ class Application
                     std::vector<Eigen::MatrixXf> teachingInputs,
                     std::vector<Eigen::MatrixXf> testingInputs);*/
 
-//// Expériences
-	
 		void runExperiments();
 	
         void runSingleStochasticExperiment();
@@ -106,7 +111,6 @@ class Application
 
 		void resetExperiment();
 	
-//// Apprentissage
 
         /// Effectue une run d'apprentissage par méthode stochastique
         /**
@@ -162,6 +166,7 @@ class Application
 		Minibatch sampleGeneratedImagesFromNoiseMinibatch();
 	
 //// Configuration
+
 
     private:
         /// Fonction pour charger la configuration de l'application

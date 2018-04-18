@@ -11,8 +11,11 @@
     "nbGenTest": 1,
     "nbDisTest": 1,
     "intervalleImg": 10,
+	"nbImgParIntervalleImg": 1,
     "labelTrainSize": 60000,
     "labelTestSize": 10000,
+	"bddToUse": "mnist",
+	"classesCifar": ["dog", "automobile", "deer", "bird", "ship", "truck", "cat", "airplane", "frog", "horse"],
     "chiffreATracer": [3],
     "minibatchSize": 10,
 
@@ -28,7 +31,11 @@
     "layersNbFiltresDis": [ 1, 0, 0],
         "_commentaire": "2e Arguments pour les layers à convolution, l'argument est inutile pour une couche normale (laisser quand meme un 0). La taille de l'input pour le layer à convolution correspond à la dimension n de l'entrée (taille entrée = n*n)).",
         "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! (Sauf ZeroPadding (non implémenté), de plus, il faut finir la derniere couche de convoution par 1 seul filtre",
-    "networkAreImported": false,
+	"descentTypeGen": 1,
+	"descentTypeDis": 1,
+		"_commentaire": "0 : descente normale; 1 : RMSProp",
+
+	"networkAreImported": false,
     "generatorPath": "generator.csv",
     "discriminatorPath": "discriminator.csv",
     "generatorDest": "generator.csv",
@@ -40,4 +47,5 @@
     "useAverageForBatchlearning": false
 
 }
+
 

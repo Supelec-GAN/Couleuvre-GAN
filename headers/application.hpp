@@ -67,8 +67,8 @@ class Application
             std::vector<unsigned int> chiffresATracer;
             std::vector<std::string> classesCifar;
 
-            std::vector<unsigned int> disLayerNbFiltres;
-            std::vector<unsigned int> genLayerNbFiltres;
+            std::vector<std::vector<unsigned int>> disLayerArgs;
+            std::vector<std::vector<unsigned int>> genLayerArgs;
 
             std::vector<unsigned int> disLayerTypes;
             std::vector<unsigned int> genLayerTypes;

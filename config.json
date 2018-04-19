@@ -43,7 +43,54 @@
     "CSVFileNameImage":"image",
     "typeOfExperiment": "Stochastic",
         "_commentaire": "Stochastic ou Minibatch",
-    "useAverageForBatchlearning": false
+    "useAverageForBatchlearning": false,
+
+    "layersGen": [
+                  {
+                        "layerType": 0, 
+                        "inputSize":400, 
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 0, 
+                        "inputSize":100,
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 0, 
+                        "inputSize":16, 
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 5, 
+                        "inputSize":784, 
+                        "arguments":[]
+                    }
+                 ],
+
+    "layersDis": [
+                  {
+                        "layerType": 0, 
+                        "inputSize":400, 
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 0, 
+                        "inputSize":100,
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 0, 
+                        "inputSize":16, 
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 5, 
+                        "inputSize":784, 
+                        "arguments":[]
+                    }
+                 ],
+    "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = ZeroPadding, 4 = FractionnalZeroPadding, 5 = Output. Arguments : 0:[], 1:[taillePooling], 2:[NbFiltres, Strides], 3:[NbChannels, tailleZeroPadding], 4:[NbChannels, tailleZeroPadding], 5:[]"
 
 }
 

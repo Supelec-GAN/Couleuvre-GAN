@@ -70,12 +70,12 @@ Application::Application()
                 if (i==mConfig.genLayerSizes.size()-2) funsGen.push_back(Functions::sigmoid(0.1f));
                 else funsGen.push_back(Functions::reLu());
             }
-            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerNbFiltres, funsGen, mConfig.descentTypeGen));
+            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerArgs, funsGen, mConfig.descentTypeGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
 			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
                 funsDis.push_back(Functions::sigmoid(0.1f));
-            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerNbFiltres, funsDis, mConfig.descentTypeDis));
+            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerArgs, funsDis, mConfig.descentTypeDis));
 		}
         mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
 		mTestCounter = 0;
@@ -384,14 +384,6 @@ void Application::setConfig(rapidjson::Document& document)
     for(rapidjson::SizeType i(0); i < classesCifar.Size(); i++)
         mConfig.classesCifar.push_back(classesCifar[i].GetString());
 
-    auto disLayerNbFiltres = document["layersNbFiltresDis"].GetArray();
-    for(rapidjson::SizeType i = 0; i < disLayerNbFiltres.Size(); i++)
-        mConfig.disLayerNbFiltres.push_back(disLayerNbFiltres[i].GetUint());
-
-    auto genLayerNbFiltres = document["layersNbFiltresGen"].GetArray();
-    for(rapidjson::SizeType i = 0; i < genLayerNbFiltres.Size(); i++)
-        mConfig.genLayerNbFiltres.push_back(genLayerNbFiltres[i].GetUint());
-
     auto layersTypesDis = document["layersTypesDis"].GetArray();
     for(rapidjson::SizeType i = 0; i < layersTypesDis.Size(); i++)
         mConfig.disLayerTypes.push_back(layersTypesDis[i].GetUint());
@@ -403,6 +395,30 @@ void Application::setConfig(rapidjson::Document& document)
     auto chiffreATracer = document["chiffreATracer"].GetArray();
     for(rapidjson::SizeType i = 0; i < chiffreATracer.Size(); i++)
         mConfig.chiffreATracer.push_back(chiffreATracer[i].GetUint());
+
+    auto layersDis = document["layersDis"].GetArray();
+    for (int i(0); document.Size()>i; i++)
+    {
+        mConfig.disLayerTypes.push_back(layersDis[i]["layerType"].GetUint());
+        mConfig.disLayerSizes.push_back(layersDis[i]["layerSize"].GetUint());
+        mConfig.disLayerArgs.push_back(std::vector<unsigned int>());
+        for (int j(0); (layersDis[i]["arguments"].GetArray()).Size()>j; j++)
+        {
+            mConfig.disLayerArgs[i].push_back(((layersDis[i].GetObject())["arguments"].GetArray())[j].GetUint());
+        }
+    }
+
+    auto layersGen = document["layersGen"].GetArray();
+    for (int i(0); document.Size()>i; i++)
+    {
+        mConfig.genLayerTypes.push_back(layersGen[i]["layerType"].GetUint());
+        mConfig.genLayerSizes.push_back(layersGen[i]["layerSize"].GetUint());
+        mConfig.genLayerArgs.push_back(std::vector<unsigned int>());
+        for (int j(0); (layersGen[i]["arguments"].GetArray()).Size()>j; j++)
+        {
+            mConfig.genLayerArgs[i].push_back(((layersGen[i].GetObject())["arguments"].GetArray())[j].GetUint());
+        }
+    }
 
     mConfig.nbExperiments = document["nbExperiments"].GetUint();
     mConfig.nbLoopsPerExperiment = document["nbLoopsPerExperiment"].GetUint();

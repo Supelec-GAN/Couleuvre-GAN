@@ -1,4 +1,4 @@
-#include "headers\noisylayer.h"
+#include "headers/noisylayer.h"
 
 NoisyLayer::NoisyLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF, unsigned int descentType)
 : FullConnectedLayer(inputSize, outputSize, activationF, descentType)

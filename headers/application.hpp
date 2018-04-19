@@ -46,7 +46,6 @@ class Application
 			unsigned int labelTestSize;
             unsigned int intervalleImg;
             unsigned int nbImgParIntervalleImg;
-            std::vector<unsigned int> chiffreATracer;
 			unsigned int minibatchSize;
             unsigned int genFunction;
             unsigned int descentTypeGen;

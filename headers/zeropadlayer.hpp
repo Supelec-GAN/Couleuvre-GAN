@@ -1,10 +1,19 @@
-#ifndef MAXPOOLINGLAYER_HPP
-#define MAXPOOLINGLAYER_HPP
+#ifndef ZEROPADLAYER_HPP
+#define ZEROPADLAYER_HPP
 
+#include <eigen3/Eigen/Dense>
+#include <iostream>
+#include <functional>
+#include <memory>
+#include "headers/functions.hpp"
 #include "neuronlayer.hpp"
-class NeuronLayer;
 
-class MaxPoolingLayer : public NeuronLayer
+class NeuronLayer;
+/// Classe modélisant une couche de neurones
+/**
+ *  NeuroneLayer représente une couche de neurones, avec une matrice de poids et une fonction d'activation
+ */
+class ZeroPadLayer : public NeuronLayer
 {
     public:
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
@@ -12,22 +21,13 @@ class MaxPoolingLayer : public NeuronLayer
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
+         * \param descentType le type de descente utilisé dans l'apprentissage des ZeroPadLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        MaxPoolingLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        ZeroPadLayer(unsigned int inputSize, unsigned int outputSize, unsigned int descentType = 0);
 
-        /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
-        /**
-         * \param inputSize le nombre d'inputs de cette couche
-         * \param outputSize le nombre d'outputs de cette couche
-         * \param activationF la fonction d'activation de tous les neurones de la couche
-         *
-         * La matrice de poids est de dimension outputSize x inputSize
-         */
-                        MaxPoolingLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
-
-                        ~MaxPoolingLayer();
+                        ~ZeroPadLayer();
 
         /// La fonction effectuant le calcul de la sortie en fonction de l'entrée
         /**
@@ -35,7 +35,7 @@ class MaxPoolingLayer : public NeuronLayer
          * \return le vecteur d'output de la couche de neurones
          * la fonction effectue le produit matriciel des poids par les entrées, puis applique la fonction d'activation
          */
-        Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
+        virtual Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
 
         /// La fonction effectuant les calculs de rétropropagation
         /**
@@ -45,7 +45,7 @@ class MaxPoolingLayer : public NeuronLayer
          * @param step le pas d'apprentissage
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
-        Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
+        virtual Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
 
         /// La fonction effectuant les calculs de rétropropagation sans mise à jour du réseau
@@ -69,7 +69,7 @@ class MaxPoolingLayer : public NeuronLayer
 
 
         /// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
-        void            updateLayerWeights(unsigned int minibatchSize = 1);
+        virtual void    updateLayerWeights(unsigned int minibatchSize = 1);
 
         void            reset();
 
@@ -80,9 +80,9 @@ class MaxPoolingLayer : public NeuronLayer
         /**
          * Cette fonction affiche la matrice des poids
          */
-        //friend std::ostream& operator<<(std::ostream& flux, FullConnectedLayer nl);
+        //friend std::ostream& operator<<(std::ostream& flux, ZeroPadLayer nl);
 
-    private:
+    protected:
         /// Fonction renvoyant le vecteur des dérivées de Fn évalué en Yn
         /**
          * Cette fonction calcule Fn'(Yn) ou Yn = mBufferActivationLevel
@@ -90,39 +90,23 @@ class MaxPoolingLayer : public NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
-    private:
+
+    protected:
         /// La matrice des poids de la couche de neurones
-        Eigen::MatrixXf                 mWeight;
+        Eigen::MatrixXf                 mPropMatrix;
 
         /// La matrice des biais de la couche de neurones
-        Eigen::MatrixXf                 mBias;
+        Eigen::MatrixXf                 mBackPropMatrix;
 
-        /// La fonction d'activation de la couche de neurones
-        std::function<float(float)>     mActivationFun;
+        unsigned int                    mInputDim;
 
-        /// Buffer pour stocker Yn = WnXn-1, nécessaire pour la backprop
-        Eigen::MatrixXf                 mBufferActivationLevel;
+        unsigned int                    mOutputDim;
 
-        /// Buffer pour stocker l'input, nécessaire pour la backrprop
-        Eigen::MatrixXf                 mBufferInput;
-
-        /// Buffer de la somme des variations du biais au sein d'un mini-batch
-        Eigen::MatrixXf					mSumWeightVariation;
-
-        /// Buffer de la somme des variation de poids au sein d'un mini-batch
-        Eigen::MatrixXf 				mSumBiasVariation;
-
-        /// Buffer contenant les step variables pour chaque poids
-        Eigen::MatrixXf                 mAdaptativeWeightStep;
-
-        /// Buffer contenant les step variables pour le biais
-        Eigen::MatrixXf                 mAdaptativeBiasStep;
+        unsigned int                    mTailleZeroPadding;
 
         /// Int déterminant le type de descente dans l'apprentissage
-        unsigned int                    mDescentType;
-
+        unsigned int                    mZeroPadType;
 
 };
 
-
-#endif // MAXPOOLINGLAYER_HPP
+#endif // ZEROPADLAYER_HPP

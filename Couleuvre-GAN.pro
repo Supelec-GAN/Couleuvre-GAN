@@ -27,7 +27,8 @@ HEADERS += \
     headers/convolutionallayer.hpp \
     headers/fullconnectedlayer.hpp \
     headers/noisylayer.h \
-    headers/maxpoolinglayer.hpp
+    headers/maxpoolinglayer.hpp \
+    headers/zeropadlayer.hpp
 
 SOURCES += \
     sources/functions.cpp \
@@ -46,7 +47,8 @@ SOURCES += \
     sources/convolutionallayer.cpp \
     sources/fullconnectedlayer.cpp \
     sources/noisylayer.cpp \
-    sources/maxpoolinglayer.cpp
+    sources/maxpoolinglayer.cpp \
+    sources/zeropadlayer.cpp
 
 DISTFILES += \
     MNIST/test-images-10k \

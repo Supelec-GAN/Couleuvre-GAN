@@ -6,8 +6,8 @@
 #include <memory>
 #include <array>
 
-#include "headers/mnist_reader.h"
-#include "headers/cifar10_reader.hpp"
+#include "headers/inputOutput/mnist_reader.h"
+#include "headers/inputOutput/cifar10_reader.hpp"
 
 class InputProvider
 {

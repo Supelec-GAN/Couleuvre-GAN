@@ -8,10 +8,10 @@
 #include <headers/rapidjson/document.h>
 #include "headers/neuralnetwork.hpp"
 #include "headers/teacher.hpp"
-#include "headers/inputprovider.hpp"
-#include "headers/statscollector.hpp"
-#include "headers/mnist_reader.h"
-#include "CSVFile.h"
+#include "headers/inputOutput/inputprovider.hpp"
+#include "headers/inputOutput/statscollector.hpp"
+#include "headers/inputOutput/mnist_reader.h"
+#include "headers/inputOutput/CSVFile.h"
 #include "string.h"
 
 #include <iostream>

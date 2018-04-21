@@ -1,4 +1,4 @@
-#include "headers/mnist_reader.h"
+#include "headers/inputOutput/mnist_reader.h"
 
 using namespace std;
 

@@ -1,7 +1,7 @@
 #ifndef HEADERSOISYLAYER_H
 #define HEADERSOISYLAYER_H
 
-#include "headers/fullconnectedlayer.hpp"
+#include "headers/layers/fullconnectedlayer.hpp"
 
 class NoisyLayer : public FullConnectedLayer
 {

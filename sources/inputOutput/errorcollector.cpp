@@ -1,4 +1,4 @@
-#include "headers/errorcollector.hpp"
+#include "headers/inputOutput/errorcollector.hpp"
 
 #include <numeric>
 #include <algorithm>

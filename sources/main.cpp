@@ -9,11 +9,10 @@
 #include <QWidget>
 #include <QLabel>*/
 
-#include "headers/CSVFile.h"
 #include "headers/application.hpp"
-#include "headers/mnist_reader.h"
-#include "headers/cifar10_reader.hpp"
-#include "headers/cifar10provider.hpp"
+#include "headers/inputOutput/mnist_reader.h"
+#include "headers/inputOutput/cifar10_reader.hpp"
+#include "headers/inputOutput/cifar10provider.hpp"
 
 using namespace std;
 

@@ -1,19 +1,10 @@
-#ifndef FULLCONNECTEDLAYER_HPP
-#define FULLCONNECTEDLAYER_HPP
+#ifndef MAXPOOLINGLAYER_HPP
+#define MAXPOOLINGLAYER_HPP
 
-#include <eigen3/Eigen/Dense>
-#include <iostream>
-#include <functional>
-#include <memory>
-#include "headers/functions.hpp"
-#include "neuronlayer.hpp"
-
+#include "headers/neuronlayer.hpp"
 class NeuronLayer;
-/// Classe modélisant une couche de neurones
-/**
- *  NeuroneLayer représente une couche de neurones, avec une matrice de poids et une fonction d'activation
- */
-class FullConnectedLayer : public NeuronLayer
+
+class MaxPoolingLayer : public NeuronLayer
 {
     public:
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
@@ -21,24 +12,22 @@ class FullConnectedLayer : public NeuronLayer
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
-         * \param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
+                        MaxPoolingLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f));
 
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
         /**
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
-         * \param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
+                        MaxPoolingLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
 
-                        ~FullConnectedLayer();
+                        ~MaxPoolingLayer();
 
         /// La fonction effectuant le calcul de la sortie en fonction de l'entrée
         /**
@@ -46,7 +35,7 @@ class FullConnectedLayer : public NeuronLayer
          * \return le vecteur d'output de la couche de neurones
          * la fonction effectue le produit matriciel des poids par les entrées, puis applique la fonction d'activation
          */
-        virtual Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
+        Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
 
         /// La fonction effectuant les calculs de rétropropagation
         /**
@@ -56,7 +45,7 @@ class FullConnectedLayer : public NeuronLayer
          * @param step le pas d'apprentissage
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
-        virtual Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
+        Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
 
         /// La fonction effectuant les calculs de rétropropagation sans mise à jour du réseau
@@ -80,7 +69,7 @@ class FullConnectedLayer : public NeuronLayer
 
 
         /// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
-        virtual void    updateLayerWeights(unsigned int minibatchSize = 1);
+        void            updateLayerWeights(unsigned int minibatchSize = 1);
 
         void            reset();
 
@@ -93,7 +82,7 @@ class FullConnectedLayer : public NeuronLayer
          */
         //friend std::ostream& operator<<(std::ostream& flux, FullConnectedLayer nl);
 
-    protected:
+    private:
         /// Fonction renvoyant le vecteur des dérivées de Fn évalué en Yn
         /**
          * Cette fonction calcule Fn'(Yn) ou Yn = mBufferActivationLevel
@@ -101,14 +90,7 @@ class FullConnectedLayer : public NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
-        /// Fonction mettant à jour le step adaptatif des poids
-        void updateWeightStep(Eigen::MatrixXf wnPartialDerivative, float step);
-
-        /// Fonction mettant à jour le step adaptatif du biais
-        void updateBiasStep(Eigen::MatrixXf ynPartialDerivative, float step);
-
-
-    protected:
+    private:
         /// La matrice des poids de la couche de neurones
         Eigen::MatrixXf                 mWeight;
 
@@ -139,6 +121,8 @@ class FullConnectedLayer : public NeuronLayer
         /// Int déterminant le type de descente dans l'apprentissage
         unsigned int                    mDescentType;
 
+
 };
 
-#endif // FULLCONNECTEDLAYER_HPP
+
+#endif // MAXPOOLINGLAYER_HPP

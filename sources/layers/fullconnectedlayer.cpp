@@ -1,4 +1,4 @@
-#include "headers/fullconnectedlayer.hpp"
+#include "headers/layers/fullconnectedlayer.hpp"
 
 //*************CONSTRUCTEUR*************
 //**************************************

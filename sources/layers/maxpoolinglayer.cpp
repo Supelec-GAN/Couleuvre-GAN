@@ -1,4 +1,4 @@
-#include "headers/maxpoolinglayer.hpp"
+#include "headers/layers/maxpoolinglayer.hpp"
 
 //*************CONSTRUCTEUR*************
 //**************************************

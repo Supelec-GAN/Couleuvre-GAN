@@ -10,45 +10,45 @@ QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
 
 HEADERS += \
-    headers/CSVFile.h \
+    headers/inputOutput/CSVFile.h \
     headers/functions.hpp \
-    headers/mnist_reader.h \
+    headers/inputOutput/mnist_reader.h \
     headers/neuralnetwork.hpp \
     headers/neuronlayer.hpp \
     headers/teacher.hpp \
     headers/application.hpp \
-    headers/errorcollector.hpp \
+    headers/inputOutput/errorcollector.hpp \
     headers/functions.hpp \
-    headers/statscollector.hpp \
-    headers/inputprovider.hpp \
-    headers/cifar10_reader.hpp \
-    headers/cifar10provider.hpp \
+    headers/inputOutput/statscollector.hpp \
+    headers/inputOutput/inputprovider.hpp \
+    headers/inputOutput/cifar10_reader.hpp \
+    headers/inputOutput/cifar10provider.hpp \
     headers/convolution.hpp \
-    headers/convolutionallayer.hpp \
-    headers/fullconnectedlayer.hpp \
-    headers/noisylayer.h \
-    headers/maxpoolinglayer.hpp \
-    headers/zeropadlayer.hpp
+    headers/layers/convolutionallayer.hpp \
+    headers/layers/fullconnectedlayer.hpp \
+    headers/layers/noisylayer.h \
+    headers/layers/maxpoolinglayer.hpp \
+    headers/layers/zeropadlayer.hpp
 
 SOURCES += \
     sources/functions.cpp \
     sources/main.cpp \
-    sources/mnist_reader.cpp \
+    sources/inputOutput/mnist_reader.cpp \
     sources/neuralnetwork.cpp \
     sources/neuronlayer.cpp \
     sources/teacher.cpp \
     headers/neuralnetwork.inl \
-    sources/errorcollector.cpp \
-    sources/statscollector.cpp \
+    sources/inputOutput/errorcollector.cpp \
+    sources/inputOutput/statscollector.cpp \
     sources/application.cpp \
-    sources/inputprovider.cpp \
-    sources/cifar10provider.cpp \
+    sources/inputOutput/inputprovider.cpp \
+    sources/inputOutput/cifar10provider.cpp \
     sources/convolution.cpp \
-    sources/convolutionallayer.cpp \
-    sources/fullconnectedlayer.cpp \
-    sources/noisylayer.cpp \
-    sources/maxpoolinglayer.cpp \
-    sources/zeropadlayer.cpp
+    sources/layers/convolutionallayer.cpp \
+    sources/layers/fullconnectedlayer.cpp \
+    sources/layers/noisylayer.cpp \
+    sources/layers/maxpoolinglayer.cpp \
+    sources/layers/zeropadlayer.cpp
 
 DISTFILES += \
     MNIST/test-images-10k \

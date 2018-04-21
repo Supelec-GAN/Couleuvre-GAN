@@ -1,8 +1,8 @@
 #ifndef STATSCOLLECTOR_HPP
 #define STATSCOLLECTOR_HPP
 
-#include "headers/errorcollector.hpp"
-#include "headers/CSVFile.h"
+#include "headers/inputOutput/errorcollector.hpp"
+#include "headers/inputOutput/CSVFile.h"
 #include <eigen3/Eigen/Dense>
 
 #include <vector>

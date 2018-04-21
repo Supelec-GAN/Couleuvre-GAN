@@ -1,4 +1,4 @@
-#include "headers/convolutionallayer.hpp"
+#include "headers/layers/convolutionallayer.hpp"
 
 
 //*************CONSTRUCTEUR*************

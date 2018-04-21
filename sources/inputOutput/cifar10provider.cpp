@@ -1,4 +1,4 @@
-#include "headers/cifar10provider.hpp"
+#include "headers/inputOutput/cifar10provider.hpp"
 
 Cifar10Provider::Cifar10Provider(CifarLabel labels, unsigned int labelTrainSize, unsigned int labelTestSize)
 : InputProvider(labelTrainSize, labelTestSize)

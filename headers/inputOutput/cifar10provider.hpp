@@ -1,7 +1,7 @@
 #ifndef CIFAR10PROVIDER_HPP
 #define CIFAR10PROVIDER_HPP
 
-#include "headers/inputprovider.hpp"
+#include "headers/inputOutput/inputprovider.hpp"
 
 #include <type_traits>
 

@@ -1,24 +1,19 @@
-#ifndef CONVOLUTIONALLAYER_HPP
-#define CONVOLUTIONALLAYER_HPP
+#ifndef ZEROPADLAYER_HPP
+#define ZEROPADLAYER_HPP
 
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <functional>
 #include <memory>
-#include <vector>
-
-#include "convolution.hpp"
 #include "headers/functions.hpp"
-#include "neuronlayer.hpp"
+#include "headers/neuronlayer.hpp"
 
 class NeuronLayer;
-
-
 /// Classe modélisant une couche de neurones
 /**
  *  NeuroneLayer représente une couche de neurones, avec une matrice de poids et une fonction d'activation
  */
-class ConvolutionalLayer : public NeuronLayer
+class ZeroPadLayer : public NeuronLayer
 {
     public:
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
@@ -26,22 +21,13 @@ class ConvolutionalLayer : public NeuronLayer
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
+         * \param descentType le type de descente utilisé dans l'apprentissage des ZeroPadLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        ConvolutionalLayer(unsigned int inputSize, unsigned int nbChannels, unsigned int dimensionFiltre, unsigned int nbFiltres, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        ZeroPadLayer(unsigned int inputSize, unsigned int outputSize, unsigned int descentType = 0);
 
-        /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
-        /**
-         * \param inputSize le nombre d'inputs de cette couche
-         * \param outputSize le nombre d'outputs de cette couche
-         * \param activationF la fonction d'activation de tous les neurones de la couche
-         *
-         * La matrice de poids est de dimension outputSize x inputSize
-         */
-                        //ConvolutionalLayer(unsigned int inputSize, unsigned int nbFiltres, unsigned int taille, std::vector<Eigen::MatrixXf> weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
-
-                        ~ConvolutionalLayer();
+                        ~ZeroPadLayer();
 
         /// La fonction effectuant le calcul de la sortie en fonction de l'entrée
         /**
@@ -49,7 +35,7 @@ class ConvolutionalLayer : public NeuronLayer
          * \return le vecteur d'output de la couche de neurones
          * la fonction effectue le produit matriciel des poids par les entrées, puis applique la fonction d'activation
          */
-        Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
+        virtual Eigen::MatrixXf processLayer(Eigen::MatrixXf inputs);
 
         /// La fonction effectuant les calculs de rétropropagation
         /**
@@ -59,7 +45,7 @@ class ConvolutionalLayer : public NeuronLayer
          * @param step le pas d'apprentissage
          * @return le vecteur des dérivées partielles selon Xn-1 à envoyer à la couche précédente
          */
-        Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
+        virtual Eigen::MatrixXf layerBackprop(Eigen::MatrixXf xnPartialDerivative, float step);
 
 
         /// La fonction effectuant les calculs de rétropropagation sans mise à jour du réseau
@@ -83,24 +69,20 @@ class ConvolutionalLayer : public NeuronLayer
 
 
         /// La fonction effectuant la mise à jour des poids à la fin du Mini-Batch
-        void            updateLayerWeights(unsigned int minibatchSize = 1);
+        virtual void    updateLayerWeights(unsigned int minibatchSize = 1);
 
         void            reset();
 
         int             getInputSize();
-
-        static Eigen::MatrixXf convolution(Eigen::MatrixXf input, Eigen::MatrixXf filtre, bool sommerLignes = true);
-
-        static Eigen::MatrixXf convolutionMonothreade(Eigen::MatrixXf input, Eigen::MatrixXf filtre, bool sommerLignes = true);
 
     public:
         /// Fonction utilitaire permettant d'afficher le neurone
         /**
          * Cette fonction affiche la matrice des poids
          */
-        //friend std::ostream& operator<<(std::ostream& flux, ConvolutionalLayer nl);
+        //friend std::ostream& operator<<(std::ostream& flux, ZeroPadLayer nl);
 
-    private:
+    protected:
         /// Fonction renvoyant le vecteur des dérivées de Fn évalué en Yn
         /**
          * Cette fonction calcule Fn'(Yn) ou Yn = mBufferActivationLevel
@@ -108,36 +90,23 @@ class ConvolutionalLayer : public NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
-    private:
 
-        unsigned int                    mDimensionInput;
-
+    protected:
         /// La matrice des poids de la couche de neurones
-        std::vector<Eigen::MatrixXf>    mWeight;
+        Eigen::MatrixXf                 mPropMatrix;
 
         /// La matrice des biais de la couche de neurones
-        Eigen::MatrixXf                 mBias;
+        Eigen::MatrixXf                 mBackPropMatrix;
 
-        /// La fonction d'activation de la couche de neurones
-        std::function<float(float)>     mActivationFun;
+        unsigned int                    mInputDim;
 
-        /// Buffer pour stocker Yn = WnXn-1, nécessaire pour la backprop
-        Eigen::MatrixXf                 mBufferActivationLevel;
+        unsigned int                    mOutputDim;
 
-        /// Buffer pour stocker l'input, nécessaire pour la backrprop
-        Eigen::MatrixXf                 mBufferInput;
+        unsigned int                    mTailleZeroPadding;
 
-        /// Buffer de la somme des variations du biais au sein d'un mini-batch
-        std::vector<Eigen::MatrixXf>    mSumWeightVariation;
-
-        /// Buffer de la somme des variation de poids au sein d'un mini-batch
-        Eigen::MatrixXf 				mSumBiasVariation;
-
-        unsigned int                    mInputDimension;
-
-        unsigned int                    mInputChannels;
-
+        /// Int déterminant le type de descente dans l'apprentissage
+        unsigned int                    mZeroPadType;
 
 };
 
-#endif // CONVOLUTIONALLAYER_HPP
+#endif // ZEROPADLAYER_HPP

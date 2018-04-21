@@ -5,9 +5,9 @@
 #include <vector>
 
 #include "headers/functions.hpp"
-#include "fullconnectedlayer.hpp"
-#include "convolutionallayer.hpp"
-#include "noisylayer.h"
+#include "layers/fullconnectedlayer.hpp"
+#include "layers/convolutionallayer.hpp"
+#include "layers/noisylayer.h"
 
 class NeuralNetwork : public std::list<NeuronLayer::Ptr>
 {

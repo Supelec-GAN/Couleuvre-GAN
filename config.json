@@ -4,7 +4,7 @@
     "sigmoidParameter": 0.1,
 
     "nbExperiments": 1,
-    "nbLoopsPerExperiment": 5000,
+    "nbLoopsPerExperiment": 500,
     "nbTeachingsPerLoop": 10,
     "nbGenTeach": 1,
     "nbDisTeach": 1,
@@ -22,17 +22,8 @@
     "genFunction": 0,
         "_commentaire": "0 = Heuristic;1 = MinMax; 2 = KLDiv",
 
-    "layersTypesGen": [ 2, 2, 0],
-    "layersTypesDis": [ 2, 0, 0],
-        "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = noisyLayer",
-    "layersSizesGen": [ 400, 100, 16, 784],
-    "layersNbFiltresGen": [ 24, 1, 0],
-    "layersSizesDis": [ 784, 676, 100, 1],
-    "layersNbFiltresDis": [ 1, 0, 0],
-        "_commentaire": "2e Arguments pour les layers à convolution, l'argument est inutile pour une couche normale (laisser quand meme un 0). La taille de l'input pour le layer à convolution correspond à la dimension n de l'entrée (taille entrée = n*n)).",
-        "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! (Sauf ZeroPadding (non implémenté), de plus, il faut finir la derniere couche de convoution par 1 seul filtre",
-	"descentTypeGen": 1,
-	"descentTypeDis": 1,
+	"descentTypeGen": 0,
+	"descentTypeDis": 0,
 		"_commentaire": "0 : descente normale; 1 : RMSProp",
 	"networkAreImported": false,
     "generatorPath": "generator.csv",
@@ -47,23 +38,45 @@
 
     "layersGen": [
                   {
-                        "layerType": 0, 
+                        "layerType": 4, 
+                        "inputSize": 16, 
+                        "inputChannels": 32,
+                        "arguments":[1]
+                   },
+                  {
+                        "layerType": 2, 
+                        "inputSize": 196, 
+                        "inputChannels":32,
+                        "arguments":[]
+                    },
+                  {
+                        "layerType": 4, 
+                        "inputSize":121,
+                        "inputChannels":16,
+                        "arguments":[1]
+                   },
+                  {
+                        "layerType": 2, 
+                        "inputSize":529, 
+                        "inputChannels":16,
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 4, 
                         "inputSize":400, 
-                        "arguments":[]
-                   },
+                        "inputChannels":4,
+                        "arguments":[1]
+                    },
                   {
-                        "layerType": 0, 
-                        "inputSize":100,
+                        "layerType": 2, 
+                        "inputSize":1681, 
+                        "inputChannels":4,
                         "arguments":[]
-                   },
-                  {
-                        "layerType": 0, 
-                        "inputSize":16, 
-                        "arguments":[]
-                   },
+                    },
                   {
                         "layerType": 5, 
                         "inputSize":784, 
+                        "inputChannels":1,
                         "arguments":[]
                     }
                  ],
@@ -71,27 +84,33 @@
     "layersDis": [
                   {
                         "layerType": 0, 
-                        "inputSize":400, 
+                        "inputSize":784, 
+                        "inputChannels":1,
                         "arguments":[]
                    },
                   {
                         "layerType": 0, 
-                        "inputSize":100,
+                        "inputSize":500,
+                        "inputChannels":1,
                         "arguments":[]
                    },
                   {
                         "layerType": 0, 
-                        "inputSize":16, 
+                        "inputSize":100, 
+                        "inputChannels":1,
                         "arguments":[]
                    },
                   {
                         "layerType": 5, 
-                        "inputSize":784, 
+                        "inputSize": 1,
+                        "inputChannels":1,
                         "arguments":[]
                     }
                  ],
-    "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = ZeroPadding, 4 = FractionnalZeroPadding, 5 = Output. Arguments : 0:[], 1:[taillePooling], 2:[NbFiltres, Strides], 3:[NbChannels, tailleZeroPadding], 4:[NbChannels, tailleZeroPadding], 5:[]"
-
+    "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = Noisy, 4 = ZeroPadding, 5 = Output. Arguments : 0:[], 1:[taillePooling], 2:[Strides], 3:[], 4:[TypeZeroPadding(0=Classique; 1=Deconvolution)], 5:[]",
+    "_commentaire": "Pour la déconvoltion, il faut vérifier (mOutputDim - mInputDim)/(mInputDim+1) entier sachant que la dimension est la racine de la taille",
+        "_commentaire": "2e Arguments pour les layers à convolution, l'argument est inutile pour une couche normale (laisser quand meme un 0). La taille de l'input pour le layer à convolution correspond à la dimension n de l'entrée (taille entrée = n*n)).",
+        "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! (Sauf ZeroPadding (non implémenté), de plus, il faut finir la derniere couche de convoution par 1 seul filtre"
 }
 
 

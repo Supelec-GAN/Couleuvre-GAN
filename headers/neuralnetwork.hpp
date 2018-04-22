@@ -8,6 +8,7 @@
 #include "layers/fullconnectedlayer.hpp"
 #include "layers/convolutionallayer.hpp"
 #include "layers/noisylayer.h"
+#include "layers/zeropadlayer.hpp"
 
 class NeuralNetwork : public std::list<NeuronLayer::Ptr>
 {
@@ -28,7 +29,7 @@ class NeuralNetwork : public std::list<NeuronLayer::Ptr>
          * @param descentType le type de descente utilisé dans l'apprentissage des fullConnectedLayers
          */
 
-        NeuralNetwork(std::vector<unsigned int> layerTypes, std::vector<unsigned int> layerSizes, std::vector<std::vector<unsigned int>> layerArgs, std::vector<Functions::ActivationFun> activationFuns, unsigned int descentType = 0);
+        NeuralNetwork(std::vector<unsigned int> layerTypes, std::vector<unsigned int> layerSizes, std::vector<unsigned int> layerChannels, std::vector<std::vector<unsigned int>> layerArgs, std::vector<Functions::ActivationFun> activationFuns, unsigned int descentType = 0);
 
         /// Constructeur permettant d'initialiser un réseau neuronal avec choix des fonctions d'activation et des poids donnés
         /**

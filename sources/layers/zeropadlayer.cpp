@@ -8,8 +8,9 @@ ZeroPadLayer::ZeroPadLayer(unsigned int inputSize, unsigned int outputSize, unsi
 , mOutputDim((int) sqrt(outputSize))
 , mZeroPadType(ZeroPadType)
 {
-    Eigen::MatrixXf mPropMatrix = Eigen::MatrixXf::Zero(inputSize, outputSize);
-    Eigen::MatrixXf mBackPropMatrix = Eigen::MatrixXf::Zero(outputSize, inputSize);
+    if (inputSize > outputSize) throw "Size not matching for ZeroPadding (Input must be smaller than Output) !";
+    mPropMatrix = Eigen::MatrixXf::Zero(inputSize, outputSize);
+    mBackPropMatrix = Eigen::MatrixXf::Zero(outputSize, inputSize);
     int outputDimension = sqrt(outputSize);
     if (ZeroPadType == 0) //CLassique
     {
@@ -19,20 +20,20 @@ ZeroPadLayer::ZeroPadLayer(unsigned int inputSize, unsigned int outputSize, unsi
             for(int j(0); j < sqrt(inputSize); j++)
             {
                 mPropMatrix(i*((int)sqrt(inputSize))+j,mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j) = 1;
-                mBackPropMatrix(mTailleZeroPadding*(outputSize+1) + outputDimension*(i) + j,i*((int)sqrt(inputSize))+j)=1;
+                mBackPropMatrix(mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j,i*((int)sqrt(inputSize))+j)=1;
             }
         }
     }
     else
     {
-        if ((mOutputDim - mInputDim)/(mInputDim+1) != (int) (mOutputDim - mInputDim)/(mInputDim+1)) throw;
+        if ((mOutputDim - mInputDim)/(mInputDim+1) != (int) (mOutputDim - mInputDim)/(mInputDim+1)) throw "Size not matching for Deconvolution !";
         mTailleZeroPadding = ((mOutputDim-mInputDim)/(mInputDim+1));
         for(int i(0); i < sqrt(inputSize); i++)
         {
             for(int j(0); j < sqrt(inputSize); j++)
             {
                 mPropMatrix(i*((int)sqrt(inputSize))+j,mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j*mTailleZeroPadding) = 1;
-                mBackPropMatrix(mTailleZeroPadding*(outputSize+1) + outputDimension*(i) + j*mTailleZeroPadding,i*((int)sqrt(inputSize))+j)=1;
+                mBackPropMatrix(mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j*mTailleZeroPadding,i*((int)sqrt(inputSize))+j)=1;
             }
         }
     }
@@ -86,7 +87,6 @@ Eigen::MatrixXf ZeroPadLayer::fnDerivativeMatrix() const
 
 void ZeroPadLayer::reset()
 {
-    std::cout << "WARNING, useless function being used" << std::endl;
 }
 
 int ZeroPadLayer::getInputSize()

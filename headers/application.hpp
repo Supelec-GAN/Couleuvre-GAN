@@ -61,10 +61,14 @@ class Application
 
             std::string bddToUse;
 			
-            std::vector<unsigned int> disLayerSizes;
-            std::vector<unsigned int> genLayerSizes;
             std::vector<unsigned int> chiffresATracer;
             std::vector<std::string> classesCifar;
+
+            std::vector<unsigned int> disLayerSizes;
+            std::vector<unsigned int> genLayerSizes;
+
+            std::vector<unsigned int> disLayerNbChannels;
+            std::vector<unsigned int> genLayerNbChannels;
 
             std::vector<std::vector<unsigned int>> disLayerArgs;
             std::vector<std::vector<unsigned int>> genLayerArgs;

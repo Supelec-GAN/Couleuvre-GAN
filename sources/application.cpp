@@ -38,7 +38,7 @@ Application::Application()
 		std::vector<Eigen::MatrixXf> vectorTest;
         for(unsigned int i(0); i < mConfig.nbGenTest; i++)
 		{
-            Eigen::MatrixXf noise = Eigen::MatrixXf::Random(1, mConfig.genLayerSizes[0] );
+            Eigen::MatrixXf noise = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0] );
 			vectorTest.push_back(noise);
 		}
 		
@@ -70,12 +70,12 @@ Application::Application()
                 if (i==mConfig.genLayerSizes.size()-2) funsGen.push_back(Functions::sigmoid(0.1f));
                 else funsGen.push_back(Functions::reLu());
             }
-            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerArgs, funsGen, mConfig.descentTypeGen));
+            mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerNbChannels, mConfig.genLayerArgs, funsGen, mConfig.descentTypeGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
 			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
                 funsDis.push_back(Functions::sigmoid(0.1f));
-            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerArgs, funsDis, mConfig.descentTypeDis));
+            mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerNbChannels, mConfig.disLayerArgs, funsDis, mConfig.descentTypeDis));
 		}
         mTeacher = Teacher(mGenerator,mDiscriminator, mConfig.genFunction);
 		mTestCounter = 0;
@@ -141,7 +141,7 @@ void Application::runSingleStochasticExperiment()
             Eigen::MatrixXf input;
             for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
             {
-                input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+                input = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
                 mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
             }
 		}
@@ -165,7 +165,7 @@ void Application::runSingleMinibatchExperiment()
             Eigen::MatrixXf input;
             for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
             {
-                input = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+                input = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
                 mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
             }
         }
@@ -188,15 +188,15 @@ void Application::runStochasticTeach()
 	
 	for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
 	{
-		Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+        Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
 		Eigen::MatrixXf desiredOutput = Eigen::MatrixXf(1,1);
 		
         for(unsigned int i(0); i<mConfig.nbGenTeach; i++)
 		{
 			
-			Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            Eigen::MatrixXf noiseInput = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
 			Eigen::MatrixXf input = mGenerator->processNetwork(noiseInput);
-			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            noiseInput = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
 			input = mGenerator->processNetwork(noiseInput);
 			
 			desiredOutput(0,0) = 1;
@@ -204,7 +204,7 @@ void Application::runStochasticTeach()
 		}
         for(unsigned int i(0); i<mConfig.nbDisTeach; i++)
 		{
-			noiseInput = Eigen::MatrixXf::Random(1, mGenerator->getInputSize());
+            noiseInput = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
 			Sample sample{mTeachingBatchDis[distribution(randomEngine)]};
 			mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
 
@@ -366,13 +366,13 @@ void Application::setConfig(rapidjson::Document& document)
 
     mConfig.networkAreImported = document["networkAreImported"].GetBool();
 
-    auto layersSizesDis = document["layersSizesDis"].GetArray();
+/*    auto layersSizesDis = document["layersSizesDis"].GetArray();
     for(rapidjson::SizeType i = 0; i < layersSizesDis.Size(); i++)
         mConfig.disLayerSizes.push_back(layersSizesDis[i].GetUint());
 
     auto layersSizesGen = document["layersSizesGen"].GetArray();
     for(rapidjson::SizeType i = 0; i < layersSizesGen.Size(); i++)
-        mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());
+        mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());*/
 
     mConfig.bddToUse = document["bddToUse"].GetString();
 
@@ -384,23 +384,24 @@ void Application::setConfig(rapidjson::Document& document)
     for(rapidjson::SizeType i(0); i < classesCifar.Size(); i++)
         mConfig.classesCifar.push_back(classesCifar[i].GetString());
 
-    auto layersTypesDis = document["layersTypesDis"].GetArray();
+/*    auto layersTypesDis = document["layersTypesDis"].GetArray();
     for(rapidjson::SizeType i = 0; i < layersTypesDis.Size(); i++)
         mConfig.disLayerTypes.push_back(layersTypesDis[i].GetUint());
 
     auto layersTypesGen = document["layersTypesGen"].GetArray();
     for(rapidjson::SizeType i = 0; i < layersTypesGen.Size(); i++)
-        mConfig.genLayerTypes.push_back(layersTypesGen[i].GetUint());
+        mConfig.genLayerTypes.push_back(layersTypesGen[i].GetUint());*/
 
     auto chiffreATracer = document["chiffreATracer"].GetArray();
     for(rapidjson::SizeType i = 0; i < chiffreATracer.Size(); i++)
-        mConfig.chiffreATracer.push_back(chiffreATracer[i].GetUint());
+        mConfig.chiffresATracer.push_back(chiffresATracer[i].GetUint());
 
     auto layersDis = document["layersDis"].GetArray();
-    for (int i(0); document.Size()>i; i++)
+    for (int i(0); layersDis.Size()>i; i++)
     {
         mConfig.disLayerTypes.push_back(layersDis[i]["layerType"].GetUint());
-        mConfig.disLayerSizes.push_back(layersDis[i]["layerSize"].GetUint());
+        mConfig.disLayerSizes.push_back(layersDis[i]["inputSize"].GetUint());
+        mConfig.disLayerNbChannels.push_back(layersDis[i]["inputChannels"].GetUint());
         mConfig.disLayerArgs.push_back(std::vector<unsigned int>());
         for (int j(0); (layersDis[i]["arguments"].GetArray()).Size()>j; j++)
         {
@@ -409,10 +410,11 @@ void Application::setConfig(rapidjson::Document& document)
     }
 
     auto layersGen = document["layersGen"].GetArray();
-    for (int i(0); document.Size()>i; i++)
+    for (int i(0); layersGen.Size()>i; i++)
     {
         mConfig.genLayerTypes.push_back(layersGen[i]["layerType"].GetUint());
-        mConfig.genLayerSizes.push_back(layersGen[i]["layerSize"].GetUint());
+        mConfig.genLayerSizes.push_back(layersGen[i]["inputSize"].GetUint());
+        mConfig.genLayerNbChannels.push_back(layersGen[i]["inputChannels"].GetUint());
         mConfig.genLayerArgs.push_back(std::vector<unsigned int>());
         for (int j(0); (layersGen[i]["arguments"].GetArray()).Size()>j; j++)
         {

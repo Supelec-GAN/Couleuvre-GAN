@@ -68,7 +68,7 @@ Application::Application()
 			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
             {
                 if (i==mConfig.genLayerSizes.size()-2) funsGen.push_back(Functions::sigmoid(0.1f));
-                else funsGen.push_back(Functions::reLu());
+                else funsGen.push_back(Functions::sigmoid(0.1f));
             }
             mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerNbChannels, mConfig.genLayerArgs, funsGen, mConfig.descentTypeGen));
 			//Le Discriminateur

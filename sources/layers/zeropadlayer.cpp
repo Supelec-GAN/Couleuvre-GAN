@@ -14,13 +14,13 @@ ZeroPadLayer::ZeroPadLayer(unsigned int inputSize, unsigned int outputSize, unsi
     int outputDimension = sqrt(outputSize);
     if (ZeroPadType == 0) //CLassique
     {
-        mTailleZeroPadding= ((((int)sqrt(outputSize))-(int)sqrt(inputSize))/2);
-        for(int i(0); i < sqrt(inputSize); i++)
+        mTailleZeroPadding= (((mOutputDim)-mInputDim)/2);
+        for(int i(0); i < mInputDim; i++)
         {
-            for(int j(0); j < sqrt(inputSize); j++)
+            for(int j(0); j < mInputDim; j++)
             {
-                mPropMatrix(i*((int)sqrt(inputSize))+j,mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j) = 1;
-                mBackPropMatrix(mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j,i*((int)sqrt(inputSize))+j)=1;
+                mPropMatrix(i*(mInputDim)+j,mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j) = 1;
+                mBackPropMatrix(mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j,i*(mInputDim)+j)=1;
             }
         }
     }
@@ -28,12 +28,12 @@ ZeroPadLayer::ZeroPadLayer(unsigned int inputSize, unsigned int outputSize, unsi
     {
         if ((mOutputDim - mInputDim)/(mInputDim+1) != (int) (mOutputDim - mInputDim)/(mInputDim+1)) throw "Size not matching for Deconvolution !";
         mTailleZeroPadding = ((mOutputDim-mInputDim)/(mInputDim+1));
-        for(int i(0); i < sqrt(inputSize); i++)
+        for(int i(0); i < mInputDim; i++)
         {
-            for(int j(0); j < sqrt(inputSize); j++)
+            for(int j(0); j < mInputDim; j++)
             {
-                mPropMatrix(i*((int)sqrt(inputSize))+j,mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j*mTailleZeroPadding) = 1;
-                mBackPropMatrix(mTailleZeroPadding*(outputDimension+1) + outputDimension*(i) + j*mTailleZeroPadding,i*((int)sqrt(inputSize))+j)=1;
+                mPropMatrix(i*(mInputDim)+j,mTailleZeroPadding*(mOutputDim+1) + (mTailleZeroPadding+1)*(mOutputDim)*(i) + j*(mTailleZeroPadding+1)) = 1;
+                mBackPropMatrix(mTailleZeroPadding*(mOutputDim+1) + (mTailleZeroPadding+1)*(mOutputDim)*(i) + j*(mTailleZeroPadding+1),i*(mInputDim)+j)=1;
             }
         }
     }

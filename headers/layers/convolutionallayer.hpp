@@ -39,7 +39,7 @@ class ConvolutionalLayer : public NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        //ConvolutionalLayer(unsigned int inputSize, unsigned int nbFiltres, unsigned int taille, std::vector<Eigen::MatrixXf> weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        ConvolutionalLayer(unsigned int inputSize, unsigned int nbChannels, std::vector<Eigen::MatrixXf> weight, std::function<float(float)> activationF = Functions::sigmoid(10.f));
 
                         ~ConvolutionalLayer();
 

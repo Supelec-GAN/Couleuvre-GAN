@@ -107,10 +107,12 @@
                         "arguments":[]
                     }
                  ],
-    "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = Noisy, 4 = ZeroPadding, 5 = Output. Arguments : 0:[], 1:[taillePooling], 2:[Strides], 3:[], 4:[TypeZeroPadding(0=Classique; 1=Deconvolution)], 5:[]",
+    "_commentaire": "0 = FullConnected, 1 = MaxPooling (not yet implemented), 2 = Convolutional, 3 = Noisy, 4 = ZeroPadding, 5 = Output. ",
+    "_commentaire": "Arguments : 0:[ActivFun], 1:[taillePooling], 2:[ActivFun], 3:[], 4:[TypeZeroPadding(0=Classique; 1=Deconvolution)], 5:[]",
+    "_commentaire": "ActivFun : ",
     "_commentaire": "Pour la déconvoltion, il faut vérifier (mOutputDim - mInputDim)/(mInputDim+1) entier sachant que la dimension est la racine de la taille",
-        "_commentaire": "2e Arguments pour les layers à convolution, l'argument est inutile pour une couche normale (laisser quand meme un 0). La taille de l'input pour le layer à convolution correspond à la dimension n de l'entrée (taille entrée = n*n)).",
-        "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! (Sauf ZeroPadding (non implémenté), de plus, il faut finir la derniere couche de convoution par 1 seul filtre"
+    "_commentaire": "La taille de l'input pour le layer à convolution correspond à la taille n de l'entrée (dimension entrée = sqrt(n))).",
+    "_commentaire": "ATTENTION : Pour la convolution, la taille est focément décroissante !! Et le fullconnected ne gere pas encore le multichannel"
 }
 
 

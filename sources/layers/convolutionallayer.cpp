@@ -24,21 +24,25 @@ ConvolutionalLayer::ConvolutionalLayer(unsigned int tailleImg, unsigned int nbCh
     }
 }
 
-/*ConvolutionalLayer::ConvolutionalLayer(unsigned int dimensionImg, unsigned int nbFiltres, unsigned int dimensionFiltre, std::vector<Eigen::MatrixXf> weight, Eigen::MatrixXf bias, std::function<float(float)> activationF)
-: mWeight(weight)
-, mBias(bias) 				//ligne
+ConvolutionalLayer::ConvolutionalLayer(unsigned int tailleImg, unsigned int nbChannels, std::vector<Eigen::MatrixXf> weight, std::function<float(float)> activationF)
+: mDimensionInput((int) sqrt(tailleImg))
+, mWeight(weight)
+, mBias(Eigen::MatrixXf::Random(1, weight.size())) 				//ligne
 , mActivationFun(activationF)
-, mBufferActivationLevel(Eigen::MatrixXf::Zero(1, ((dimensionImg-dimensionFiltre) + 1)*((dimensionImg-dimensionFiltre) + 1)))	//ligne
-, mBufferInput(Eigen::MatrixXf::Zero(1, dimensionImg*dimensionImg))				//ligne
+, mBufferActivationLevel(Eigen::MatrixXf::Zero(weight.size(), (mDimensionInput-(int)sqrt(weight[0].cols()) + 1)*(mDimensionInput-(int)sqrt(weight[0].cols()) + 1)))	//ligne
+, mBufferInput(Eigen::MatrixXf::Zero(nbChannels, tailleImg))				//ligne
 , mSumWeightVariation(std::vector<Eigen::MatrixXf>())
-, mSumBiasVariation(Eigen::MatrixXf::Zero(1, nbFiltres))
+, mSumBiasVariation(Eigen::MatrixXf::Zero(1, weight.size()))
+, mInputDimension(mDimensionInput)
+, mInputChannels(nbChannels)
 {
     //Matrice de poids
-    for(int i(0); i < nbFiltres; i++)
-    {
-        mSumWeightVariation.push_back(Eigen::MatrixXf::Zero(1,dimensionFiltre*dimensionFiltre)); //A CORRIGER
+    for(int i(0); i < weight.size(); i++)
+    {   for(int j(0); j< weight[0].cols();j++)
+            mWeight[i](0,j) = weight[i](0,j);
+        mSumWeightVariation.push_back(Eigen::MatrixXf::Zero(nbChannels,weight[0].cols()));
     }
-}*/
+}
 
 ConvolutionalLayer::~ConvolutionalLayer(){}
 

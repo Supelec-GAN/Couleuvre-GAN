@@ -65,7 +65,7 @@ Application::Application()
 			// Construction du réseau de neurones
 			//Le Generateur
 			std::vector<Functions::ActivationFun> funsGen;
-			for(int i(0); i < mConfig.genLayerSizes.size()-1;i++)
+            for(unsigned int i(0); i < mConfig.genLayerSizes.size()-1;i++)
             {
                 if (i==mConfig.genLayerSizes.size()-2) funsGen.push_back(Functions::sigmoid(0.1f));
                 else funsGen.push_back(Functions::reLu());
@@ -73,7 +73,7 @@ Application::Application()
             mGenerator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.genLayerTypes, mConfig.genLayerSizes, mConfig.genLayerNbChannels, mConfig.genLayerArgs, funsGen, mConfig.descentTypeGen));
 			//Le Discriminateur
 			std::vector<Functions::ActivationFun> funsDis;
-			for(int i(0); i < mConfig.disLayerSizes.size()-1;i++)
+            for(unsigned int i(0); i < mConfig.disLayerSizes.size()-1;i++)
                 funsDis.push_back(Functions::sigmoid(0.1f));
             mDiscriminator = NeuralNetwork::Ptr(new NeuralNetwork(mConfig.disLayerTypes, mConfig.disLayerSizes, mConfig.disLayerNbChannels, mConfig.disLayerArgs, funsDis, mConfig.descentTypeDis));
 		}
@@ -397,26 +397,26 @@ void Application::setConfig(rapidjson::Document& document)
         mConfig.chiffresATracer.push_back(chiffresATracer[i].GetUint());
 
     auto layersDis = document["layersDis"].GetArray();
-    for (int i(0); layersDis.Size()>i; i++)
+    for (unsigned int i(0); layersDis.Size()>i; i++)
     {
         mConfig.disLayerTypes.push_back(layersDis[i]["layerType"].GetUint());
         mConfig.disLayerSizes.push_back(layersDis[i]["inputSize"].GetUint());
         mConfig.disLayerNbChannels.push_back(layersDis[i]["inputChannels"].GetUint());
         mConfig.disLayerArgs.push_back(std::vector<unsigned int>());
-        for (int j(0); (layersDis[i]["arguments"].GetArray()).Size()>j; j++)
+        for (unsigned int j(0); (layersDis[i]["arguments"].GetArray()).Size()>j; j++)
         {
             mConfig.disLayerArgs[i].push_back(((layersDis[i].GetObject())["arguments"].GetArray())[j].GetUint());
         }
     }
 
     auto layersGen = document["layersGen"].GetArray();
-    for (int i(0); layersGen.Size()>i; i++)
+    for (unsigned int i(0); layersGen.Size()>i; i++)
     {
         mConfig.genLayerTypes.push_back(layersGen[i]["layerType"].GetUint());
         mConfig.genLayerSizes.push_back(layersGen[i]["inputSize"].GetUint());
         mConfig.genLayerNbChannels.push_back(layersGen[i]["inputChannels"].GetUint());
         mConfig.genLayerArgs.push_back(std::vector<unsigned int>());
-        for (int j(0); (layersGen[i]["arguments"].GetArray()).Size()>j; j++)
+        for (unsigned int j(0); (layersGen[i]["arguments"].GetArray()).Size()>j; j++)
         {
             mConfig.genLayerArgs[i].push_back(((layersGen[i].GetObject())["arguments"].GetArray())[j].GetUint());
         }

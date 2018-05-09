@@ -553,3 +553,59 @@ NeuralNetwork* Application::importNeuralNetwork(std::string networkPath,Function
     ifs.close();
     return (nullptr);//new NeuralNetwork(taille, neuralNetwork, bias, activationFunVector));
 }
+
+
+void Application::runSingleExperimentMNIST()
+{
+    mStatsCollector[0].addResultDis(runTestMNIST());
+
+    for(unsigned int loopIndex{0}; loopIndex < mConfig.nbLoopsPerExperiment; ++loopIndex)
+    {
+        std::cout << "Apprentissage num. : " << (loopIndex)*mConfig.nbTeachingsPerLoop << std::endl;
+        runTeachMNIST();
+        float score = runTestMNIST();
+        std::cout << "Score : " << score << std::endl;
+        mStatsCollector[loopIndex+1].addResultDis(score);
+    }
+}
+
+void Application::runTeachMNIST()
+{
+    std::uniform_int_distribution<> distribution(0, mTeachingBatchDis.size()-1);
+    std::mt19937 randomEngine((std::random_device())());
+
+    for(unsigned int index{0}; index < mConfig.nbTeachingsPerLoop; index++)
+    {
+        Sample sample{mTeachingBatchDis[distribution(randomEngine)]};
+        mTeacher.backpropDiscriminator(sample.first, sample.second, mConfig.step, mConfig.dx);
+    }
+}
+
+float Application::runTestMNIST(bool returnErrorRate)
+{
+    float errorMean{0};
+
+    if (returnErrorRate)
+    {
+        int maxLine, maxCol;
+        for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end(); ++itr)
+        {
+            Eigen::MatrixXf output{mDiscriminator->processNetwork(itr->first)};
+            output.maxCoeff(&maxLine, &maxCol);
+            output.setZero();
+            output(maxLine, maxCol) = 1;
+            errorMean += sqrt((output - itr->second).squaredNorm())/sqrt(2);
+        }
+    }
+    else
+    {
+        for(std::vector<Sample>::iterator itr = mTestingBatchDis.begin(); itr != mTestingBatchDis.end(); ++itr)
+        {
+            Eigen::MatrixXf output{mDiscriminator->processNetwork(itr->first)};
+            errorMean += sqrt((output - itr->second).squaredNorm());
+        }
+    }
+    //std::cout << errorMean/static_cast<float>(mTestingBatchDis.size()) << std::endl;
+
+    return errorMean/static_cast<float>(mTestingBatchDis.size());
+}

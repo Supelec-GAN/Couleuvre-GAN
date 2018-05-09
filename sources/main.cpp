@@ -20,7 +20,7 @@ using namespace Eigen;
 
 int main()
 {
-    MatrixXf inp = MatrixXf::Zero(2,16);
+    /*MatrixXf inp = MatrixXf::Zero(2,16);
     for(int i(0); i < 16; i++)
     {
         inp(0,i) = 2*i;
@@ -60,6 +60,10 @@ int main()
 
         cout << endl << endl;
     }
-    }
+    }*/
+
+    //Construction de l'application qui gère tout
+    Application appMNIST;
+    appMNIST.runSingleExperimentMNIST();
     return 0;
 }

@@ -25,17 +25,18 @@ InputProvider::Batch MnistProvider::trainingBatch() const
 
     Batch trainingBatch;
 
-    Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,1);
-    outputTrain(0,0) = 1.0;
+    Eigen::MatrixXf outputTrain = Eigen::MatrixXf::Zero(1,10);
 
     unsigned int compteur(0);
     for(unsigned int i(0); i < 60000 && compteur < mLabelTrainSize; i++)
     {
+        outputTrain(0,mLabelTrain(i)) = 1;
         if(mLabels[mLabelTrain(i)])
         {
             trainingBatch.push_back(Sample(mImageTrain[i], outputTrain));
             compteur++;
         }
+        outputTrain(0,mLabelTrain(i)) = 0;
     }
 
     std::cout << "Chargement du Batch d'entrainement effectué !" << std::endl;
@@ -49,17 +50,19 @@ InputProvider::Batch MnistProvider::testingBatch() const
 
     Batch testingBatch;
 
-    Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,1);
-    outputTest(0,0) = 1.0;
+    Eigen::MatrixXf outputTest = Eigen::MatrixXf::Zero(1,10);
+
 
     unsigned int compteur(0);
     for(unsigned int i(0); i < mLabelTestSize; i++)
     {
+        outputTest(0, mLabelTest(i)) = 1;
         if(mLabels[mLabelTest(i)])
         {
            testingBatch.push_back(Sample(mImageTest[i], outputTest));
             compteur++;
         }
+        outputTest(0, mLabelTest(i)) = 0;
     }
     std::cout << "Chargement du Batch de test effectué !" << std::endl;
 

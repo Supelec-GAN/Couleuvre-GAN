@@ -153,6 +153,9 @@ class Application
          */
         Eigen::MatrixXf genProcessing(Eigen::MatrixXf input);
 
+
+        void runSingleExperimentMNIST();
+
 	private:
 		/// Génère un minibatch à partir d'un batch
 		/**
@@ -170,7 +173,9 @@ class Application
 	
 //// Configuration
 
+        float runTestMNIST(bool returnErrorRate = true);
 
+        void runTeachMNIST();
     private:
         /// Fonction pour charger la configuration de l'application
         void loadConfig(const std::string& configFileName = "config.json");

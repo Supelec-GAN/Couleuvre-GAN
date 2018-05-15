@@ -79,3 +79,8 @@ Thumbs.db
 # JSON config files
 *.json
 *.pro.user
+
+
+#Couleuvre files
+cifar-10
+

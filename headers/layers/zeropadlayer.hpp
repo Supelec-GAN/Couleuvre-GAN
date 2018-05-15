@@ -20,7 +20,6 @@ class ZeroPadLayer : public NeuronLayer
         /**
          * \param inputSize le nombre d'inputs de cette couche
          * \param outputSize le nombre d'outputs de cette couche
-         * \param activationF la fonction d'activation de tous les neurones de la couche
          * \param descentType le type de descente utilisé dans l'apprentissage des ZeroPadLayers
          *
          * La matrice de poids est de dimension outputSize x inputSize

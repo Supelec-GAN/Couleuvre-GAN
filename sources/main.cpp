@@ -25,8 +25,8 @@ int main()
 
 
     //Construction de l'application qui gère tout
-    Application appCifar;
-    appCifar.runExperiments();
+    Application app;
+    app.runExperiments();
 
     return 0;
 }

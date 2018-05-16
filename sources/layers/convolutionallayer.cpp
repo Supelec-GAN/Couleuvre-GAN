@@ -24,21 +24,25 @@ ConvolutionalLayer::ConvolutionalLayer(unsigned int tailleImg, unsigned int nbCh
     }
 }
 
-/*ConvolutionalLayer::ConvolutionalLayer(unsigned int dimensionImg, unsigned int nbFiltres, unsigned int dimensionFiltre, std::vector<Eigen::MatrixXf> weight, Eigen::MatrixXf bias, std::function<float(float)> activationF)
-: mWeight(weight)
-, mBias(bias) 				//ligne
+ConvolutionalLayer::ConvolutionalLayer(unsigned int tailleImg, unsigned int nbChannels, std::vector<Eigen::MatrixXf> weight, std::function<float(float)> activationF)
+: mDimensionInput((int) sqrt(tailleImg))
+, mWeight(weight)
+, mBias(Eigen::MatrixXf::Random(1, weight.size())) 				//ligne
 , mActivationFun(activationF)
-, mBufferActivationLevel(Eigen::MatrixXf::Zero(1, ((dimensionImg-dimensionFiltre) + 1)*((dimensionImg-dimensionFiltre) + 1)))	//ligne
-, mBufferInput(Eigen::MatrixXf::Zero(1, dimensionImg*dimensionImg))				//ligne
+, mBufferActivationLevel(Eigen::MatrixXf::Zero(weight.size(), (mDimensionInput-(int)sqrt(weight[0].cols()) + 1)*(mDimensionInput-(int)sqrt(weight[0].cols()) + 1)))	//ligne
+, mBufferInput(Eigen::MatrixXf::Zero(nbChannels, tailleImg))				//ligne
 , mSumWeightVariation(std::vector<Eigen::MatrixXf>())
-, mSumBiasVariation(Eigen::MatrixXf::Zero(1, nbFiltres))
+, mSumBiasVariation(Eigen::MatrixXf::Zero(1, weight.size()))
+, mInputDimension(mDimensionInput)
+, mInputChannels(nbChannels)
 {
     //Matrice de poids
-    for(int i(0); i < nbFiltres; i++)
-    {
-        mSumWeightVariation.push_back(Eigen::MatrixXf::Zero(1,dimensionFiltre*dimensionFiltre)); //A CORRIGER
+    for(int i(0); i < weight.size(); i++)
+    {   for(int j(0); j< weight[0].cols();j++)
+            mWeight[i](0,j) = weight[i](0,j);
+        mSumWeightVariation.push_back(Eigen::MatrixXf::Zero(nbChannels,weight[0].cols()));
     }
-}*/
+}
 
 ConvolutionalLayer::~ConvolutionalLayer(){}
 
@@ -48,9 +52,6 @@ ConvolutionalLayer::~ConvolutionalLayer(){}
 Eigen::MatrixXf ConvolutionalLayer::processLayer(Eigen::MatrixXf inputs)
 {
     mBufferInput = inputs;
-    //int inputDimension = sqrt(inputs.cols());
-    //int weightDimension = sqrt(mWeight[0].cols());
-    //int outputTaille = (inputDimension - weightDimension+1)*(inputDimension - weightDimension+1); //Pour une matrice carrée, taille = dimension^2 (Conversion vecteur ligne, matrice et inversement)
     if (inputs.cols()!=mInputDimension*mInputDimension) throw;
     for (int n=0; n < mWeight.size(); n++) //Pour chaque filtre...
     {
@@ -65,29 +66,7 @@ Eigen::MatrixXf ConvolutionalLayer::processLayer(Eigen::MatrixXf inputs)
 
     return output;
 }
-//Ancienne version à supprimer si la nouvelle marche
-/*    int inputDimension = sqrt(inputs.cols());
-    int weightDimension = sqrt(mWeight[0].cols());
-    Eigen::MatrixXf filtreConv = Eigen::MatrixXf::Zero((inputs.cols(), inputDimension - weightDimension+1));
-    for (int n=0; n < mWeight.size(); n++) //Pour chaque filtre...
-    {
-        for (int k=0; k< filtreConv.rows()-weightDimension+1; k++) //Pour chaque décalage vertical du filtre...
-        {
-            for (int l=0; l< filtreConv.cols()-weightDimension+1; l++) //Pour chaque décalage latéral du filtre...
-            {
-                for (int i=0; i< weightDimension; i++) //Pour chaque colonne du filtre...
-                {
-                    for (int j=0; j< weightDimension; j++) //Pour chaque ligne du filtre...
-                    {
-                        filtreConv(l+j+i*inputDimension,j+k) = mWeight[n](i,j); //On crée une matrice de poids qui va nous permettre de lancer un calcul qui sera parallélisable
-                    }
-                }
-            }
 
-            mBufferActivationLevel.segment(n*(inputDimension - weightDimension+1), (n+1)*(inputDimension - weightDimension+1)-1) = inputs*filtreConv;
-            filtreConv.setZero(filtreConv.cols());
-            }
-    }*/
 //***********RETROPROPAGATION***********
 //**************************************
 
@@ -107,7 +86,6 @@ Eigen::MatrixXf ConvolutionalLayer::layerBackprop(Eigen::MatrixXf xnPartialDeriv
         mSumWeightVariation[i] += step*ConvolutionalLayer::convolution(mBufferInput,ynPartialDerivativeCarree, false);
     }
     //mSumBiasVariation += step*ynPartialDerivative;
-    updateLayerWeights();
 
     //Retour de x(n-1)PartialDerivative
     int incrementDimension = 2*(weightDimension-1);
@@ -116,20 +94,21 @@ Eigen::MatrixXf ConvolutionalLayer::layerBackprop(Eigen::MatrixXf xnPartialDeriv
     Eigen::MatrixXf ynZeroPadding = Eigen::MatrixXf::Zero(ynPartialDerivative.rows(),zeroPaddingDimension*zeroPaddingDimension);
     for (int n=0; n < ynPartialDerivative.rows(); n++) //Pour chaque channel...
     {
-        for (int i=0; i < ynDerivDimension; i++) //Copie du symmétrique de ynPartialDerivative dans le Zeropadding (A_i,j = A_n-i,m-j)
+        for (int i=0; i < ynDerivDimension; i++)
         {
             for (int j=0; j < ynDerivDimension; j++)
             {
-                ynZeroPadding(n, (zeroPaddingDimension+1)*incrementDimension + j + i*zeroPaddingDimension) = ynPartialDerivative(n,(ynDerivDimension-i-1)*ynDerivDimension + (ynDerivDimension-j-1));
+                ynZeroPadding(n, (i+incrementDimension/2)*zeroPaddingDimension + j + incrementDimension/2) = ynPartialDerivative(n,i*ynDerivDimension+j);
             }
         }
     }
     Eigen::MatrixXf resultat = Eigen::MatrixXf::Zero(mInputChannels, mBufferInput.cols()); //mBufferInput.cols() est la taille de l'input
-    for (int i=0; i < mWeight.size(); i++)
+    for (int i=0; i < mWeight.size(); i++) //Pour tous les channels
     {
-        Eigen::MatrixXf ynZeroPaddingCarree = Eigen::MatrixXf::Ones(mWeight[i].rows(),ynZeroPadding.rows())*ynZeroPadding;
-        resultat += convolution(ynZeroPaddingCarree,mWeight[i], false);
+        Eigen::MatrixXf ynZeroPaddingCarree = Eigen::MatrixXf::Ones(mWeight[i].rows(),ynZeroPadding.rows())*ynZeroPadding; //On somme l'ensemble des erreurs d'une ligne pour tous les channels
+        resultat += convolution(ynZeroPaddingCarree,mWeight[i].reverse(), false);
     }
+    updateLayerWeights();
     return resultat;
 }
 /*

@@ -361,6 +361,7 @@ void Application::loadConfig(const std::string& configFileName)
 void Application::setConfig(rapidjson::Document& document)
 {
     mConfig.step = document["step"].GetFloat();
+    mConfig.stepAdam = document["stepAdam"].GetFloat();
     mConfig.dx = document["dx"].GetFloat();
 	mConfig.sigmoidParameter = document["sigmoidParameter"].GetFloat();
 

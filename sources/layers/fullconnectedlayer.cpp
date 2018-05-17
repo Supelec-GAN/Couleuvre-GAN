@@ -1,4 +1,5 @@
 #include "headers/layers/fullconnectedlayer.hpp"
+#include <cmath>
 
 //*************CONSTRUCTEUR*************
 //**************************************
@@ -13,7 +14,10 @@ FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outp
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
 , mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
 , mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
+, mAdaptativeWeightSecondStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
+, mAdaptativeBiasSecondStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
 , mDescentType(descentType)
+, mUpdateCount(0)
 {}
 
 FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF, unsigned int descentType)
@@ -26,7 +30,10 @@ FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outp
 , mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
 , mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
 , mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
+, mAdaptativeWeightSecondStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
+, mAdaptativeBiasSecondStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
 , mDescentType(descentType)
+, mUpdateCount(0)
 {}
 
 FullConnectedLayer::~FullConnectedLayer(){}
@@ -57,21 +64,28 @@ Eigen::MatrixXf FullConnectedLayer::layerBackprop(Eigen::MatrixXf xnPartialDeriv
 
     //Mise à jour des poids
     Eigen::MatrixXf wnPartialDerivative = (mBufferInput.transpose())*ynPartialDerivative;
-
-    if (mDescentType == 1)
+    switch(mDescentType)
     {
-        updateBiasStep(ynPartialDerivative, step);
-        updateWeightStep(wnPartialDerivative, step);
+    case 1:     // RMS Prop
+        updateFirstMomentStep(wnPartialDerivative, ynPartialDerivative, step);
         mSumBiasVariation += ((1.0/(sqrt(mAdaptativeBiasStep.array()+0.000001)))*ynPartialDerivative.array()).matrix();
         mSumWeightVariation += ((1.0/(sqrt(mAdaptativeWeightStep.array()+0.000001)))*wnPartialDerivative.array()).matrix();
         updateLayerWeights();
-    }
-    else
-    {
+        break;
+    case 2:     // Adam
+        mUpdateCount++;
+        updateFirstMomentStep(wnPartialDerivative, ynPartialDerivative, step);
+        updateSecondMomentStep(wnPartialDerivative, ynPartialDerivative, step);
+        mSumBiasVariation += ((1.0/(sqrt(((mAdaptativeBiasSecondStep).array())+0.000001)))*mAdaptativeBiasStep.array()).matrix();
+        mSumWeightVariation += ((1.0/(sqrt(((mAdaptativeWeightSecondStep).array())+0.000001)))*mAdaptativeWeightStep.array()).matrix();
+        updateLayerWeights();
+        break;
+    default:
         mSumBiasVariation += step*ynPartialDerivative;
         mSumWeightVariation += step*wnPartialDerivative;
         updateLayerWeights();
-     }
+        break;
+    }
     //Retour de x(n-1)PartialDerivative
     return ynPartialDerivative*mWeight.transpose();
 }
@@ -130,14 +144,16 @@ Eigen::MatrixXf FullConnectedLayer::fnDerivativeMatrix() const
     return Eigen::MatrixXf(fnDerivativeMat.asDiagonal());
 }
 
-void FullConnectedLayer::updateWeightStep(Eigen::MatrixXf wnPartialDerivative, float step)
+void FullConnectedLayer::updateFirstMomentStep(Eigen::MatrixXf wnPartialDerivative, Eigen::MatrixXf ynPartialDerivative,  float step)
 {
      mAdaptativeWeightStep = step*mAdaptativeWeightStep + (1-step)*abs(wnPartialDerivative.array()).matrix();
+     mAdaptativeBiasStep = step*mAdaptativeBiasStep + (1-step)*abs(ynPartialDerivative.array()).matrix();
 }
 
-void FullConnectedLayer::updateBiasStep(Eigen::MatrixXf ynPartialDerivative, float step)
+void FullConnectedLayer::updateSecondMomentStep(Eigen::MatrixXf wnPartialDerivative, Eigen::MatrixXf ynPartialDerivative, float step)
 {
-    mAdaptativeBiasStep = step*mAdaptativeBiasStep + (1-step)*abs(ynPartialDerivative.array()).matrix();
+    mAdaptativeWeightSecondStep = 0.99*mAdaptativeWeightStep + (1-0.99)*(wnPartialDerivative.array()*wnPartialDerivative.array()).matrix();
+    mAdaptativeBiasSecondStep = 0.99*mAdaptativeBiasStep + (1-0.99)*(ynPartialDerivative.array()*ynPartialDerivative.array()).matrix();
 }
 
 void FullConnectedLayer::reset()

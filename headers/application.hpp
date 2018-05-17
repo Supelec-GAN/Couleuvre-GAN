@@ -29,6 +29,7 @@ class Application
         struct Config
         {
             float step;
+            float stepAdam;
             float dx;
 			float sigmoidParameter;
 

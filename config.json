@@ -1,5 +1,6 @@
 {
-    "step": 0.5,
+    "step": 0.9,
+    "stepAdam": 0.999,
     "dx": 0.01,
     "sigmoidParameter": 0.1,
 

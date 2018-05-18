@@ -64,16 +64,19 @@ Eigen::MatrixXf FullConnectedLayer::layerBackprop(Eigen::MatrixXf xnPartialDeriv
         updateWeightStep(wnPartialDerivative, step);
         mSumBiasVariation += ((1.0/(sqrt(mAdaptativeBiasStep.array()+0.000001)))*ynPartialDerivative.array()).matrix();
         mSumWeightVariation += ((1.0/(sqrt(mAdaptativeWeightStep.array()+0.000001)))*wnPartialDerivative.array()).matrix();
-        updateLayerWeights();
     }
     else
     {
         mSumBiasVariation += step*ynPartialDerivative;
         mSumWeightVariation += step*wnPartialDerivative;
-        updateLayerWeights();
+
      }
     //Retour de x(n-1)PartialDerivative
-    return ynPartialDerivative*mWeight.transpose();
+    Eigen::MatrixXf output = ynPartialDerivative*mWeight.transpose();
+
+    updateLayerWeights();
+
+    return output;
 }
 
 [[deprecated]] //use minibatchLayerBackprop instead

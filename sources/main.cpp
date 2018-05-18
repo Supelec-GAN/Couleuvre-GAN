@@ -20,30 +20,35 @@ using namespace Eigen;
 
 int main()
 {
-    /*MatrixXf inp = MatrixXf::Zero(2,16);
+    /*MatrixXf inp = MatrixXf::Zero(1,16);
     for(int i(0); i < 16; i++)
     {
-        inp(0,i) = 2*i;
-        inp(1,i) = 2*i+1;
+        inp(0,i) = 1;
     }
     std::vector<MatrixXf> vec;
-    MatrixXf wei = MatrixXf::Zero(2,4);
+    MatrixXf wei = MatrixXf::Zero(1,4);
+    wei(0,2) =1;
     vec.push_back(wei);
+    MatrixXf error = MatrixXf::Zero(1,9);
+    error(0,8) = 1;
+
     for(int k(0); k < 1; k++)
     {
         cout << "k est : " << k << endl;
         if (k !=0) vec[0](0,k-1) = 0;
-        vec[0](0,0)=1;
-        vec[0](1,0)=1;
-        ConvolutionalLayer lay = ConvolutionalLayer(16,2,vec,Functions::reLu());
-        for(int r(0); r<2;r++)
+        //vec[0](0,0)=1;
+        ConvolutionalLayer lay = ConvolutionalLayer(16,1,vec,Functions::reLu());
+        for(int r(0); r<1;r++)
         {
+
+        std::cout << "Printing Weight : ";
         for(int i(0); i < 4; i++)
         {
             if (i%2==0) cout << endl;
             cout << vec[0](r,i);
         }
         cout << endl;
+        std::cout << "Printing Input : ";
         for(int i(0); i < 16; i++)
         {
             if (i%4==0) cout << endl;
@@ -51,13 +56,22 @@ int main()
             cout << " ";
         }
         cout << endl;
+        std::cout << "Printing Process : ";
         for(int i(0); i < 9; i++)
         {
             if (i%3==0) cout << endl;
             cout << lay.processLayer(inp)(0,i);
             cout << " ";
         }
-
+        cout << endl;
+        MatrixXf res = lay.layerBackprop(error,1);
+        std::cout << "Printing Error Backprop : ";
+        for(int i(0); i<16; i++)
+        {
+            if (i%4==0) cout << endl;
+            cout << res(0,i);
+            cout << " ";
+        }
         cout << endl << endl;
     }
     }*/

@@ -29,7 +29,7 @@ class ConvolutionalLayer : public NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        ConvolutionalLayer(unsigned int inputSize, unsigned int nbChannels, unsigned int dimensionFiltre, unsigned int nbFiltres, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        ConvolutionalLayer(unsigned int inputSize, unsigned int nbChannels, unsigned int dimensionFiltre, unsigned int nbFiltres, std::function<float(float)> activationF = Functions::sigmoid(1.f));
 
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
         /**
@@ -39,7 +39,7 @@ class ConvolutionalLayer : public NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        ConvolutionalLayer(unsigned int inputSize, unsigned int nbChannels, std::vector<Eigen::MatrixXf> weight, std::function<float(float)> activationF = Functions::sigmoid(10.f));
+                        ConvolutionalLayer(unsigned int inputSize, unsigned int nbChannels, std::vector<Eigen::MatrixXf> weight, std::function<float(float)> activationF = Functions::sigmoid(1.f));
 
                         ~ConvolutionalLayer();
 

@@ -52,9 +52,6 @@ ConvolutionalLayer::~ConvolutionalLayer(){}
 Eigen::MatrixXf ConvolutionalLayer::processLayer(Eigen::MatrixXf inputs)
 {
     mBufferInput = inputs;
-    //int inputDimension = sqrt(inputs.cols());
-    //int weightDimension = sqrt(mWeight[0].cols());
-    //int outputTaille = (inputDimension - weightDimension+1)*(inputDimension - weightDimension+1); //Pour une matrice carrée, taille = dimension^2 (Conversion vecteur ligne, matrice et inversement)
     if (inputs.cols()!=mInputDimension*mInputDimension) throw;
     for (int n=0; n < mWeight.size(); n++) //Pour chaque filtre...
     {
@@ -69,29 +66,7 @@ Eigen::MatrixXf ConvolutionalLayer::processLayer(Eigen::MatrixXf inputs)
 
     return output;
 }
-//Ancienne version à supprimer si la nouvelle marche
-/*    int inputDimension = sqrt(inputs.cols());
-    int weightDimension = sqrt(mWeight[0].cols());
-    Eigen::MatrixXf filtreConv = Eigen::MatrixXf::Zero((inputs.cols(), inputDimension - weightDimension+1));
-    for (int n=0; n < mWeight.size(); n++) //Pour chaque filtre...
-    {
-        for (int k=0; k< filtreConv.rows()-weightDimension+1; k++) //Pour chaque décalage vertical du filtre...
-        {
-            for (int l=0; l< filtreConv.cols()-weightDimension+1; l++) //Pour chaque décalage latéral du filtre...
-            {
-                for (int i=0; i< weightDimension; i++) //Pour chaque colonne du filtre...
-                {
-                    for (int j=0; j< weightDimension; j++) //Pour chaque ligne du filtre...
-                    {
-                        filtreConv(l+j+i*inputDimension,j+k) = mWeight[n](i,j); //On crée une matrice de poids qui va nous permettre de lancer un calcul qui sera parallélisable
-                    }
-                }
-            }
 
-            mBufferActivationLevel.segment(n*(inputDimension - weightDimension+1), (n+1)*(inputDimension - weightDimension+1)-1) = inputs*filtreConv;
-            filtreConv.setZero(filtreConv.cols());
-            }
-    }*/
 //***********RETROPROPAGATION***********
 //**************************************
 
@@ -111,8 +86,22 @@ Eigen::MatrixXf ConvolutionalLayer::layerBackprop(Eigen::MatrixXf xnPartialDeriv
         mSumWeightVariation[i] += step*ConvolutionalLayer::convolution(mBufferInput,ynPartialDerivativeCarree, false);
     }
     //mSumBiasVariation += step*ynPartialDerivative;
-    updateLayerWeights();
+    /*std::cout << std::endl <<  "Printing weightVar : ";
+    for(int i(0); i<mSumWeightVariation[0].cols(); i++)
+    {
+        if (i%(int)sqrt(mSumWeightVariation[0].cols())==0) std::cout << std::endl;
+        std::cout << mSumWeightVariation[0](0,i) << " ";
+    }
+    std::cout << std::endl;
 
+    std::cout << std::endl;
+    std::cout << "Printing Weight After : ";
+    for(int i(0); i < mWeight[0].cols(); i++)
+    {
+        if (i%2==0) std::cout << std::endl;
+        std::cout << mWeight[0](0,i);
+    }
+    std::cout << std::endl;*/
     //Retour de x(n-1)PartialDerivative
     int incrementDimension = 2*(weightDimension-1);
     int zeroPaddingDimension = incrementDimension+ynDerivDimension;
@@ -120,20 +109,36 @@ Eigen::MatrixXf ConvolutionalLayer::layerBackprop(Eigen::MatrixXf xnPartialDeriv
     Eigen::MatrixXf ynZeroPadding = Eigen::MatrixXf::Zero(ynPartialDerivative.rows(),zeroPaddingDimension*zeroPaddingDimension);
     for (int n=0; n < ynPartialDerivative.rows(); n++) //Pour chaque channel...
     {
-        for (int i=0; i < ynDerivDimension; i++) //Copie du symmétrique de ynPartialDerivative dans le Zeropadding (A_i,j = A_n-i,m-j)
+        for (int i=0; i < ynDerivDimension; i++)
         {
             for (int j=0; j < ynDerivDimension; j++)
             {
-                ynZeroPadding(n, (zeroPaddingDimension+1)*incrementDimension + j + i*zeroPaddingDimension) = ynPartialDerivative(n,(ynDerivDimension-i-1)*ynDerivDimension + (ynDerivDimension-j-1));
+                ynZeroPadding(n, (i+incrementDimension/2)*zeroPaddingDimension + j + incrementDimension/2) = ynPartialDerivative(n,i*ynDerivDimension+j);
             }
         }
     }
-    Eigen::MatrixXf resultat = Eigen::MatrixXf::Zero(mInputChannels, mBufferInput.cols()); //mBufferInput.cols() est la taille de l'input
-    for (int i=0; i < mWeight.size(); i++)
+    /*std::cout << std::endl <<  "Printing ynPartialD : ";
+    for(int i(0); i<ynPartialDerivative.cols(); i++)
     {
-        Eigen::MatrixXf ynZeroPaddingCarree = Eigen::MatrixXf::Ones(mWeight[i].rows(),ynZeroPadding.rows())*ynZeroPadding;
-        resultat += convolution(ynZeroPaddingCarree,mWeight[i], false);
+        if (i%3==0) std::cout << std::endl;
+        std::cout << ynPartialDerivative(0,i) << " ";
     }
+    std::cout << std::endl;
+
+    std::cout << "Printing ynZeroP : ";
+    for(int i(0); i<ynZeroPadding.cols(); i++)
+    {
+        if (i%5==0) std::cout << std::endl;
+        std::cout << ynZeroPadding(0,i) << " ";
+    }
+    std::cout << std::endl;*/
+    Eigen::MatrixXf resultat = Eigen::MatrixXf::Zero(mInputChannels, mBufferInput.cols()); //mBufferInput.cols() est la taille de l'input
+    for (int i=0; i < mWeight.size(); i++) //Pour tous les channels
+    {
+        Eigen::MatrixXf ynZeroPaddingCarree = Eigen::MatrixXf::Ones(mWeight[i].rows(),ynZeroPadding.rows())*ynZeroPadding; //On somme l'ensemble des erreurs d'une ligne pour tous les channels
+        resultat += convolution(ynZeroPaddingCarree,mWeight[i].reverse(), false);
+    }
+    updateLayerWeights();
     return resultat;
 }
 /*

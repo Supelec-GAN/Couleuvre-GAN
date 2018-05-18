@@ -567,7 +567,7 @@ void Application::runSingleExperimentMNIST()
         std::cout << "Score : " << score << std::endl;
         mStatsCollector[loopIndex+1].addResultDis(score);
     }
-    mStatsCollector.exportData(false);
+    mStatsCollector.exportData(true);
 }
 
 void Application::runTeachMNIST()

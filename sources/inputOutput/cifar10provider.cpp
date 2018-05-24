@@ -11,7 +11,7 @@ Cifar10Provider::Cifar10Provider(CifarLabel labels, unsigned int labelTrainSize,
         throw std::logic_error("Erreur : dépassement d'indice sur le batch de test");
 }
 
-InputProvider::Batch Cifar10Provider::trainingBatch() const
+InputProvider::Batch Cifar10Provider::trainingBatch(bool greyLevel) const
 {
     std::cout << "Création du Batch d'entrainement Cifar10 du discriminateur" << std::endl;
 
@@ -26,7 +26,7 @@ InputProvider::Batch Cifar10Provider::trainingBatch() const
     {
         if(Cifar10Provider::matchLabelWithId(mLabels, mDataset.training_labels[i]))
         {
-            trainingBatch.push_back(Sample(getMatrix(i, true), outputTrain));
+            trainingBatch.push_back(Sample(getMatrix(i, true, greyLevel), outputTrain));
             compteur++;
         }
     }
@@ -35,7 +35,7 @@ InputProvider::Batch Cifar10Provider::trainingBatch() const
     return trainingBatch;
 }
 
-InputProvider::Batch Cifar10Provider::testingBatch() const
+InputProvider::Batch Cifar10Provider::testingBatch(bool greyLevel) const
 {
 
     std::cout << "Création du Batch de test Cifar10 du discriminateur" << std::endl;
@@ -51,7 +51,7 @@ InputProvider::Batch Cifar10Provider::testingBatch() const
     {
         if(Cifar10Provider::matchLabelWithId(mLabels, mDataset.test_labels[i]))
         {
-            testBatch.push_back(Sample(getMatrix(i, true), outputTest));
+            testBatch.push_back(Sample(getMatrix(i, true, greyLevel), outputTest));
             compteur++;
         }
     }
@@ -61,20 +61,34 @@ InputProvider::Batch Cifar10Provider::testingBatch() const
     return testBatch;
 }
 
-Eigen::MatrixXf Cifar10Provider::getMatrix(unsigned int index, bool isTrainOrTestRequired) const
+Eigen::MatrixXf Cifar10Provider::getMatrix(unsigned int index, bool isTrainOrTestRequired, bool greyLevel) const
 {
     // Le 3072 est hardcodé car c'est la taille d'une image cifar (32 * 32 = 1024 (nombre de pixels) et 1024 * 3 = 3072 (3 couleurs))
-    unsigned int cifarSize = 3072;
-
+    unsigned int cifarSize;
     auto dSet = isTrainOrTestRequired ? &mDataset.training_images : &mDataset.test_images;
 
-    Eigen::MatrixXf mat = Eigen::MatrixXf::Zero(1,cifarSize);
-    for(unsigned int pixel(0); pixel < cifarSize; pixel++)
+    if(greyLevel)
     {
-        mat(0,pixel) = (*dSet)[index][pixel];
+        cifarSize = 1024;
+        Eigen::MatrixXf mat = Eigen::MatrixXf::Zero(1,cifarSize);
+        for(unsigned int pixel(0); pixel < cifarSize; pixel++)
+        {
+            mat(0,pixel) = (*dSet)[index][pixel]*0.2126
+                         + (*dSet)[index][pixel + 1024]*0.7152
+                         + (*dSet)[index][pixel + 2048]*0.0722;
+        }
+        return mat;
     }
-
-    return mat;
+    else
+    {
+        cifarSize = 3072;
+        Eigen::MatrixXf mat = Eigen::MatrixXf::Zero(1,cifarSize);
+        for(unsigned int pixel(0); pixel < cifarSize; pixel++)
+        {
+            mat(0,pixel) = (*dSet)[index][pixel];
+        }
+        return mat;
+    }
 }
 
 bool Cifar10Provider::matchLabelWithId(CifarLabel label, uint8_t id)

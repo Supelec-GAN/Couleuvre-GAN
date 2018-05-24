@@ -1,5 +1,5 @@
 {
-    "step": 0.5,
+    "step": 0.9,
     "dx": 0.01,
     "sigmoidParameter": 0.1,
 
@@ -16,6 +16,7 @@
     "labelTestSize": 10000,
 	"databaseToUse": "cifar10",
         "_comment": "mnist or cifar10",
+		"_comment": "Attention aux tailles des input et output"
 	"classesCifar": ["dog", "automobile", "deer", "bird", "ship", "truck", "cat", "airplane", "frog", "horse"],
     "chiffreATracer": [3],
     "minibatchSize": 10,
@@ -23,8 +24,8 @@
     "genFunction": 0,
         "_commentaire": "0 = Heuristic;1 = MinMax; 2 = KLDiv",
 
-	"descentTypeGen": 0,
-	"descentTypeDis": 0,
+	"descentTypeGen": 2,
+	"descentTypeDis": 1,
 		"_commentaire": "0 : descente normale; 1 : RMSProp",
 	"networkAreImported": false,
         "_comment": "deprecated",
@@ -40,44 +41,44 @@
 
     "layersGen": [
                   {
-                        "layerType": 4, 
+                        "layerType": 0, 
                         "inputSize": 16, 
-                        "inputChannels": 32,
-                        "arguments":[1]
+                        "inputChannels": 1,
+                        "arguments":[]
                    },
                   {
-                        "layerType": 2, 
+                        "layerType": 0, 
                         "inputSize": 196, 
-                        "inputChannels":32,
+                        "inputChannels":1,
                         "arguments":[]
                     },
                   {
-                        "layerType": 4, 
+                        "layerType": 0, 
                         "inputSize":121,
-                        "inputChannels":16,
-                        "arguments":[1]
-                   },
-                  {
-                        "layerType": 2, 
-                        "inputSize":529, 
-                        "inputChannels":16,
+                        "inputChannels":1,
                         "arguments":[]
                    },
                   {
-                        "layerType": 4, 
+                        "layerType": 0, 
+                        "inputSize":529, 
+                        "inputChannels":1,
+                        "arguments":[]
+                   },
+                  {
+                        "layerType": 0, 
                         "inputSize":400, 
-                        "inputChannels":4,
-                        "arguments":[1]
+                        "inputChannels":1,
+                        "arguments":[]
                     },
                   {
-                        "layerType": 2, 
+                        "layerType": 3, 
                         "inputSize":1681, 
-                        "inputChannels":4,
+                        "inputChannels":1,
                         "arguments":[]
                     },
                   {
                         "layerType": 5, 
-                        "inputSize":784, 
+                        "inputSize":1024, 
                         "inputChannels":1,
                         "arguments":[]
                     }
@@ -86,7 +87,7 @@
     "layersDis": [
                   {
                         "layerType": 0, 
-                        "inputSize":784, 
+                        "inputSize":1024, 
                         "inputChannels":1,
                         "arguments":[]
                    },

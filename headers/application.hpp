@@ -50,6 +50,7 @@ class Application
             unsigned int genFunction;
             unsigned int descentTypeGen;
             unsigned int descentTypeDis;
+            unsigned int imageSizeSide;
 
             std::string generatorPath;
             std::string discriminatorPath;
@@ -58,8 +59,8 @@ class Application
 			std::string typeOfExperiment;
 			std::string CSVFileNameImage;
 			std::string CSVFileNameResult;
-
             std::string databaseToUse;
+
 			
             std::vector<unsigned int> chiffresATracer;
             std::vector<std::string> classesCifar;

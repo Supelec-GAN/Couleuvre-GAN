@@ -32,13 +32,13 @@ void Stats::StatsCollector::exportData(bool mustProcessData)
     }
 }
 
-void Stats::StatsCollector::exportImage(Eigen::MatrixXf image, unsigned int teachIndex)
+void Stats::StatsCollector::exportImage(Eigen::MatrixXf image, unsigned int teachIndex, unsigned int sizeSide)
 {
     mCSVImg << "#" << teachIndex << endrow;
-    for(int j(0); j<784; j++)
+    for(int j(0); j<sizeSide*sizeSide; j++)
     {
         mCSVImg << image(j);
-        if (j%28 == 27) mCSVImg << endrow;
+        if (j%sizeSide == sizeSide - 1) mCSVImg << endrow;
     }
     mCSVImg << endrow;
 }

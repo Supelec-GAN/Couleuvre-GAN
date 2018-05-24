@@ -101,11 +101,11 @@ class FullConnectedLayer : public NeuronLayer
          */
         Eigen::MatrixXf fnDerivativeMatrix() const;
 
-        /// Fonction mettant à jour le step adaptatif des poids
-        void updateWeightStep(Eigen::MatrixXf wnPartialDerivative, float step);
+        /// Fonction mettant à jour le step adaptatif de moment 1 des poids (RMSProp et Adam)
+        void updateFirstMomentStep(Eigen::MatrixXf wnPartialDerivative, Eigen::MatrixXf ynPartialDerivative, float step);
 
-        /// Fonction mettant à jour le step adaptatif du biais
-        void updateBiasStep(Eigen::MatrixXf ynPartialDerivative, float step);
+        /// Fonction mettant à jour le step adaptatif de moment 2 du biais (Adam)
+        void updateSecondMomentStep(Eigen::MatrixXf wnPartialDerivative, Eigen::MatrixXf ynPartialDerivative, float step);
 
 
     protected:
@@ -130,15 +130,23 @@ class FullConnectedLayer : public NeuronLayer
         /// Buffer de la somme des variation de poids au sein d'un mini-batch
         Eigen::MatrixXf 				mSumBiasVariation;
 
-        /// Buffer contenant les step variables pour chaque poids
+        /// Buffer contenant les step variables de moment 1 pour chaque poids
         Eigen::MatrixXf                 mAdaptativeWeightStep;
 
-        /// Buffer contenant les step variables pour le biais
+        /// Buffer contenant les step variables de moment 1 pour le biais
         Eigen::MatrixXf                 mAdaptativeBiasStep;
+
+        /// Buffer contenant les step variables de moment 2 pour chaque poids (Adam)
+        Eigen::MatrixXf                 mAdaptativeWeightSecondStep;
+
+        /// Buffer contenant les step variables de moment 2 pour le biais (Adam)
+        Eigen::MatrixXf                 mAdaptativeBiasSecondStep;
 
         /// Int déterminant le type de descente dans l'apprentissage
         unsigned int                    mDescentType;
 
+        /// Int le nombre de mises à jour des poids
+        unsigned int                    mUpdateCount;
 };
 
 #endif // FULLCONNECTEDLAYER_HPP

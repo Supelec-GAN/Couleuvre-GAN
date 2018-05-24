@@ -25,21 +25,20 @@ Application::Application()
             mTestingBatchDis = inputProvider->testingBatch();
         }
         else if (mConfig.databaseToUse == "cifar10")
-        {*/
+        {
             //Cifar10Provider::CifarLabel CifVehicle =    Cifar10Provider::CifarLabel::airplane | Cifar10Provider::CifarLabel::automobile | Cifar10Provider::CifarLabel::ship | Cifar10Provider::CifarLabel::truck;
             Cifar10Provider::CifarLabel CifAnimals =   Cifar10Provider::CifarLabel::bird | Cifar10Provider::CifarLabel::cat |
 Cifar10Provider::CifarLabel::deer | Cifar10Provider::CifarLabel::dog | Cifar10Provider::CifarLabel::horse | Cifar10Provider::CifarLabel::frog;
             //Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
             InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
-            mTeachingBatchDis = inputProvider->trainingBatch();
-            mTestingBatchDis = inputProvider->testingBatch();
+            mTeachingBatchDis = inputProvider->trainingBatch(1);
+            mTestingBatchDis = inputProvider->testingBatch(1);
         }
         else
         {
             std::cout << "Application::Application error : databaseToUse is unknown (" << stderr << ")" << std::endl;
             exit(EXIT_FAILURE);
         }
-        
 
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;
@@ -149,7 +148,7 @@ void Application::runSingleStochasticExperiment()
             for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
             {
                 input = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
-                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop, mConfig.imageSizeSide);
             }
 		}
 	}
@@ -173,7 +172,7 @@ void Application::runSingleMinibatchExperiment()
             for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
             {
                 input = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
-                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop, mConfig.imageSizeSide);
             }
         }
 	}
@@ -382,6 +381,10 @@ void Application::setConfig(rapidjson::Document& document)
         mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());*/
 
     mConfig.databaseToUse = document["databaseToUse"].GetString();
+    if(mConfig.databaseToUse == "mnist")
+        mConfig.imageSizeSide = 28;
+    else if(mConfig.databaseToUse == "cifar10")
+        mConfig.imageSizeSide = 32;
 
     auto chiffresATracer = document["chiffreATracer"].GetArray();
     for(rapidjson::SizeType i(0); i < chiffresATracer.Size(); i++)

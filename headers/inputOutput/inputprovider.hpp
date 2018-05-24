@@ -26,8 +26,8 @@ class InputProvider
             : mLabelTrainSize(labelTrainSize)
             , mLabelTestSize(labelTestSize) {}
 
-        virtual Batch trainingBatch() const =0;
-        virtual Batch testingBatch() const =0;
+        virtual Batch trainingBatch(bool greyLevel = 0) const =0;
+        virtual Batch testingBatch(bool greyLevel = 0) const =0;
 
     protected:
         unsigned int mLabelTrainSize;
@@ -40,8 +40,8 @@ class MnistProvider : public InputProvider
     public:
         MnistProvider(std::vector<unsigned int> labels, unsigned int labelTrainSize = 60000, unsigned int labelTestSize = 10000);
 
-        Batch trainingBatch() const;
-        Batch testingBatch() const;
+        Batch trainingBatch(bool greyLevel = 0) const;
+        Batch testingBatch(bool greyLevel = 0) const;
 
     private:
         std::array<unsigned int, 10>    mLabels;

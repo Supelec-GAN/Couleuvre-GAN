@@ -18,21 +18,28 @@ Application::Application()
 
     try
     {
-        //Cifar10Provider::CifarLabel CifVehicle =    Cifar10Provider::CifarLabel::airplane | Cifar10Provider::CifarLabel::automobile |
-        //                                            Cifar10Provider::CifarLabel::ship | Cifar10Provider::CifarLabel::truck;
-
-        Cifar10Provider::CifarLabel CifAnimals =   Cifar10Provider::CifarLabel::bird | Cifar10Provider::CifarLabel::cat |
-                                                Cifar10Provider::CifarLabel::deer | Cifar10Provider::CifarLabel::dog |
-                                                Cifar10Provider::CifarLabel::horse | Cifar10Provider::CifarLabel::frog;
-
-        //Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
-
-        //InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
-
-        InputProvider::Ptr inputProvider(new MnistProvider(mConfig.chiffresATracer, 6000, 1000));
-
-        mTeachingBatchDis = inputProvider->trainingBatch();
-        mTestingBatchDis = inputProvider->testingBatch();
+        if (mConfig.databaseToUse == "mnist")
+        {
+            InputProvider::Ptr inputProvider(new MnistProvider(mConfig.chiffresATracer, 6000, 1000));
+            mTeachingBatchDis = inputProvider->trainingBatch();
+            mTestingBatchDis = inputProvider->testingBatch();
+        }
+        else if (mConfig.databaseToUse == "cifar10")
+        {*/
+            //Cifar10Provider::CifarLabel CifVehicle =    Cifar10Provider::CifarLabel::airplane | Cifar10Provider::CifarLabel::automobile | Cifar10Provider::CifarLabel::ship | Cifar10Provider::CifarLabel::truck;
+            Cifar10Provider::CifarLabel CifAnimals =   Cifar10Provider::CifarLabel::bird | Cifar10Provider::CifarLabel::cat |
+Cifar10Provider::CifarLabel::deer | Cifar10Provider::CifarLabel::dog | Cifar10Provider::CifarLabel::horse | Cifar10Provider::CifarLabel::frog;
+            //Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
+            InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
+            mTeachingBatchDis = inputProvider->trainingBatch();
+            mTestingBatchDis = inputProvider->testingBatch();
+        }
+        else
+        {
+            std::cout << "Application::Application error : databaseToUse is unknown (" << stderr << ")" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        
 
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;
@@ -101,11 +108,11 @@ void Application::runExperiments()
 			std::cout << "Réseau réinitialisé !" << std::endl;
 		}
 		
-		if (mConfig.typeOfExperiment == "Stochastic")
+		if (mConfig.typeOfExperiment == "stochastic")
 		{
 			runSingleStochasticExperiment();
 		}
-		else if (mConfig.typeOfExperiment == "Minibatch")
+		else if (mConfig.typeOfExperiment == "minibatch")
 		{
 			runSingleMinibatchExperiment();
 		}
@@ -374,7 +381,7 @@ void Application::setConfig(rapidjson::Document& document)
     for(rapidjson::SizeType i = 0; i < layersSizesGen.Size(); i++)
         mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());*/
 
-    mConfig.bddToUse = document["bddToUse"].GetString();
+    mConfig.databaseToUse = document["databaseToUse"].GetString();
 
     auto chiffresATracer = document["chiffreATracer"].GetArray();
     for(rapidjson::SizeType i(0); i < chiffresATracer.Size(); i++)

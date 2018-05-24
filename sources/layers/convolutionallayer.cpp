@@ -247,7 +247,7 @@ Eigen::MatrixXf ConvolutionalLayer::convolution(Eigen::MatrixXf input, Eigen::Ma
     std::vector<std::thread> threads;
     int inputDimension = sqrt(input.cols());
     int filtreDimension = sqrt(filtre.cols());
-    int nbChannels = filtre.rows();
+    int nbChannels = static_cast<int> (filtre.rows());
     if (sommerLignes) nbChannels = 1;
     std::shared_ptr<Eigen::MatrixXf> resultat(new Eigen::MatrixXf(Eigen::MatrixXf::Zero(nbChannels, (inputDimension - filtreDimension+1)*(inputDimension - filtreDimension+1))));
     Convolution conv(input, filtre, resultat, sommerLignes);

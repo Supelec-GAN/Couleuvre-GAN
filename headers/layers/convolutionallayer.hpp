@@ -24,7 +24,6 @@ class ConvolutionalLayer : public NeuronLayer
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
         /**
          * \param inputSize le nombre d'inputs de cette couche
-         * \param outputSize le nombre d'outputs de cette couche
          * \param activationF la fonction d'activation de tous les neurones de la couche
          *
          * La matrice de poids est de dimension outputSize x inputSize

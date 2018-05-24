@@ -59,7 +59,7 @@ class Application
 			std::string CSVFileNameImage;
 			std::string CSVFileNameResult;
 
-            std::string bddToUse;
+            std::string databaseToUse;
 			
             std::vector<unsigned int> chiffresATracer;
             std::vector<std::string> classesCifar;

@@ -1,7 +1,7 @@
 #include "headers/layers/noisylayer.h"
 
-NoisyLayer::NoisyLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF, unsigned int descentType)
-: FullConnectedLayer(inputSize, outputSize, activationF, descentType)
+NoisyLayer::NoisyLayer(unsigned int inputSize, unsigned int outputSize, unsigned int layerNbChannels, std::function<float(float)> activationF, unsigned int descentType)
+: FullConnectedLayer(inputSize, outputSize, layerNbChannels, activationF, descentType)
 , mNoiseWeight(Eigen::MatrixXf::Random(1, outputSize))
 , mBufferNoise(Eigen::MatrixXf::Zero(mNoiseWeight.rows(), 1))
 , mSumNoiseVariation(Eigen::MatrixXf::Zero(1, outputSize))

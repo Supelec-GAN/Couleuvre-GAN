@@ -15,7 +15,7 @@ public:
      *
      * La matrice de poids est de dimension outputSize x inputSize
      */
-    NoisyLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
+    NoisyLayer(unsigned int inputSize, unsigned int outputSize, unsigned int layerNbChannels, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
 
 
     /// La fonction effectuant le calcul de la sortie en fonction de l'entrée

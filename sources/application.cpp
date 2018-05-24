@@ -27,9 +27,9 @@ Application::Application()
 
         //Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
 
-        //InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
+        InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
 
-        InputProvider::Ptr inputProvider(new MnistProvider(mConfig.chiffresATracer, 6000, 1000));
+        //InputProvider::Ptr inputProvider(new MnistProvider(mConfig.chiffresATracer, 6000, 1000));
 
         mTeachingBatchDis = inputProvider->trainingBatch();
         mTestingBatchDis = inputProvider->testingBatch();

@@ -3,20 +3,20 @@
 //*************CONSTRUCTEUR*************
 //**************************************
 
-FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF, unsigned int descentType)
+FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, unsigned int layerNbChannels, std::function<float(float)> activationF, unsigned int descentType)
 : mWeight(Eigen::MatrixXf::Random(inputSize,outputSize))
-, mBias(Eigen::MatrixXf::Random(1, outputSize)) 				//ligne
+, mBias(Eigen::MatrixXf::Random(layerNbChannels, outputSize)) 				//ligne
 , mActivationFun(activationF)
-, mBufferActivationLevel(Eigen::MatrixXf::Zero(1, outputSize))	//ligne
+, mBufferActivationLevel(Eigen::MatrixXf::Zero(layerNbChannels, outputSize))	//ligne
 , mBufferInput(Eigen::MatrixXf::Zero(1, inputSize))				//ligne
 , mSumWeightVariation(Eigen::MatrixXf::Zero(inputSize, outputSize))
-, mSumBiasVariation(Eigen::MatrixXf::Zero(1, outputSize))
+, mSumBiasVariation(Eigen::MatrixXf::Zero(layerNbChannels, outputSize))
 , mAdaptativeWeightStep(Eigen::MatrixXf::Constant(inputSize, outputSize, 1))
-, mAdaptativeBiasStep(Eigen::MatrixXf::Constant(1, outputSize, 1))
+, mAdaptativeBiasStep(Eigen::MatrixXf::Constant(layerNbChannels, outputSize, 1))
 , mDescentType(descentType)
 {}
 
-FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF, unsigned int descentType)
+FullConnectedLayer::FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, unsigned int layerNbChannels, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF, unsigned int descentType)
 : mWeight(weight)
 , mBias(bias) 				//ligne
 , mActivationFun(activationF)
@@ -40,9 +40,12 @@ Eigen::MatrixXf FullConnectedLayer::processLayer(Eigen::MatrixXf inputs)
     mBufferActivationLevel = inputs*mWeight - mBias;
     Eigen::MatrixXf output = mBufferActivationLevel;
 
-    for(unsigned int i(0); i < output.size(); i++)
-        output(0,i) = mActivationFun(output(0,i));
-
+    
+    for (unsigned int i(0); i < output.rows(); i++)
+    {
+        for(unsigned int j(0); j < output.cols(); j++)
+            output(i,j) = mActivationFun(output(i,j));
+    }
     return output;
 }
 
@@ -143,7 +146,7 @@ void FullConnectedLayer::updateBiasStep(Eigen::MatrixXf ynPartialDerivative, flo
 void FullConnectedLayer::reset()
 {
     mWeight = Eigen::MatrixXf::Random(mWeight.rows(), mWeight.cols());
-    mBias = Eigen::MatrixXf::Random(1,mBias.cols());
+    mBias = Eigen::MatrixXf::Random(mBias.rows(),mBias.cols());
 }
 
 int FullConnectedLayer::getInputSize()

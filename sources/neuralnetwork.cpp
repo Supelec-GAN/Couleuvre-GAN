@@ -13,13 +13,19 @@ NeuralNetwork::NeuralNetwork(std::vector<unsigned int> layerTypes, std::vector<u
     for(size_t i(0); i < layerSizes.size()-1; ++i)
     {
         switch(layerTypes[i]) {
-            case 0 : push_back(NeuronLayer::Ptr(new FullConnectedLayer(layerSizes[i], layerSizes[i+1], activationFuns[i], descentType)));
+            case 0 :
+                if (layerChannels[i] != layerChannels[i+1])
+                    throw std::logic_error("NeuralNetwork::NeuralNetwork error - LayerChannel size do not match - size should not change between FullConnectedLayers");
+                push_back(NeuronLayer::Ptr(new FullConnectedLayer(layerSizes[i], layerSizes[i+1], layerChannels[i], activationFuns[i], descentType)));
                 break;
             case 1 :
                 break;
             case 2 : push_back(NeuronLayer::Ptr(new ConvolutionalLayer(layerSizes[i], layerChannels[i], sqrt(layerSizes[i])-sqrt(layerSizes[i+1])+1, layerChannels[i+1])));
                 break;
-            case 3 : push_back(NeuronLayer::Ptr(new NoisyLayer(layerSizes[i], layerSizes[i+1], activationFuns[i], descentType)));
+            case 3 :
+                if (layerChannels[i] != layerChannels[i+1])
+                    throw std::logic_error("NeuralNetwork::NeuralNetwork error - LayerChannel size do not match - size should not change between FullConnectedLayers");
+                push_back(NeuronLayer::Ptr(new NoisyLayer(layerSizes[i], layerSizes[i+1], layerChannels[i], activationFuns[i], descentType)));
                 break;
             case 4 : push_back(NeuronLayer::Ptr(new ZeroPadLayer(layerSizes[i],layerSizes[i+1],layerArg[i][0])));
                 break;

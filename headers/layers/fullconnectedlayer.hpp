@@ -25,7 +25,7 @@ class FullConnectedLayer : public NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
+                        FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, unsigned int layerNbChannels, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
 
         /// Constructeur permettant d'initialiser les paramètres de la couche de neurones
         /**
@@ -36,7 +36,7 @@ class FullConnectedLayer : public NeuronLayer
          *
          * La matrice de poids est de dimension outputSize x inputSize
          */
-                        FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
+                        FullConnectedLayer(unsigned int inputSize, unsigned int outputSize, unsigned int layerNbChannels, Eigen::MatrixXf weight, Eigen::MatrixXf bias, std::function<float(float)> activationF = Functions::sigmoid(10.f), unsigned int descentType = 0);
 
                         ~FullConnectedLayer();
 

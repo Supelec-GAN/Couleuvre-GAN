@@ -40,43 +40,43 @@
                   {
                         "layerType": 4, 
                         "inputSize": 16, 
-                        "inputChannels": 32,
+                        "inputChannels": 3,
                         "arguments":[1]
                    },
                   {
                         "layerType": 2, 
                         "inputSize": 196, 
-                        "inputChannels":32,
+                        "inputChannels":3,
                         "arguments":[]
                     },
                   {
                         "layerType": 4, 
                         "inputSize":121,
-                        "inputChannels":16,
+                        "inputChannels":3,
                         "arguments":[1]
                    },
                   {
                         "layerType": 2, 
                         "inputSize":529, 
-                        "inputChannels":16,
+                        "inputChannels":3,
                         "arguments":[]
                    },
                   {
                         "layerType": 4, 
                         "inputSize":400, 
-                        "inputChannels":4,
+                        "inputChannels":3,
                         "arguments":[1]
                     },
                   {
                         "layerType": 2, 
                         "inputSize":1681, 
-                        "inputChannels":4,
+                        "inputChannels":3,
                         "arguments":[]
                     },
                   {
                         "layerType": 5, 
                         "inputSize":784, 
-                        "inputChannels":1,
+                        "inputChannels":3,
                         "arguments":[]
                     }
                  ],
@@ -85,25 +85,25 @@
                   {
                         "layerType": 0, 
                         "inputSize":784, 
-                        "inputChannels":1,
+                        "inputChannels":3,
                         "arguments":[]
                    },
                   {
                         "layerType": 0, 
                         "inputSize":500,
-                        "inputChannels":1,
+                        "inputChannels":3,
                         "arguments":[]
                    },
                   {
                         "layerType": 0, 
                         "inputSize":100, 
-                        "inputChannels":1,
+                        "inputChannels":3,
                         "arguments":[]
                    },
                   {
                         "layerType": 5, 
                         "inputSize": 1,
-                        "inputChannels":1,
+                        "inputChannels":3,
                         "arguments":[]
                     }
                  ],

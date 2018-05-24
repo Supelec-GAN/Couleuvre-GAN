@@ -21,7 +21,7 @@ class StatsCollector
 
         void exportData(bool mustProcessData = true);
 
-        void exportImage(Eigen::MatrixXf image, unsigned int teachIndex);
+        void exportImage(Eigen::MatrixXf image, unsigned int teachIndex, unsigned int sizeSide);
 
         csvfile* getCSVFile();
 

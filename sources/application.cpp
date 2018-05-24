@@ -27,12 +27,12 @@ Application::Application()
 
         //Cifar10Provider::CifarLabel CifAll = CifAnimals | CifVehicle;
 
-        //InputProvider::Ptr inputProvider(new Cifar10Provider(CifAnimals, 10000, 10000));
+        InputProvider::Ptr inputProvider(new Cifar10Provider(Cifar10Provider::CifarLabel::horse, 10000, 10000));
 
-        InputProvider::Ptr inputProvider(new MnistProvider(mConfig.chiffresATracer, 6000, 1000));
+        //InputProvider::Ptr inputProvider(new MnistProvider(mConfig.chiffresATracer, 6000, 1000));
 
-        mTeachingBatchDis = inputProvider->trainingBatch();
-        mTestingBatchDis = inputProvider->testingBatch();
+        mTeachingBatchDis = inputProvider->trainingBatch(1);
+        mTestingBatchDis = inputProvider->testingBatch(1);
 
 		//Création du vecteur de bruit pour les tests du générateur
 		std::vector<Eigen::MatrixXf> vectorTest;
@@ -142,7 +142,7 @@ void Application::runSingleStochasticExperiment()
             for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
             {
                 input = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
-                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop, mConfig.imageSizeSide);
             }
 		}
 	}
@@ -166,7 +166,7 @@ void Application::runSingleMinibatchExperiment()
             for(unsigned int i(0); i < mConfig.nbImgParIntervalleImg; i++)
             {
                 input = Eigen::MatrixXf::Random(mConfig.genLayerNbChannels[0],mConfig.genLayerSizes[0]);
-                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop);
+                mStatsCollector.exportImage(mGenerator->processNetwork(input), loopIndex*mConfig.nbTeachingsPerLoop, mConfig.imageSizeSide);
             }
         }
 	}
@@ -376,6 +376,10 @@ void Application::setConfig(rapidjson::Document& document)
         mConfig.genLayerSizes.push_back(layersSizesGen[i].GetUint());*/
 
     mConfig.bddToUse = document["bddToUse"].GetString();
+    if(mConfig.bddToUse == "mnist")
+        mConfig.imageSizeSide = 28;
+    else if(mConfig.bddToUse == "cifar10")
+        mConfig.imageSizeSide = 32;
 
     auto chiffresATracer = document["chiffreATracer"].GetArray();
     for(rapidjson::SizeType i(0); i < chiffresATracer.Size(); i++)

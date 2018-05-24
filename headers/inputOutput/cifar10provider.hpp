@@ -35,9 +35,15 @@ class Cifar10Provider : public InputProvider
         Cifar10Provider(CifarLabel labels, unsigned int labelTrainSize = 50000, unsigned int labelTestSize = 10000);
 
         /// Retourne le batch de training
-        Batch trainingBatch() const;
+        /**
+        * @param greyLevel : détermine si l'on travaille sur les images en couleur ou en niveau de gris
+        */
+        Batch trainingBatch(bool greyLevel) const;
         /// Retourne le batch de test
-        Batch testingBatch() const;
+        /**
+        * @param greyLevel : détermine si l'on travaille sur les images en couleur ou en niveau de gris
+        */
+        Batch testingBatch(bool greyLevel) const;
 
     private:
         /// Permet de faire la conversion label (airplaine, dog...) vers un id cifar entre 0 et 9
@@ -52,9 +58,10 @@ class Cifar10Provider : public InputProvider
         /**
          * @param index l'indice de l'image à recuperer dans le set
          * @param isTrainOrTestRequired true si on veut une image de training et false pour une de test
+         * @param greyLevel : détermine si l'on travaille sur les images en couleur ou en niveau de gris
          * @return la matrice correspondant à l'image d'indice index dans le set spécifié
          */
-        Eigen::MatrixXf getMatrix(unsigned int index, bool isTrainOrTestRequired = 1) const;
+        Eigen::MatrixXf getMatrix(unsigned int index, bool isTrainOrTestRequired = 1, bool greyLevel = 0) const;
 
     private:
         // Résolution automatique de type parce que j'ai la flemme

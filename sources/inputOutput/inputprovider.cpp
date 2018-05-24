@@ -19,7 +19,7 @@ MnistProvider::MnistProvider(std::vector<unsigned int> labels, unsigned int labe
             mLabels[labels[i]] = 1;
 }
 
-InputProvider::Batch MnistProvider::trainingBatch() const
+InputProvider::Batch MnistProvider::trainingBatch(bool) const
 {
     std::cout << "Création du Batch d'entrainement du discriminateur" << std::endl;
 
@@ -43,7 +43,7 @@ InputProvider::Batch MnistProvider::trainingBatch() const
     return trainingBatch;
 }
 
-InputProvider::Batch MnistProvider::testingBatch() const
+InputProvider::Batch MnistProvider::testingBatch(bool) const
 {
     std::cout << "Création du Batch de test du discriminateur" << std::endl;
 

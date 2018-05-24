@@ -16,7 +16,7 @@
     "labelTestSize": 10000,
 	"databaseToUse": "cifar10",
         "_comment": "mnist or cifar10",
-		"_comment": "Attention aux tailles des input et output"
+		"_comment": "Attention aux tailles des input et output",
 	"classesCifar": ["dog", "automobile", "deer", "bird", "ship", "truck", "cat", "airplane", "frog", "horse"],
     "chiffreATracer": [3],
     "minibatchSize": 10,

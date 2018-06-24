@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>name</key>
+		<string>Project</string>
+		<key>predicate</key>
+		<dict>
+			<key>predicates</key>
+			<array>
+				<dict>
+					<key>operand</key>
+					<string>pro</string>
+					<key>operator</key>
+					<string>contains</string>
+					<key>rule</key>
+					<string>file-extension</string>
+				</dict>
+				<dict>
+					<key>path-components</key>
+					<array>
+						<string>Couleuvre-GAN.xcodeproj</string>
+						<string>Couleuvre-GAN</string>
+						<string>cifar-10</string>
+					</array>
+					<key>rule</key>
+					<string>workspace-location</string>
+				</dict>
+				<dict>
+					<key>path-components</key>
+					<array>
+						<string>Couleuvre-GAN.xcodeproj</string>
+						<string>Couleuvre-GAN</string>
+						<string>headers</string>
+						<string>rapidjson</string>
+					</array>
+					<key>rule</key>
+					<string>workspace-location</string>
+				</dict>
+			</array>
+			<key>rule</key>
+			<string>none</string>
+		</dict>
+		<key>source</key>
+		<dict>
+			<key>file-source</key>
+			<string>workspace</string>
+		</dict>
+	</dict>
+</array>
+</plist>
